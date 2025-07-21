@@ -1,6 +1,6 @@
 {
   "name": "@ythalorossy/openfda",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "OpenFDA Model Context Protocol",
   "bin": {
     "openfda": "./bin/index.js"
@@ -11,7 +11,12 @@
     "build:cli": "npm run build && node scripts/add-shebang.cjs && shx cp -r build/* bin/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["openfda", "drugs", "mcp", "server"],
+  "keywords": [
+    "openfda",
+    "drugs",
+    "mcp",
+    "server"
+  ],
   "author": "Ythalo Saldanha",
   "license": "MIT",
   "type": "module",
