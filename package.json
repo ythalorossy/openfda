@@ -2,28 +2,31 @@
   "name": "@ythalorossy/openfda",
   "version": "1.0.1",
   "description": "OpenFDA Model Context Protocol",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ythalorossy/openfda.git"
+  },
+  "author": "Ythalo Saldanha",
+  "license": "MIT",
+  "type": "module",
   "bin": {
     "openfda": "./bin/index.js"
   },
-  "main": "index.js",
-  "scripts": {
-    "build": "tsc && chmod 755 build/index.js",
-    "build:cli": "npm run build && node scripts/add-shebang.cjs && shx cp -r build/* bin/",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "files": [
+    "build",
+    "bin"
+  ],
   "keywords": [
     "openfda",
     "drugs",
     "mcp",
     "server"
   ],
-  "author": "Ythalo Saldanha",
-  "license": "MIT",
-  "type": "module",
-  "files": [
-    "build",
-    "bin"
-  ],
+  "scripts": {
+    "build": "tsc && chmod 755 build/index.js",
+    "build:cli": "npm run build && node scripts/add-shebang.cjs && shx cp -r build/* bin/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.15.1",
     "@ythalorossy/openfda": "^1.0.0",
