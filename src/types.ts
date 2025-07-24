@@ -18,6 +18,12 @@ interface Results {
 }
 
 interface Result {
+  dosage_form: never[];
+  precautions: string[];
+  adverse_reactions: string[];
+  overdosage: string[];
+  drug_interactions: string[];
+  contraindications: string[];
   spl_product_data_elements: string[];
   spl_unclassified_section: string[];
   active_ingredient: string[];
@@ -44,6 +50,7 @@ interface Result {
 }
 
 interface Openfda {
+  strength: never[];
   application_number: string[];
   brand_name: string[];
   generic_name: string[];
