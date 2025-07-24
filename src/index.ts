@@ -30,7 +30,7 @@ async function makeOpenFDARequest<T>(url: string): Promise<T | null> {
     }
     return (await response.json()) as T;
   } catch (error) {
-    console.error("Error making NWS request:", error);
+    console.error("Error making OpenFDA request:", error);
     return null;
   }
 }
