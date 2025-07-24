@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import dotenv from "dotenv";
 import z from "zod";
 import { OpenFDABuilder } from "./OpenFDABuilder.js";
-dotenv.config();
 const USER_AGENT = "openfda-mcp/1.0";
 const server = new McpServer({
     name: "openfda",
