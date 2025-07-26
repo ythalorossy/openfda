@@ -81,7 +81,7 @@ Create a `.env` file for any required environment variables.
 
 MIT 
 
-## Suport me
+
 [Buy me a Coffee](coff.ee/ythalorossy)
 
 ![coff.ee/ythalorossy](https://raw.githubusercontent.com/ythalorossy/openfda/refs/heads/main/bmc_qr.png "Buy me a Coffee")
