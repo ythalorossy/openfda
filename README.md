@@ -82,6 +82,6 @@ Create a `.env` file for any required environment variables.
 MIT 
 
 
-[Buy me a Coffee](coff.ee/ythalorossy)
+[Buy me a Coffee](https://buymeacoffee.com/ythalorossy)
 
 ![coff.ee/ythalorossy](https://raw.githubusercontent.com/ythalorossy/openfda/refs/heads/main/bmc_qr.png "Buy me a Coffee")
