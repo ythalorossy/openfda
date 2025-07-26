@@ -5,7 +5,13 @@ A Model Context Protocol (MCP) server for querying drug information from the Ope
 ## Features
 
 - Retrieve drug label information by brand name
-- Returns key drug information fields (brand name, generic name, manufacturer, NDC, etc.)
+- Retrieve drug information by generic (active ingredient) name
+- Get all brand versions of a generic drug
+- Get adverse event (side effect) reports for a drug (by brand or generic name)
+- Retrieve all drugs manufactured by a specific company
+- Get comprehensive drug safety information (warnings, contraindications, interactions, precautions, etc.)
+- Normalize and validate NDC (National Drug Code) formats
+- Helpful error messages and suggestions for failed queries
 
 1. **Set up your OpenFDA API Key**
 
