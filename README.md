@@ -2,6 +2,10 @@
 
 A Model Context Protocol (MCP) server for querying drug information from the OpenFDA API.
 
+<a href="https://glama.ai/mcp/servers/@ythalorossy/openfda">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@ythalorossy/openfda/badge" alt="OpenFDA MCP server" />
+</a>
+
 ## Features
 
 - Retrieve drug label information by brand name
@@ -72,7 +76,6 @@ node build/index.js
 - The build step (`npm run build`) compiles your source files into the build/ directory.
 - You should run the compiled output (e.g., `build/bin/index.js`), not the source file (`bin/index.js`), unless your project is set up to run directly from source.
 
-
 ## Configuration
 
 Create a `.env` file for any required environment variables.
@@ -80,7 +83,6 @@ Create a `.env` file for any required environment variables.
 ## License
 
 MIT 
-
 
 [Buy me a Coffee](https://buymeacoffee.com/ythalorossy)
 
