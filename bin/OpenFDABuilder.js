@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025 Ythalo Saldanha
+ * Licensed under the MIT License
+ */
 /**
  * The OpenFDABuilder class helps construct URLs for the OpenFDA API.
  *

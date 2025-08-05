@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025 Ythalo Saldanha
+ * Licensed under the MIT License
+ */
 const DEFAULT_CONFIG = {
     maxRetries: 3,
     retryDelay: 1000, // 1 second
