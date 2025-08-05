@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025 Ythalo Saldanha
+ * Licensed under the MIT License
+ */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { OpenFDAResponse } from "./types.js";

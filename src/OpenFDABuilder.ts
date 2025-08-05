@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Ythalo Saldanha
+ * Licensed under the MIT License
+ */
+
 // The ContextType type defines the valid OpenFDA API contexts that can be used with the OpenFDABuilder.
 // These correspond to different OpenFDA drug endpoints, such as:
 //   - 'ndc': National Drug Code Directory
