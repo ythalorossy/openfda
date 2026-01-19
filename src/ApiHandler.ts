@@ -3,19 +3,7 @@
  * Licensed under the MIT License
  */
 
-// Enhanced error types for better error handling
-interface OpenFDAError {
-  type:
-    | "network"
-    | "http"
-    | "parsing"
-    | "timeout"
-    | "empty_response"
-    | "unknown";
-  message: string;
-  status?: number;
-  details?: any;
-}
+import { OpenFDAResponse, OpenFDAError } from './types';
 
 // Configuration for retry logic
 interface RequestConfig {
@@ -237,5 +225,4 @@ async function makeOpenFDARequest<T>(
   return { data: null, error: lastError };
 }
 
-
-export { makeOpenFDARequest }
+export { makeOpenFDARequest };

@@ -7,7 +7,8 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { OpenFDAResponse } from "./types.js";
 import z from "zod";
 import { OpenFDABuilder } from "./OpenFDABuilder.js";
-import { makeOpenFDARequest } from "./OpenFDAClient.js";
+import { ToolManager } from "./ToolManager.js";
+import { makeOpenFDARequest } from "./ApiHandler.js";
 
 const server = new McpServer({
   name: "openfda",
@@ -18,6 +19,8 @@ const server = new McpServer({
     tools: {},
   },
 });
+
+const toolManager = new ToolManager(server);
 
 // Helper function to normalize and validate NDC format
 function normalizeNDC(ndc: string): { productNDC: string; packageNDC: string | null; isValid: boolean } {
@@ -68,13 +71,13 @@ function normalizeNDC(ndc: string): { productNDC: string; packageNDC: string | n
   return { productNDC, packageNDC, isValid };
 }
 
-server.tool(
-  "get-drug-by-name",
-  "Get drug by name. Use this tool to get the drug information by name. The drug name should be the brand name. It returns the brand name, generic name, manufacturer name, product NDC, product type, route, substance name, indications and usage, warnings, do not use, ask doctor, ask doctor or pharmacist, stop use, pregnancy or breast feeding.",
-  {
+toolManager.registerTool({
+  name: "get-drug-by-name",
+  description: "Get drug by name. Use this tool to get the drug information by name. The drug name should be the brand name. It returns the brand name, generic name, manufacturer name, product NDC, product type, route, substance name, indications and usage, warnings, do not use, ask doctor, ask doctor or pharmacist, stop use, pregnancy or breast feeding.",
+  schema: z.object({
     drugName: z.string().describe("Drug name"),
-  },
-  async ({ drugName }) => {
+  }),
+  handler: async ({ drugName }) => {
     const url = new OpenFDABuilder()
       .context("label")
       .search(`openfda.brand_name:"${drugName}"`)
@@ -144,17 +147,17 @@ server.tool(
         text: `Drug information retrieved successfully:\n\n${JSON.stringify(drugInfo, null, 2)}`,
       }],
     };
-  }
-);
+  },
+});
 
-server.tool(
-  "get-drug-by-generic-name",
-  "Get drug information by generic (active ingredient) name. Useful when you know the generic name but not the brand name. Returns all brand versions of the generic drug.",
-  {
+toolManager.registerTool({
+  name: "get-drug-by-generic-name",
+  description: "Get drug information by generic (active ingredient) name. Useful when you know the generic name but not the brand name. Returns all brand versions of the generic drug.",
+  schema: z.object({
     genericName: z.string().describe("Generic drug name (active ingredient)"),
     limit: z.number().optional().default(5).describe("Maximum number of results to return")
-  },
-  async ({ genericName, limit }) => {
+  }),
+  handler: async ({ genericName, limit }) => {
     const url = new OpenFDABuilder()
       .context("label")
       .search(`openfda.generic_name:"${genericName}"`)
@@ -195,18 +198,18 @@ server.tool(
         text: `Found ${drugs.length} drug(s) with generic name "${genericName}":\n\n${JSON.stringify(drugs, null, 2)}`,
       }],
     };
-  }
-);
+  },
+});
 
-server.tool(
-  "get-drug-adverse-events",
-  "Get adverse event reports for a drug. This provides safety information about reported side effects and reactions. Use brand name or generic name.",
-  {
+toolManager.registerTool({
+  name: "get-drug-adverse-events",
+  description: "Get adverse event reports for a drug. This provides safety information about reported side effects and reactions. Use brand name or generic name.",
+  schema: z.object({
     drugName: z.string().describe("Drug name (brand or generic)"),
     limit: z.number().optional().default(10).describe("Maximum number of events to return"),
     seriousness: z.enum(["serious", "non-serious", "all"]).optional().default("all").describe("Filter by event seriousness")
-  },
-  async ({ drugName, limit, seriousness }) => {
+  }),
+  handler: async ({ drugName, limit, seriousness }) => {
     let searchQuery = `patient.drug.medicinalproduct:"${drugName}"`;
     
     if (seriousness !== "all") {
@@ -256,17 +259,17 @@ server.tool(
         text: `Found ${events.length} adverse event report(s) for "${drugName}":\n\n${JSON.stringify(events, null, 2)}`,
       }],
     };
-  }
-);
+  },
+});
 
-server.tool(
-  "get-drugs-by-manufacturer",
-  "Get all drugs manufactured by a specific company. Useful for finding alternatives or checking manufacturer portfolios.",
-  {
+toolManager.registerTool({
+  name: "get-drugs-by-manufacturer",
+  description: "Get all drugs manufactured by a specific company. Useful for finding alternatives or checking manufacturer portfolios.",
+  schema: z.object({
     manufacturerName: z.string().describe("Manufacturer/company name"),
     limit: z.number().optional().default(20).describe("Maximum number of drugs to return")
-  },
-  async ({ manufacturerName, limit }) => {
+  }),
+  handler: async ({ manufacturerName, limit }) => {
     const url = new OpenFDABuilder()
       .context("label")
       .search(`openfda.manufacturer_name:"${manufacturerName}"`)
@@ -307,16 +310,16 @@ server.tool(
         text: `Found ${drugs.length} drug(s) from manufacturer "${manufacturerName}":\n\n${JSON.stringify(drugs, null, 2)}`,
       }],
     };
-  }
-);
-
-server.tool(
-  "get-drug-safety-info",
-  "Get comprehensive safety information for a drug including warnings, contraindications, drug interactions, and precautions. Use brand name.",
-  {
-    drugName: z.string().describe("Drug brand name")
   },
-  async ({ drugName }) => {
+});
+
+toolManager.registerTool({
+  name: "get-drug-safety-info",
+  description: "Get comprehensive safety information for a drug including warnings, contraindications, drug interactions, and precautions. Use brand name.",
+  schema: z.object({
+    drugName: z.string().describe("Drug brand name")
+  }),
+  handler: async ({ drugName }) => {
     const url = new OpenFDABuilder()
       .context("label")
       .search(`openfda.brand_name:"${drugName}"`)
@@ -365,16 +368,16 @@ server.tool(
         text: `Safety information for "${drugName}":\n\n${JSON.stringify(safetyInfo, null, 2)}`,
       }],
     };
-  }
-);
-
-server.tool(
-  "get-drug-by-ndc",
-  "Get drug information by National Drug Code (NDC). Accepts both product NDC (XXXXX-XXXX) and package NDC (XXXXX-XXXX-XX) formats. Also accepts NDC codes without dashes.",
-  {
-    ndcCode: z.string().describe("National Drug Code (NDC) - accepts formats: XXXXX-XXXX, XXXXX-XXXX-XX, or without dashes")
   },
-  async ({ ndcCode }) => {
+});
+
+toolManager.registerTool({
+  name: "get-drug-by-ndc",
+  description: "Get drug information by National Drug Code (NDC). Accepts both product NDC (XXXXX-XXXX) and package NDC (XXXXX-XXXX-XX) formats. Also accepts NDC codes without dashes.",
+  schema: z.object({
+    ndcCode: z.string().describe("National Drug Code (NDC) - accepts formats: XXXXX-XXXX, XXXXX-XXXX-XX, or without dashes")
+  }),
+  handler: async ({ ndcCode }) => {
     const { productNDC, packageNDC, isValid } = normalizeNDC(ndcCode);
     
     if (!isValid) {
@@ -470,17 +473,17 @@ server.tool(
         text: `✅ Found ${results.length} drug(s) with ${totalPackages} package(s) for NDC "${ndcCode}"\n\n${searchSummary}\n\n${JSON.stringify(results, null, 2)}`,
       }],
     };
-  }
-);
+  },
+});
 
 // Alternative: Simple product-only NDC search tool
-server.tool(
-  "get-drug-by-product-ndc",
-  "Get drug information by product NDC only (XXXXX-XXXX format). This ignores package variations and finds all packages for a product.",
-  {
+toolManager.registerTool({
+  name: "get-drug-by-product-ndc",
+  description: "Get drug information by product NDC only (XXXXX-XXXX format). This ignores package variations and finds all packages for a product.",
+  schema: z.object({
     productNDC: z.string().describe("Product NDC in format XXXXX-XXXX")
-  },
-  async ({ productNDC }) => {
+  }),
+  handler: async ({ productNDC }) => {
     // Validate product NDC format
     if (!/^\d{5}-\d{4}$/.test(productNDC.trim())) {
       return {
@@ -544,8 +547,8 @@ server.tool(
         text: `✅ Product NDC "${productNDC}" found with ${allPackagesForProduct.length} package variation(s):\n\n${JSON.stringify(drugInfo, null, 2)}`,
       }],
     };
-  }
-);
+  },
+});
 
 async function main() {
   const transport = new StdioServerTransport();

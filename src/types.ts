@@ -72,4 +72,18 @@ interface Openfda {
   unii: string[];
 }
 
-export { OpenFDAResponse };
+export { OpenFDAResponse, OpenFDAError };
+
+// Enhanced error types for better error handling
+interface OpenFDAError {
+  type:
+    | "network"
+    | "http"
+    | "parsing"
+    | "timeout"
+    | "empty_response"
+    | "unknown";
+  message: string;
+  status?: number;
+  details?: any;
+}
