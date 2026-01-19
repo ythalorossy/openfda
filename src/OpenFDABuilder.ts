@@ -51,11 +51,15 @@ export class OpenFDABuilder {
   build(): string {
     const context = this.params.get("context");
     const search = this.params.get("search");
-    const limit = this.params.get("limit");
+    let limit = this.params.get("limit");
     const apiKey = process.env.OPENFDA_API_KEY;
 
-    if (!context || !search || !limit) {
-      throw new Error("Missing required parameters: context, search, or limit");
+    if (!context || !search) {
+      throw new Error("Missing required parameters: context or search");
+    }
+
+    if (limit === undefined) {
+      limit = 1;
     }
 
     return `${this.url}${context}.json?api_key=${apiKey}&search=${search}&limit=${limit}`;
