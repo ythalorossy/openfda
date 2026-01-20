@@ -25,7 +25,7 @@
   "scripts": {
     "build": "tsc && chmod 755 build/index.js",
     "build:cli": "npm run build && node scripts/add-shebang.cjs && shx cp -r build/* bin/",
-    "test": "jest",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {

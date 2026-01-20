@@ -1,5 +1,6 @@
 
-import { OpenFDABuilder } from './OpenFDABuilder';
+import { jest, describe, beforeEach, afterEach, it, expect } from '@jest/globals';
+import { OpenFDABuilder } from './OpenFDABuilder.js';
 
 describe('OpenFDABuilder', () => {
   const originalEnv = process.env;

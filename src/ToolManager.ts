@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 2025 Ythalo Saldanha
+ * Copyright (c) 2024 Ythalo Saldanha
  * Licensed under the MIT License
  */
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import { OpenFDABuilder } from './OpenFDABuilder';
-import { makeOpenFDARequest } from './ApiHandler';
-import { OpenFDAResponse } from './types';
+import { OpenFDABuilder } from './OpenFDABuilder.js';
+import { makeOpenFDARequest } from './ApiHandler.js';
+import { OpenFDAResponse } from './types.js';
 
 type ToolDefinition<T extends z.ZodObject<any>> = {
   name: string;
@@ -25,7 +25,7 @@ class ToolManager {
     this.server.tool(
       definition.name,
       definition.description,
-      definition.schema,
+      definition.schema.shape,
       definition.handler
     );
   }

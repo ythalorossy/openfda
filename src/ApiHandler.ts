@@ -3,7 +3,7 @@
  * Licensed under the MIT License
  */
 
-import { OpenFDAResponse, OpenFDAError } from './types';
+import { OpenFDAResponse, OpenFDAError } from './types.js';
 
 // Configuration for retry logic
 interface RequestConfig {

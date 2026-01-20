@@ -1,9 +1,11 @@
 
-import { makeOpenFDARequest } from './ApiHandler';
-import { OpenFDAError } from './types';
+import { jest, describe, beforeEach, it, expect } from '@jest/globals';
+import { makeOpenFDARequest } from './ApiHandler.js';
+import { OpenFDAError } from './types.js';
 
 // Mocking fetch
-global.fetch = jest.fn();
+// Use `(global as any)` to avoid TypeScript errors with `isolatedModules`
+(global as any).fetch = jest.fn();
 
 describe('makeOpenFDARequest', () => {
   beforeEach(() => {
@@ -15,7 +17,7 @@ describe('makeOpenFDARequest', () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => mockData,
-    });
+    } as Response);
 
     const { data, error } = await makeOpenFDARequest('http://test.com');
     expect(data).toEqual(mockData);
@@ -29,7 +31,7 @@ describe('makeOpenFDARequest', () => {
       status: 404,
       statusText: 'Not Found',
       text: async () => 'Error message',
-    });
+    } as Response);
 
     const { data, error } = await makeOpenFDARequest('http://test.com');
     expect(data).toBeNull();
@@ -45,11 +47,11 @@ describe('makeOpenFDARequest', () => {
         status: 500,
         statusText: 'Server Error',
         text: async () => 'Server error',
-      })
+      } as Response)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ results: [] }),
-      });
+      } as Response);
 
     const { data, error } = await makeOpenFDARequest('http://test.com', { maxRetries: 1, retryDelay: 10 });
     expect(data).not.toBeNull();
