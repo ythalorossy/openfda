@@ -72,8 +72,6 @@ interface Openfda {
   unii: string[];
 }
 
-export { OpenFDAResponse, OpenFDAError };
-
 // Enhanced error types for better error handling
 interface OpenFDAError {
   type:
@@ -87,3 +85,5 @@ interface OpenFDAError {
   status?: number;
   details?: any;
 }
+
+export type { OpenFDAResponse, OpenFDAError };

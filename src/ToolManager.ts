@@ -25,7 +25,7 @@ class ToolManager {
     this.server.tool(
       definition.name,
       definition.description,
-      definition.schema,
+      definition.schema.shape,
       definition.handler
     );
   }
