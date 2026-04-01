@@ -30,3 +30,6 @@ coverage/
 
 # Git worktrees
 .worktrees/ 
+
+# NPM
+.npmrc

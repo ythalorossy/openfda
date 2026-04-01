@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "openfda": {
+      "command": "openfda",
+      "env": {
+        "OPENFDA_API_KEY": "jhRvqHIrNJIICrpqM76IvzZvaCmU2ZgF0MnlYCwF"
+      }
+    }
+  }
+}
