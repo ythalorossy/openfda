@@ -1,6 +1,6 @@
 {
   "name": "@ythalorossy/openfda",
-  "version": "1.0.15",
+  "version": "1.0.17",
   "description": "OpenFDA Model Context Protocol",
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
     "test:ci": "vitest run",
     "lint": "eslint . --ext .ts",
     "typecheck": "tsc --noEmit",
-    "prepare": "npm run build"
+    "prepare": "npm run build:cli"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

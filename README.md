@@ -34,18 +34,29 @@ A Model Context Protocol (MCP) server for querying drug information from the Ope
    If you are integrating this server with a larger MCP system, your configuration might look like:
 
    ```json
-   {
-     "mcpServers": {
-       "openfda": {
-         "command": "npx",
-         "args": ["@ythalorossy/openfda"],
-         "env": {
-           "OPENFDA_API_KEY": "************"
-         },
-         "timeout": 60000
-       }
-     }
-   }
+    {
+      "mcpServers": {
+          "openfda": {
+              "command": "npx",
+              "args": [
+                  "@ythalorossy/openfda"
+              ],
+              "env": {
+                  "OPENFDA_API_KEY": "*****************************************"
+              },
+              "timeout": 60000,
+              "autoApprove": [
+                  "get-drug-by-name",
+                  "get-drug-by-generic-name",
+                  "get-drug-adverse-events",
+                  "get-drugs-by-manufacturer",
+                  "get-drug-safety-info",
+                  "get-drug-by-ndc",
+                  "get-drug-by-product-ndc"
+              ]
+          }
+      }
+    }
    ```
 
    Replace the asterisks with your actual API key, or ensure it is loaded from your `.env` file.
