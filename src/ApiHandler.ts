@@ -21,9 +21,9 @@ const DEFAULT_CONFIG: RequestConfig = {
 // Helper function to determine if error is retryable
 function isRetryableError(error: any): boolean {
   // Network errors, timeouts, and 5xx server errors are retryable
-  if (error.name === "TypeError" && error.message.includes("fetch"))
+  if (error.name === 'TypeError' && error.message.includes('fetch'))
     return true;
-  if (error.name === "AbortError") return true;
+  if (error.name === 'AbortError') return true;
   if (error.status >= 500 && error.status <= 599) return true;
   if (error.status === 429) return true; // Rate limit
   return false;
@@ -42,8 +42,8 @@ async function makeOpenFDARequest<T>(
   const { maxRetries, retryDelay, timeout } = { ...DEFAULT_CONFIG, ...config };
 
   const headers = {
-    "User-Agent": "@ythalorossy/openfda",
-    Accept: "application/json",
+    'User-Agent': '@ythalorossy/openfda',
+    Accept: 'application/json',
   };
 
   let lastError: OpenFDAError | null = null;
@@ -71,10 +71,10 @@ async function makeOpenFDARequest<T>(
       if (!response.ok) {
         const errorText = await response
           .text()
-          .catch(() => "Unable to read error response");
+          .catch(() => 'Unable to read error response');
 
         const httpError: OpenFDAError = {
-          type: "http",
+          type: 'http',
           message: `HTTP ${response.status}: ${response.statusText}`,
           status: response.status,
           details: errorText,
@@ -142,16 +142,16 @@ async function makeOpenFDARequest<T>(
         parsedData = await response.json();
       } catch (parseError) {
         const parsingError: OpenFDAError = {
-          type: "parsing",
+          type: 'parsing',
           message: `Failed to parse JSON response: ${
             parseError instanceof Error
               ? parseError.message
-              : "Unknown parsing error"
+              : 'Unknown parsing error'
           }`,
           details: parseError,
         };
 
-        console.error("OpenFDA JSON Parsing Error:", {
+        console.error('OpenFDA JSON Parsing Error:', {
           url,
           parseError:
             parseError instanceof Error ? parseError.message : parseError,
@@ -164,8 +164,8 @@ async function makeOpenFDARequest<T>(
       // Check for empty response
       if (!parsedData) {
         const emptyError: OpenFDAError = {
-          type: "empty_response",
-          message: "Received empty response from OpenFDA API",
+          type: 'empty_response',
+          message: 'Received empty response from OpenFDA API',
         };
         lastError = emptyError;
         break;
@@ -177,26 +177,26 @@ async function makeOpenFDARequest<T>(
       // Handle network errors, timeouts, and other fetch errors
       let networkError: OpenFDAError;
 
-      if (error.name === "AbortError") {
+      if (error.name === 'AbortError') {
         networkError = {
-          type: "timeout",
+          type: 'timeout',
           message: `Request timeout after ${timeout}ms`,
           details: error,
         };
       } else if (
         error instanceof TypeError &&
-        error.message.includes("fetch")
+        error.message.includes('fetch')
       ) {
         networkError = {
-          type: "network",
+          type: 'network',
           message: `Network error: Unable to connect to OpenFDA API`,
           details: error.message,
         };
       } else {
         networkError = {
-          type: "unknown",
+          type: 'unknown',
           message: `Unexpected error: ${
-            error.message || "Unknown error occurred"
+            error.message || 'Unknown error occurred'
           }`,
           details: error,
         };
