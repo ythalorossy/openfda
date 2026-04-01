@@ -33,3 +33,6 @@ coverage/
 
 # NPM
 .npmrc
+
+# MCPs
+.mcp.json
