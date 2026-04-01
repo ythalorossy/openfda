@@ -13,7 +13,7 @@
     "openfda": "./bin/index.js"
   },
   "files": [
-    "build",
+    "dist",
     "bin"
   ],
   "keywords": [
@@ -23,27 +23,29 @@
     "server"
   ],
   "scripts": {
-    "build": "tsc && chmod 755 build/index.js",
-    "build:cli": "npm run build && node scripts/add-shebang.cjs && shx cp -r build/* bin/",
-    "test": "jest",
-    "lint": "eslint . --ext .ts"
+    "dev": "vite",
+    "build": "vite build && chmod 755 dist/index.js && shx mkdir -p bin && shx cp dist/index.js bin/",
+    "test": "vitest",
+    "test:ci": "vitest run",
+    "lint": "eslint . --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "prepare": "npm run build"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.15.1",
-    "zod": "^3.25.76"
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.25.0"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "@types/node": "^24.0.14",
-    "@typescript-eslint/eslint-plugin": "^8.53.1",
-    "@typescript-eslint/parser": "^8.53.1",
-    "eslint": "^9.39.2",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.5",
-    "jest": "^30.2.0",
-    "prettier": "^3.8.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
     "shx": "^0.3.4",
-    "ts-jest": "^29.4.6",
-    "typescript": "^5.8.3"
+    "tsx": "^4.0.0",
+    "typescript": "^5.5.0",
+    "vite": "^5.4.0",
+    "vitest": "^2.0.0"
   }
 }
