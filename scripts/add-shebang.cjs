@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const buildPath = path.join(__dirname, '../build/index.js');
+const buildPath = path.join(__dirname, '../dist/index.js');
 const shebang = '#!/usr/bin/env node\n';
 
 let content = fs.readFileSync(buildPath, 'utf8');
