@@ -10,15 +10,19 @@ import { OpenFDABuilder } from "./OpenFDABuilder.js";
 import { ToolManager } from "./ToolManager.js";
 import { makeOpenFDARequest } from "./ApiHandler.js";
 
-const server = new McpServer({
-  name: "openfda",
-  version: "1.0.0",
-  description: "OpenFDA Model Context Protocol",
-  capabilities: {
-    resources: {},
-    tools: {},
+const server = new McpServer(
+  {
+    name: "openfda",
+    version: "1.0.0",
+    description: "OpenFDA Model Context Protocol",
   },
-});
+  {
+    capabilities: {
+      resources: {},
+      tools: {},
+    },
+  }
+);
 
 const toolManager = new ToolManager(server);
 
