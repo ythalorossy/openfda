@@ -1,6 +1,6 @@
 {
   "name": "@ythalorossy/openfda",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "OpenFDA Model Context Protocol",
   "repository": {
     "type": "git",
@@ -10,11 +10,10 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "openfda": "./bin/index.js"
+    "openfda": "./dist/index.js"
   },
   "files": [
-    "dist",
-    "bin"
+    "dist"
   ],
   "keywords": [
     "openfda",
@@ -24,7 +23,8 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build && shx mkdir -p bin && shx cp dist/index.js bin/",
+    "build": "vite build",
+    "build:cli": "vite build && node scripts/add-shebang.cjs",
     "test": "vitest",
     "test:ci": "vitest run",
     "lint": "eslint . --ext .ts",
