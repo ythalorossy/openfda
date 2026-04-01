@@ -24,7 +24,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build && chmod 755 dist/index.js && shx mkdir -p bin && shx cp dist/index.js bin/",
+    "build": "vite build && shx mkdir -p bin && shx cp dist/index.js bin/",
     "test": "vitest",
     "test:ci": "vitest run",
     "lint": "eslint . --ext .ts",
