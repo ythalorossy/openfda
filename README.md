@@ -50,31 +50,26 @@ A Model Context Protocol (MCP) server for querying drug information from the Ope
 
    Replace the asterisks with your actual API key, or ensure it is loaded from your `.env` file.
 
-## Want to run it local?
+## Want to run it locally?
 
 ```bash
 git clone https://github.com/ythalorossy/openfda.git
 cd openfda
 npm install
-```
-
-## Usage
-
-First, build the project:
-
-```bash
 npm run build
 ```
 
-Then, start the server from the build folder:
+Then start the server:
 
 ```bash
-node build/index.js
+node bin/index.js
 ```
 
-**Key Points:**
-- The build step (`npm run build`) compiles your source files into the build/ directory.
-- You should run the compiled output (e.g., `build/bin/index.js`), not the source file (`bin/index.js`), unless your project is set up to run directly from source.
+Or use it directly with npx:
+
+```bash
+npx @ythalorossy/openfda
+```
 
 ## Configuration
 
