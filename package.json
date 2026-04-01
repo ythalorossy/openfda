@@ -44,6 +44,7 @@
     "prettier": "^3.8.0",
     "shx": "^0.3.4",
     "ts-jest": "^29.4.6",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.2"
   }
 }

@@ -22,10 +22,11 @@ class ToolManager {
   constructor(private server: McpServer) {}
 
   registerTool<T extends z.ZodObject<any>>(definition: ToolDefinition<T>) {
+    // Pass raw shape to SDK to avoid double-wrapping bug in SDK 1.15.x
     this.server.tool(
       definition.name,
       definition.description,
-      definition.schema,
+      definition.schema.shape,
       definition.handler
     );
   }
