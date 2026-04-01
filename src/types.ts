@@ -75,12 +75,12 @@ interface Openfda {
 // Enhanced error types for better error handling
 interface OpenFDAError {
   type:
-    | "network"
-    | "http"
-    | "parsing"
-    | "timeout"
-    | "empty_response"
-    | "unknown";
+    | 'network'
+    | 'http'
+    | 'parsing'
+    | 'timeout'
+    | 'empty_response'
+    | 'unknown';
   message: string;
   status?: number;
   details?: any;
