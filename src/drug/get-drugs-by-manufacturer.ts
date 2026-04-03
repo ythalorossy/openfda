@@ -6,6 +6,7 @@ import { OpenFDAResponse } from '../types.js';
 import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
+import { ToolManager } from '../ToolManager.js';
 
 export const getDrugsByManufacturer = {
   name: 'get-drugs-by-manufacturer',
@@ -75,5 +76,8 @@ export const getDrugsByManufacturer = {
         },
       ],
     };
+  },
+  register(toolManager: ToolManager) {
+    toolManager.registerTool(this);
   },
 };
