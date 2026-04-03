@@ -10,17 +10,16 @@ type ToolDefinition = {
   name: string;
   description: string;
   inputSchema: z.ZodObject<any>;
-  handler: (input: z.infer<any>)
-    => Promise<{
-      content: [{
-        type: 'text';
-        text: string
-      }]
-    }>;
+  handler: (input: z.infer<any>) => Promise<{
+    content: {
+      type: 'text';
+      text: string;
+    }[];
+  }>;
 };
 
 class ToolManager {
-  constructor(private readonly server: McpServer) { }
+  constructor(private readonly server: McpServer) {}
 
   registerTool = (definition: ToolDefinition) =>
     this.server.registerTool(
@@ -28,7 +27,7 @@ class ToolManager {
       {
         title: definition.name,
         description: definition.description,
-        inputSchema: definition.inputSchema
+        inputSchema: definition.inputSchema,
       },
       definition.handler
     );

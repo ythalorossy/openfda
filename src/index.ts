@@ -135,7 +135,7 @@ toolManager.registerTool({
             type: 'text',
             text: `No drug information found for "${drugName}". Please verify the brand name spelling or try searching for the generic name.`,
           },
-        ]
+        ],
       };
     }
 
@@ -163,14 +163,15 @@ toolManager.registerTool({
           type: 'text',
           text: `Drug information retrieved successfully:\n\n${JSON.stringify(drugInfo, null, 2)}`,
         },
-      ]
+      ],
     };
   },
 });
 
 toolManager.registerTool({
   name: 'get-drug-by-generic-name',
-  description: 'Get drug information by generic (active ingredient) name. Useful when you know the generic name but not the brand name. Returns all brand versions of the generic drug.',
+  description:
+    'Get drug information by generic (active ingredient) name. Useful when you know the generic name but not the brand name. Returns all brand versions of the generic drug.',
   inputSchema: z.object({
     genericName: z.string().describe('Generic drug name (active ingredient)'),
     limit: z
@@ -187,7 +188,8 @@ toolManager.registerTool({
       .limit(limit)
       .build();
 
-    const { data: drugData, error } = await makeOpenFDARequest<OpenFDAResponse>(url);
+    const { data: drugData, error } =
+      await makeOpenFDARequest<OpenFDAResponse>(url);
 
     if (error) {
       return {
@@ -208,7 +210,7 @@ toolManager.registerTool({
             type: 'text',
             text: `No drug information found for generic name "${genericName}".`,
           },
-        ]
+        ],
       };
     }
 
@@ -226,14 +228,15 @@ toolManager.registerTool({
           type: 'text',
           text: `Found ${drugs.length} drug(s) with generic name "${genericName}":\n\n${JSON.stringify(drugs, null, 2)}`,
         },
-      ]
+      ],
     };
   },
 });
 
 toolManager.registerTool({
   name: 'get-drug-adverse-events',
-  description: 'Get adverse event reports for a drug. This provides safety information about reported side effects and reactions. Use brand name or generic name.',
+  description:
+    'Get adverse event reports for a drug. This provides safety information about reported side effects and reactions. Use brand name or generic name.',
   inputSchema: z.object({
     drugName: z.string().describe('Drug name (brand or generic)'),
     limit: z
@@ -283,7 +286,7 @@ toolManager.registerTool({
             type: 'text',
             text: `No adverse events found for "${drugName}".`,
           },
-        ]
+        ],
       };
     }
 
@@ -294,7 +297,9 @@ toolManager.registerTool({
       patient_sex:
         event.patient?.patientsex === '1'
           ? 'Male'
-          : event.patient?.patientsex === '2' ? 'Female' : 'Unknown',
+          : event.patient?.patientsex === '2'
+            ? 'Female'
+            : 'Unknown',
       reactions:
         event.patient?.reaction
           ?.map((r: any) => r.reactionmeddrapt)
@@ -312,14 +317,15 @@ toolManager.registerTool({
           type: 'text',
           text: `Found ${events.length} adverse event report(s) for "${drugName}":\n\n${JSON.stringify(events, null, 2)}`,
         },
-      ]
+      ],
     };
   },
 });
 
 toolManager.registerTool({
   name: 'get-drugs-by-manufacturer',
-  description: 'Get all drugs manufactured by a specific company. Useful for finding alternatives or checking manufacturer portfolios.',
+  description:
+    'Get all drugs manufactured by a specific company. Useful for finding alternatives or checking manufacturer portfolios.',
   inputSchema: z.object({
     manufacturerName: z.string().describe('Manufacturer/company name'),
     limit: z
@@ -336,7 +342,8 @@ toolManager.registerTool({
       .limit(limit)
       .build();
 
-    const { data: drugData, error } = await makeOpenFDARequest<OpenFDAResponse>(url);
+    const { data: drugData, error } =
+      await makeOpenFDARequest<OpenFDAResponse>(url);
 
     if (error) {
       return {
@@ -357,7 +364,7 @@ toolManager.registerTool({
             type: 'text',
             text: `No drugs found for manufacturer "${manufacturerName}".`,
           },
-        ]
+        ],
       };
     }
 
@@ -375,14 +382,15 @@ toolManager.registerTool({
           type: 'text',
           text: `Found ${drugs.length} drug(s) from manufacturer "${manufacturerName}":\n\n${JSON.stringify(drugs, null, 2)}`,
         },
-      ]
+      ],
     };
   },
 });
 
 toolManager.registerTool({
   name: 'get-drug-safety-info',
-  description: 'Get comprehensive safety information for a drug including warnings, contraindications, drug interactions, and precautions. Use brand name.',
+  description:
+    'Get comprehensive safety information for a drug including warnings, contraindications, drug interactions, and precautions. Use brand name.',
   inputSchema: z.object({
     drugName: z.string().describe('Drug brand name'),
   }),
@@ -394,7 +402,8 @@ toolManager.registerTool({
       .limit(1)
       .build();
 
-    const { data: drugData, error } = await makeOpenFDARequest<OpenFDAResponse>(url);
+    const { data: drugData, error } =
+      await makeOpenFDARequest<OpenFDAResponse>(url);
 
     if (error) {
       return {
@@ -415,7 +424,7 @@ toolManager.registerTool({
             type: 'text',
             text: `No safety information found for "${drugName}".`,
           },
-        ]
+        ],
       };
     }
 
@@ -441,14 +450,15 @@ toolManager.registerTool({
           type: 'text',
           text: `Safety information for "${drugName}":\n\n${JSON.stringify(safetyInfo, null, 2)}`,
         },
-      ]
+      ],
     };
   },
 });
 
 toolManager.registerTool({
   name: 'get-drug-by-ndc',
-  description: 'Get drug information by National Drug Code (NDC). Accepts both product NDC (XXXXX-XXXX) and package NDC (XXXXX-XXXX-XX) formats. Also accepts NDC codes without dashes.',
+  description:
+    'Get drug information by National Drug Code (NDC). Accepts both product NDC (XXXXX-XXXX) and package NDC (XXXXX-XXXX-XX) formats. Also accepts NDC codes without dashes.',
   inputSchema: z.object({
     ndcCode: z
       .string()
@@ -508,7 +518,7 @@ toolManager.registerTool({
             type: 'text',
             text: `No drug found with NDC "${ndcCode}" (product: ${productNDC}).\n\n💡 Tips:\n• Verify the NDC format\n• Try without the package suffix (e.g., use 12345-1234 instead of 12345-1234-01)\n• Check if this is an FDA-approved product`,
           },
-        ]
+        ],
       };
     }
 
@@ -562,7 +572,7 @@ toolManager.registerTool({
           type: 'text',
           text: `✅ Found ${results.length} drug(s) with ${totalPackages} package(s) for NDC "${ndcCode}"\n\n${searchSummary}\n\n${JSON.stringify(results, null, 2)}`,
         },
-      ]
+      ],
     };
   },
 });
@@ -596,7 +606,8 @@ toolManager.registerTool({
       .limit(1)
       .build();
 
-    const { data: drugData, error } = await makeOpenFDARequest<OpenFDAResponse>(url);
+    const { data: drugData, error } =
+      await makeOpenFDARequest<OpenFDAResponse>(url);
 
     if (error) {
       return {
@@ -650,7 +661,7 @@ toolManager.registerTool({
           type: 'text',
           text: `✅ Product NDC "${productNDC}" found with ${allPackagesForProduct.length} package variation(s):\n\n${JSON.stringify(drugInfo, null, 2)}`,
         },
-      ]
+      ],
     };
   },
 });
