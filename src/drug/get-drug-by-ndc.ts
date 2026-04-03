@@ -7,6 +7,7 @@ import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import { normalizeNDC } from '../utils/ndc.js';
+import { ToolManager } from '../ToolManager.js';
 
 export const getDrugByNdc = {
   name: 'get-drug-by-ndc',
@@ -118,5 +119,8 @@ export const getDrugByNdc = {
         },
       ],
     };
+  },
+  register(toolManager: ToolManager) {
+    toolManager.registerTool(this);
   },
 };
