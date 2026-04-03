@@ -31,13 +31,13 @@ const server = new McpServer(
 
 const toolManager = new ToolManager(server);
 
-getDrugByName.register(toolManager);
-getDrugByGenericName.register(toolManager);
-getDrugAdverseEvents.register(toolManager);
-getDrugsByManufacturer.register(toolManager);
-getDrugSafetyInfo.register(toolManager);
-getDrugByNdc.register(toolManager);
-getDrugByProductNdc.register(toolManager);
+toolManager.registerTool(getDrugByName);
+toolManager.registerTool(getDrugByGenericName);
+toolManager.registerTool(getDrugAdverseEvents);
+toolManager.registerTool(getDrugsByManufacturer);
+toolManager.registerTool(getDrugSafetyInfo);
+toolManager.registerTool(getDrugByNdc);
+toolManager.registerTool(getDrugByProductNdc);
 
 async function main() {
   const transport = new StdioServerTransport();
