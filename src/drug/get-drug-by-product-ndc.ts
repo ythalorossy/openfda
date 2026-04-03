@@ -6,7 +6,6 @@ import { OpenFDAResponse } from '../types.js';
 import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
-import { ToolManager } from '../ToolManager.js';
 
 export const getDrugByProductNdc = {
   name: 'get-drug-by-product-ndc',
@@ -91,8 +90,5 @@ export const getDrugByProductNdc = {
         },
       ],
     };
-  },
-  register(toolManager: ToolManager) {
-    toolManager.registerTool(this);
   },
 };

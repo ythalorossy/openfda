@@ -5,7 +5,6 @@
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import z from 'zod';
-import { ToolManager } from '../ToolManager.js';
 
 export const getDrugAdverseEvents = {
   name: 'get-drug-adverse-events',
@@ -101,8 +100,5 @@ export const getDrugAdverseEvents = {
         },
       ],
     };
-  },
-  register(toolManager: ToolManager) {
-    toolManager.registerTool(this);
   },
 };
