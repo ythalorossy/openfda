@@ -10,7 +10,7 @@ type DatasetType = 'drug';
 //   - 'ndc': National Drug Code Directory
 //   - 'label': Drug Labeling
 //   - 'event': Adverse Event Reporting
-type ContextType = 'ndc' | 'label' | 'event';
+type ContextType = 'ndc' | 'label' | 'event' | 'drugsfda';
 
 /**
  * The OpenFDABuilder class helps construct URLs for the OpenFDA API.
