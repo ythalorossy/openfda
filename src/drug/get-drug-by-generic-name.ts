@@ -6,7 +6,6 @@ import { OpenFDAResponse } from '../types.js';
 import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
-import { ToolManager } from '../ToolManager.js';
 
 export const getDrugByGenericName = {
   name: 'get-drug-by-generic-name',
@@ -76,8 +75,5 @@ export const getDrugByGenericName = {
         },
       ],
     };
-  },
-  register(toolManager: ToolManager) {
-    toolManager.registerTool(this);
   },
 };

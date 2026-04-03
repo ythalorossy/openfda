@@ -5,7 +5,6 @@
 import { OpenFDAResponse } from '../types.js';
 import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
-import { ToolManager } from '../ToolManager.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 
 export const getDrugByName = {
@@ -88,8 +87,5 @@ export const getDrugByName = {
         },
       ],
     };
-  },
-  register(toolManager: ToolManager) {
-    toolManager.registerTool(this);
   },
 };
