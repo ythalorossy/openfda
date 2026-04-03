@@ -13,6 +13,7 @@ import {
   getDrugSafetyInfo,
   getDrugByNdc,
   getDrugByProductNdc,
+  getDrugsfda,
 } from './drug/index.js';
 
 const server = new McpServer(
@@ -38,6 +39,7 @@ toolManager.registerTool(getDrugsByManufacturer);
 toolManager.registerTool(getDrugSafetyInfo);
 toolManager.registerTool(getDrugByNdc);
 toolManager.registerTool(getDrugByProductNdc);
+toolManager.registerTool(getDrugsfda);
 
 async function main() {
   const transport = new StdioServerTransport();
