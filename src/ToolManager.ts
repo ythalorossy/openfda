@@ -5,31 +5,33 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import { z } from 'zod';
-import { OpenFDABuilder } from './OpenFDABuilder';
-import { makeOpenFDARequest } from './ApiHandler';
-import { OpenFDAResponse } from './types';
 
-type ToolDefinition<T extends z.ZodObject<any>> = {
+type ToolDefinition = {
   name: string;
   description: string;
-  schema: T;
-  handler: (
-    input: z.infer<T>
-  ) => Promise<{ content: { type: 'text'; text: string }[] }>;
+  inputSchema: z.ZodObject<any>;
+  handler: (input: z.infer<any>)
+    => Promise<{
+      content: [{
+        type: 'text';
+        text: string
+      }]
+    }>;
 };
 
 class ToolManager {
-  constructor(private server: McpServer) {}
+  constructor(private readonly server: McpServer) { }
 
-  registerTool<T extends z.ZodObject<any>>(definition: ToolDefinition<T>) {
-    // Pass raw shape to SDK to avoid double-wrapping bug in SDK 1.15.x
-    this.server.tool(
+  registerTool = (definition: ToolDefinition) =>
+    this.server.registerTool(
       definition.name,
-      definition.description,
-      definition.schema.shape,
+      {
+        title: definition.name,
+        description: definition.description,
+        inputSchema: definition.inputSchema
+      },
       definition.handler
     );
-  }
 }
 
 export { ToolManager };

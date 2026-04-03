@@ -15,7 +15,8 @@
     "noEmit": true,
     "paths": {
       "@modelcontextprotocol/sdk/server/mcp": ["./node_modules/@modelcontextprotocol/sdk/dist/esm/server/mcp"]
-    }
+    },
+    "types": ["node"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "tests", "dist"]

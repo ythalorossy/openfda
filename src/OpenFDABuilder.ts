@@ -3,6 +3,8 @@
  * Licensed under the MIT License
  */
 
+type DatasetType = 'drug';
+
 // The ContextType type defines the valid OpenFDA API contexts that can be used with the OpenFDABuilder.
 // These correspond to different OpenFDA drug endpoints, such as:
 //   - 'ndc': National Drug Code Directory
@@ -14,6 +16,7 @@ type ContextType = 'ndc' | 'label' | 'event';
  * The OpenFDABuilder class helps construct URLs for the OpenFDA API.
  *
  * Usage:
+ *   - Set the dataset (such as 'drugs') using the dataset() method.
  *   - Set the context (such as 'label', 'ndc', or 'event') using the context() method.
  *   - Set the search query using the search() method.
  *   - Optionally set the result limit using the limit() method (default is 1).
@@ -21,6 +24,7 @@ type ContextType = 'ndc' | 'label' | 'event';
  *
  * Example:
  *   const url = new OpenFDABuilder()
+ *     .dataset('drug')
  *     .context('label')
  *     .search('openfda.brand_name:"Advil"')
  *     .limit(1)
@@ -30,8 +34,13 @@ type ContextType = 'ndc' | 'label' | 'event';
  * The API key is read from the OPENFDA_API_KEY environment variable.
  */
 export class OpenFDABuilder {
-  private url = 'https://api.fda.gov/drug/';
-  private params = new Map<string, string | number>();
+  private readonly urlBase = 'https://api.fda.gov';
+  private readonly params = new Map<string, string | number>();
+
+  dataset(dataset: DatasetType): this {
+    this.params.set('dataset', dataset);
+    return this;
+  }
 
   context(context: ContextType): this {
     this.params.set('context', context);
@@ -49,19 +58,16 @@ export class OpenFDABuilder {
   }
 
   build(): string {
+    const dataset = this.params.get('dataset');
     const context = this.params.get('context');
     const search = this.params.get('search');
-    let limit = this.params.get('limit');
+    const limit = this.params.get('limit') ?? 1;
     const apiKey = process.env.OPENFDA_API_KEY;
 
-    if (!context || !search) {
+    if (!dataset || !context || !search) {
       throw new Error('Missing required parameters: context or search');
     }
 
-    if (limit === undefined) {
-      limit = 1;
-    }
-
-    return `${this.url}${context}.json?api_key=${apiKey}&search=${search}&limit=${limit}`;
+    return `${this.urlBase}/${dataset}/${context}.json?api_key=${apiKey}&search=${search}&limit=${limit}`;
   }
 }

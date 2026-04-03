@@ -3,7 +3,7 @@
  * Licensed under the MIT License
  */
 
-import { OpenFDAResponse, OpenFDAError } from './types';
+import { OpenFDAError } from './types';
 
 // Configuration for retry logic
 interface RequestConfig {
@@ -54,12 +54,6 @@ async function makeOpenFDARequest<T>(
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-      console.log(
-        `Making OpenFDA request (attempt ${attempt + 1}/${
-          maxRetries! + 1
-        }): ${url}`
-      );
-
       const response = await fetch(url, {
         headers,
         signal: controller.signal,
@@ -79,13 +73,6 @@ async function makeOpenFDARequest<T>(
           status: response.status,
           details: errorText,
         };
-
-        console.error(`OpenFDA HTTP Error (${response.status}):`, {
-          url,
-          status: response.status,
-          statusText: response.statusText,
-          errorText: errorText.substring(0, 200), // Truncate long error messages
-        });
 
         // OpenFDA-specific status code handling
         switch (response.status) {
@@ -128,7 +115,6 @@ async function makeOpenFDARequest<T>(
           isRetryableError({ status: response.status })
         ) {
           const delay = retryDelay! * Math.pow(2, attempt); // Exponential backoff
-          console.log(`Retrying in ${delay}ms...`);
           await sleep(delay);
           continue;
         }
@@ -151,12 +137,6 @@ async function makeOpenFDARequest<T>(
           details: parseError,
         };
 
-        console.error('OpenFDA JSON Parsing Error:', {
-          url,
-          parseError:
-            parseError instanceof Error ? parseError.message : parseError,
-        });
-
         lastError = parsingError;
         break; // Don't retry parsing errors
       }
@@ -171,7 +151,6 @@ async function makeOpenFDARequest<T>(
         break;
       }
 
-      console.log(`OpenFDA request successful on attempt ${attempt + 1}`);
       return { data: parsedData as T, error: null };
     } catch (error: any) {
       // Handle network errors, timeouts, and other fetch errors
@@ -202,18 +181,11 @@ async function makeOpenFDARequest<T>(
         };
       }
 
-      console.error(`OpenFDA Request Error (attempt ${attempt + 1}):`, {
-        url,
-        error: error.message,
-        type: error.name,
-      });
-
       lastError = networkError;
 
       // Retry network errors and timeouts
       if (attempt < maxRetries! && isRetryableError(error)) {
         const delay = retryDelay! * Math.pow(2, attempt); // Exponential backoff
-        console.log(`Network error, retrying in ${delay}ms...`);
         await sleep(delay);
         continue;
       }

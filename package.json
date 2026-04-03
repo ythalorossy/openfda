@@ -1,6 +1,6 @@
 {
   "name": "@ythalorossy/openfda",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "OpenFDA Model Context Protocol",
   "repository": {
     "type": "git",
@@ -36,6 +36,7 @@
     "zod": "^3.25.0"
   },
   "devDependencies": {
+    "@types/node": "^25.5.2",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^9.0.0",
