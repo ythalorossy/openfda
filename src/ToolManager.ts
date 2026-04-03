@@ -12,9 +12,10 @@ type ToolDefinition = {
   inputSchema: z.ZodObject<any>;
   handler: (input: z.infer<any>) => Promise<{
     content: {
-      type: 'text';
+      type: string;
       text: string;
     }[];
+    isError?: boolean;
   }>;
 };
 
@@ -29,7 +30,7 @@ class ToolManager {
         description: definition.description,
         inputSchema: definition.inputSchema,
       },
-      definition.handler
+      definition.handler as any
     );
 }
 

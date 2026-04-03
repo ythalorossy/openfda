@@ -2,7 +2,6 @@
  * Copyright (c) 2025 Ythalo Saldanha
  * Licensed under the MIT License
  */
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { OpenFDAResponse } from '../types.js';
 import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
@@ -16,7 +15,7 @@ export const getDrugByName = {
   inputSchema: z.object({
     drugName: z.string().describe('Drug name'),
   }),
-  async handler({ drugName }: { drugName: string }, toolManager: ToolManager) {
+  async handler({ drugName }: { drugName: string }) {
     const url = new OpenFDABuilder()
       .dataset('drug')
       .context('label')
@@ -47,7 +46,7 @@ export const getDrugByName = {
       }
 
       return {
-        content: [{ type: 'text', text: errorMessage }],
+        content: [{ type: 'text' as const, text: errorMessage }],
         isError: true,
       };
     }
@@ -56,7 +55,7 @@ export const getDrugByName = {
       return {
         content: [
           {
-            type: 'text',
+            type: 'text' as const,
             text: `No drug information found for "${drugName}". Please verify the brand name spelling or try searching for the generic name.`,
           },
         ],
@@ -84,10 +83,13 @@ export const getDrugByName = {
     return {
       content: [
         {
-          type: 'text',
+          type: 'text' as const,
           text: `Drug information retrieved successfully:\n\n${JSON.stringify(drugInfo, null, 2)}`,
         },
       ],
     };
+  },
+  register(toolManager: ToolManager) {
+    toolManager.registerTool(this);
   },
 };
