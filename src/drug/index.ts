@@ -10,3 +10,4 @@ export { getDrugsByManufacturer } from './get-drugs-by-manufacturer.js';
 export { getDrugSafetyInfo } from './get-drug-safety-info.js';
 export { getDrugByNdc } from './get-drug-by-ndc.js';
 export { getDrugByProductNdc } from './get-drug-by-product-ndc.js';
+export { getDrugsfda } from './get-drugsfda.js';
