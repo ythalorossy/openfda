@@ -43,14 +43,14 @@ export const getDrugsfda = {
     const url = new OpenFDABuilder()
       .dataset('drug')
       .context('drugsfda')
-      .search(`"${fieldName}":"${searchValue}"`)
+      .search(`${sectionName}.${fieldName}:"${searchValue}"`)
       .limit(1)
       .build();
 
     const { data, error } = await makeOpenFDARequest<OpenFDAResponse>(url);
 
     if (error) {
-      let errorMessage = `Failed to retrieve drugsfda data for "${searchValue}" in ${sectionName}.${fieldName}: ${error.message}`;
+      let errorMessage = `${url} Failed to retrieve drugsfda data for "${searchValue}" in ${sectionName}.${fieldName}: ${error.message}`;
 
       switch (error.type) {
         case 'http':
