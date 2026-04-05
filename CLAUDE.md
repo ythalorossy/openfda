@@ -9,7 +9,8 @@ This is a Model Context Protocol (MCP) server that provides tools for querying d
 ## Commands
 
 ```bash
-npm run build      # Compile TypeScript to dist/ and bin/
+npm run build      # Compile TypeScript to dist/
+npm run build:cli  # Build + add shebang for bin entry (required for CLI)
 npm run dev        # Start development server
 npm run test       # Run Vitest tests
 npm run test:ci    # Run tests in CI mode (no watch)
@@ -44,6 +45,8 @@ The MCP SDK has a bug with Zod schema validation. Always use `schema.shape` inst
 - **`ApiHandler`** (`src/ApiHandler.ts`): HTTP client with retry logic (exponential backoff), timeout handling, and OpenFDA-specific error categorization.
 - **`ToolManager`** (`src/ToolManager.ts`): Thin wrapper around `McpServer.tool()` registration.
 - **`types.ts`**: TypeScript interfaces for OpenFDA API responses and error types.
+- **Tool implementations** (`src/drug/`): Individual tool handlers (`get-drug-by-name.ts`, `get-drug-by-ndc.ts`, etc.) exported via `src/drug/index.ts`
+- **`src/food/`**: NDC search implementation
 
 ### API Request Flow
 1. Tool handler receives input → `OpenFDABuilder` constructs URL
@@ -58,6 +61,7 @@ The MCP SDK has a bug with Zod schema validation. Always use `schema.shape` inst
 - `get-drug-safety-info` - Warnings, contraindications, interactions
 - `get-drug-by-ndc` - Search by National Drug Code
 - `get-drug-by-product-ndc` - Search by product NDC only
+- `get-drugsfda` - Full drug FDALabel data
 
 ## Environment
 
