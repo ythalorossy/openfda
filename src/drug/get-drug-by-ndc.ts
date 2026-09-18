@@ -37,7 +37,7 @@ export const getDrugByNdc = {
     let searchQuery = `openfda.product_ndc:"${productNDC}"`;
 
     if (packageNDC) {
-      searchQuery += `+OR+openfda.package_ndc:"${packageNDC}"`;
+      searchQuery += ` OR openfda.package_ndc:"${packageNDC}"`;
     }
 
     const url = new OpenFDABuilder()
