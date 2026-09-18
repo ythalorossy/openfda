@@ -5,6 +5,7 @@
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import { summarizeResults, withTotals } from '../utils/format.js';
+import { describeOutcome } from './faers.js';
 import z from 'zod';
 
 export const getDrugAdverseEvents = {
@@ -82,14 +83,23 @@ export const getDrugAdverseEvents = {
           : event.patient?.patientsex === '2'
             ? 'Female'
             : 'Unknown',
-      reactions:
-        event.patient?.reaction
-          ?.map((r: any) => r.reactionmeddrapt)
-          .slice(0, 3) || [],
-      outcomes:
-        event.patient?.reaction
-          ?.map((r: any) => r.reactionoutcome)
-          .slice(0, 3) || [],
+      // Raw FAERS records repeat the same reaction term within one report,
+      // which reads as two distinct events. Deduplicate before truncating so
+      // the 3-item slice carries three distinct terms.
+      reactions: [
+        ...new Set<string>(
+          (event.patient?.reaction ?? [])
+            .map((r: any) => r.reactionmeddrapt)
+            .filter(Boolean)
+        ),
+      ].slice(0, 3),
+      outcomes: [
+        ...new Set<string>(
+          (event.patient?.reaction ?? []).map((r: any) =>
+            describeOutcome(r.reactionoutcome)
+          )
+        ),
+      ].slice(0, 3),
       report_date: event.receiptdate || 'Unknown',
     }));
 
