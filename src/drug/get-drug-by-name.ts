@@ -31,7 +31,7 @@ export const getDrugByName = {
       switch (error.type) {
         case 'http':
           if (error.status === 404) {
-            errorMessage += `${url}\n\nSuggestions:\n- Verify the exact brand name spelling\n- Try searching for the generic name instead\n- Check if the drug is FDA-approved`;
+            errorMessage += `\n\nSuggestions:\n- Verify the exact brand name spelling\n- Try searching for the generic name instead\n- Check if the drug is FDA-approved`;
           } else if (error.status === 401 || error.status === 403) {
             errorMessage += `\n\nPlease check the API key configuration.`;
           }

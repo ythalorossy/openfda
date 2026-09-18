@@ -41,7 +41,7 @@ export const getDrugsByManufacturer = {
         content: [
           {
             type: 'text',
-            text: `${url}\nFailed to retrieve drugs for manufacturer "${manufacturerName}": ${error.message}`,
+            text: `Failed to retrieve drugs for manufacturer "${manufacturerName}": ${error.message}`,
           },
         ],
         isError: true,
