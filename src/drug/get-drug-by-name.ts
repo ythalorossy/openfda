@@ -2,67 +2,38 @@
  * Copyright (c) 2025 Ythalo Saldanha
  * Licensed under the MIT License
  */
-import { OpenFDAResponse } from '../types.js';
 import z from 'zod';
-import { OpenFDABuilder } from '../OpenFDABuilder.js';
-import { makeOpenFDARequest } from '../ApiHandler.js';
 import { mapLabelFields } from './label-fields.js';
+import { resolveLabel, notFoundMessage } from './resolve-label.js';
 
 export const getDrugByName = {
   name: 'get-drug-by-name',
   description:
-    'Get drug by name. Use this tool to get the drug information by name. The drug name should be the brand name. It returns the brand name, generic name, manufacturer name, product NDC, product type, route, substance name, indications and usage, warnings, do not use, ask doctor, ask doctor or pharmacist, stop use, pregnancy or breast feeding.',
+    'Get drug information by brand name, generic name, or active substance. Returns the brand name, generic name, manufacturer name, product NDC, product type, route, substance name, indications and usage, warnings, do not use, ask doctor, ask doctor or pharmacist, stop use, pregnancy or breast feeding. The response reports which field matched via matched_via.',
   inputSchema: z.object({
     drugName: z.string().describe('Drug name'),
   }),
   async handler({ drugName }: { drugName: string }) {
-    const url = new OpenFDABuilder()
-      .dataset('drug')
-      .context('label')
-      .search(`openfda.brand_name:"${drugName}"`)
-      .limit(1)
-      .build();
+    const resolved = await resolveLabel(drugName, 1);
 
-    const { data: drugData, error } =
-      await makeOpenFDARequest<OpenFDAResponse>(url);
-
-    if (error) {
-      let errorMessage = `Failed to retrieve drug data for "${drugName}": ${error.message}`;
-
-      switch (error.type) {
-        case 'http':
-          if (error.status === 404) {
-            errorMessage += `\n\nSuggestions:\n- Verify the exact brand name spelling\n- Try searching for the generic name instead\n- Check if the drug is FDA-approved`;
-          } else if (error.status === 401 || error.status === 403) {
-            errorMessage += `\n\nPlease check the API key configuration.`;
-          }
-          break;
-        case 'network':
-          errorMessage += `\n\nPlease check your internet connection and try again.`;
-          break;
-        case 'timeout':
-          errorMessage += `\n\nThe request took too long. Please try again.`;
-          break;
+    if (!resolved.found) {
+      if (resolved.error) {
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `Failed to retrieve drug data for "${drugName}": ${resolved.error.message}`,
+            },
+          ],
+          isError: true,
+        };
       }
-
       return {
-        content: [{ type: 'text' as const, text: errorMessage }],
-        isError: true,
+        content: [{ type: 'text' as const, text: notFoundMessage(drugName) }],
       };
     }
 
-    if (!drugData?.results || drugData.results.length === 0) {
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: `No drug information found for "${drugName}". Please verify the brand name spelling or try searching for the generic name.`,
-          },
-        ],
-      };
-    }
-
-    const drug = drugData.results[0];
+    const drug = resolved.data.results[0];
     const drugInfo = {
       brand_name: drug?.openfda.brand_name,
       generic_name: drug?.openfda.generic_name,
@@ -71,6 +42,7 @@ export const getDrugByName = {
       product_type: drug?.openfda.product_type,
       route: drug?.openfda.route,
       substance_name: drug?.openfda.substance_name,
+      matched_via: resolved.matched_via,
       ...mapLabelFields(drug as unknown as Record<string, unknown>),
     };
 
