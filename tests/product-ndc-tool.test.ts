@@ -41,4 +41,15 @@ describe('get-drug-by-product-ndc', () => {
     expect(result.isError).toBe(true);
     expect(fetchStub.calls.length).toBe(0);
   });
+
+  it('echoes undashed input back as the normalized, dashed product NDC', async () => {
+    const result = await getDrugByProductNdc.handler({ productNDC: '58151155' });
+
+    const text = result.content[0].text;
+    expect(text).toContain('"product_ndc": "58151-155"');
+    expect(text).not.toContain('"product_ndc": "58151155"');
+    // The normalized value should also be what the surrounding prose reports,
+    // consistent with the packages listed alongside it.
+    expect(text).toContain('Product NDC "58151-155" found');
+  });
 });

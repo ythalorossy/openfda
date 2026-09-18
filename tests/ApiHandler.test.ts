@@ -65,6 +65,29 @@ describe('makeOpenFDARequest', () => {
     expect(error?.type).toBe('network');
   });
 
+  it('redacts an api_key embedded in an unknown-error message', async () => {
+    // A Node TypeError like "Failed to parse URL from <url>" does not contain
+    // the word "fetch", so it falls past the network-error branch into the
+    // generic `unknown` branch, which used to emit the caught message
+    // verbatim. This is unreachable through any handler today (the base URL
+    // is a literal and all params go through URLSearchParams), so it is
+    // exercised directly against makeOpenFDARequest.
+    const leakyUrl =
+      'https://api.fda.gov/drug/label.json?api_key=SUPERSECRETKEY&search=x';
+    mockFetch.mockRejectedValueOnce(
+      new TypeError(`Failed to parse URL from ${leakyUrl}`)
+    );
+
+    const { data, error } = await makeOpenFDARequest('http://test.com', {
+      maxRetries: 0,
+    });
+
+    expect(data).toBeNull();
+    expect(error?.type).toBe('unknown');
+    expect(error?.message).toContain('<REDACTED>');
+    expect(error?.message).not.toContain('SUPERSECRETKEY');
+  });
+
   it('should handle a timeout', async () => {
     mockFetch.mockImplementation(() => {
       return new Promise((_, reject) => {
