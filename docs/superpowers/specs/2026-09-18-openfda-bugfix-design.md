@@ -30,7 +30,7 @@ Confirmed reproducing:
 
 | Item | Location on current `main` |
 |---|---|
-| P0-1 | `src/drug/get-drug-by-product-ndc.ts:45` **and** the 404 branch of `src/drug/get-drug-by-name.ts` — two sites, brief said one |
+| P0-1 | **four** sites, brief said one: `get-drugsfda.ts:53`, `get-drug-by-name.ts:34`, `get-drug-by-product-ndc.ts:45`, `get-drugs-by-manufacturer.ts:44` |
 | P0-2 | `src/OpenFDABuilder.ts:71` |
 | P1-1 | `src/drug/get-drug-safety-info.ts:52-65` |
 | P1-2 | `src/drug/get-drug-safety-info.ts:55` |
@@ -62,7 +62,7 @@ Cordarone and Glucophage, which exact brand search cannot.
 Structural fix: handlers never hold a URL. The URL stays between the builder
 and `makeOpenFDARequest`; the returned `error` object carries no URL.
 
-- Remove `${url}` from both leak sites.
+- Remove `${url}` from all four leak sites.
 - Add `src/utils/redact.ts` exporting
   `redactApiKey(s) => s.replace(/([?&]api_key=)[^&\s]*/gi, '$1<REDACTED>')`
   for any future logging path.
