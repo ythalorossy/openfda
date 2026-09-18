@@ -6,21 +6,26 @@ import { OpenFDAResponse } from '../types.js';
 import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
+import { normalizeNDC } from '../utils/ndc.js';
 
 export const getDrugByProductNdc = {
   name: 'get-drug-by-product-ndc',
   description:
-    'Get drug information by product NDC only (XXXXX-XXXX format). This ignores package variations and finds all packages for a product.',
+    'Get drug information by product NDC (5-4 such as 12345-1234, or 5-3 such as 58151-155). This ignores package variations and finds all packages for a product.',
   inputSchema: z.object({
-    productNDC: z.string().describe('Product NDC in format XXXXX-XXXX'),
+    productNDC: z
+      .string()
+      .describe('Product NDC, 5-4 (12345-1234) or 5-3 (58151-155)'),
   }),
   async handler({ productNDC }: { productNDC: string }) {
-    if (!/^\d{5}-\d{4}$/.test(productNDC.trim())) {
+    const { productNDC: normalizedNDC, isValid } = normalizeNDC(productNDC);
+
+    if (!isValid) {
       return {
         content: [
           {
             type: 'text',
-            text: `Invalid product NDC format: "${productNDC}"\n\n✅ Required format: XXXXX-XXXX (e.g., 12345-1234)`,
+            text: `Invalid product NDC format: "${productNDC}"\n\n✅ Accepted formats:\n• 5-4 product NDC: 12345-1234\n• 5-3 product NDC: 58151-155\n• Undashed: 123451234 or 58151155\n\nNote: a 10-digit undashed NDC is ambiguous and is not accepted; include the dashes.`,
           },
         ],
         isError: true,
@@ -30,7 +35,7 @@ export const getDrugByProductNdc = {
     const url = new OpenFDABuilder()
       .dataset('drug')
       .context('label')
-      .search(`openfda.product_ndc:"${productNDC.trim()}"`)
+      .search(`openfda.product_ndc:"${normalizedNDC}"`)
       .limit(1)
       .build();
 
@@ -65,7 +70,7 @@ export const getDrugByProductNdc = {
 
     const allPackagesForProduct =
       drug.openfda.package_ndc?.filter((ndc) =>
-        ndc.startsWith(productNDC.trim())
+        ndc.startsWith(normalizedNDC)
       ) || [];
 
     const drugInfo = {
