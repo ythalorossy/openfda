@@ -11,11 +11,13 @@ import { normalizeNDC } from '../utils/ndc.js';
 export const getDrugByProductNdc = {
   name: 'get-drug-by-product-ndc',
   description:
-    'Get drug information by product NDC (5-4 such as 12345-1234, or 5-3 such as 58151-155). This ignores package variations and finds all packages for a product.',
+    'Get drug information by product NDC (5-4 such as 12345-1234, or 5-3 such as 58151-155; also accepts undashed 8, 9, or 11-digit input). This ignores package variations and finds all packages for a product.',
   inputSchema: z.object({
     productNDC: z
       .string()
-      .describe('Product NDC, 5-4 (12345-1234) or 5-3 (58151-155)'),
+      .describe(
+        'Product NDC, 5-4 (12345-1234) or 5-3 (58151-155), or undashed 8, 9, or 11-digit input'
+      ),
   }),
   async handler({ productNDC }: { productNDC: string }) {
     const { productNDC: normalizedNDC, isValid } = normalizeNDC(productNDC);
@@ -74,7 +76,7 @@ export const getDrugByProductNdc = {
       ) || [];
 
     const drugInfo = {
-      product_ndc: productNDC,
+      product_ndc: normalizedNDC,
       available_packages: allPackagesForProduct,
       brand_name: drug.openfda.brand_name || [],
       generic_name: drug.openfda.generic_name || [],
@@ -91,7 +93,7 @@ export const getDrugByProductNdc = {
       content: [
         {
           type: 'text',
-          text: `✅ Product NDC "${productNDC}" found with ${allPackagesForProduct.length} package variation(s):\n\n${JSON.stringify(drugInfo, null, 2)}`,
+          text: `✅ Product NDC "${normalizedNDC}" found with ${allPackagesForProduct.length} package variation(s):\n\n${JSON.stringify(drugInfo, null, 2)}`,
         },
       ],
     };
