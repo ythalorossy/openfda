@@ -56,6 +56,15 @@ describe('resolveLabel', () => {
     const result = await resolveLabel('Notadrugatall');
 
     expect(result.found).toBe(false);
+    // Pin the request count: with all four stub responses identical, a
+    // regression that gives up after tier 1 would still report
+    // found: false, so the count (and per-tier field checks below) are
+    // what actually prove all four tiers were walked.
+    expect(fetchStub.calls.length).toBe(4);
+    expect(fetchStub.calls[0]).toContain('openfda.brand_name');
+    expect(fetchStub.calls[1]).toContain('openfda.generic_name');
+    expect(fetchStub.calls[2]).toContain('openfda.substance_name');
+    expect(fetchStub.calls[3]).toContain('spl_product_data_elements');
   });
 
   it('queries each tier against its own field', async () => {
@@ -63,6 +72,7 @@ describe('resolveLabel', () => {
 
     await resolveLabel('metformin');
 
+    expect(fetchStub.calls.length).toBe(2);
     expect(fetchStub.calls[0]).toContain('openfda.brand_name');
     expect(fetchStub.calls[1]).toContain('openfda.generic_name');
   });
