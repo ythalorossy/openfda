@@ -5,6 +5,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { ToolManager } from './ToolManager.js';
+import { warnIfKeyless } from './utils/env.js';
 import {
   getDrugByName,
   getDrugByGenericName,
@@ -42,6 +43,7 @@ toolManager.registerTool(getDrugByProductNdc);
 toolManager.registerTool(getDrugsfda);
 
 async function main() {
+  warnIfKeyless();
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error('OpenFDA MCP Server running on stdio');
