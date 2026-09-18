@@ -42,7 +42,7 @@ export const getDrugByProductNdc = {
         content: [
           {
             type: 'text',
-            text: `${url}Failed to retrieve drug data for product NDC "${productNDC}": ${error.message}`,
+            text: `Failed to retrieve drug data for product NDC "${productNDC}": ${error.message}`,
           },
         ],
         isError: true,
