@@ -6,6 +6,7 @@ import { OpenFDAResponse } from '../types.js';
 import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
+import { mapLabelFields } from './label-fields.js';
 
 export const getDrugByName = {
   name: 'get-drug-by-name',
@@ -70,13 +71,7 @@ export const getDrugByName = {
       product_type: drug?.openfda.product_type,
       route: drug?.openfda.route,
       substance_name: drug?.openfda.substance_name,
-      indications_and_usage: drug?.indications_and_usage,
-      warnings: drug?.warnings,
-      do_not_use: drug?.do_not_use,
-      ask_doctor: drug?.ask_doctor,
-      ask_doctor_or_pharmacist: drug?.ask_doctor_or_pharmacist,
-      stop_use: drug?.stop_use,
-      pregnancy_or_breast_feeding: drug?.pregnancy_or_breast_feeding,
+      ...mapLabelFields(drug as unknown as Record<string, unknown>),
     };
 
     return {

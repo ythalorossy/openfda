@@ -1,0 +1,105 @@
+{
+  "meta": {
+    "disclaimer": "Do not rely on openFDA to make decisions regarding medical care. While we make every effort to ensure that data is accurate, you should assume all results are unvalidated. We may limit or otherwise restrict your access to the API in line with our Terms of Service.",
+    "terms": "https://open.fda.gov/terms/",
+    "license": "https://open.fda.gov/license/",
+    "last_updated": "2026-09-18",
+    "results": {
+      "skip": 0,
+      "limit": 1,
+      "total": 1
+    }
+  },
+  "results": [
+    {
+      "openfda": {
+        "application_number": [
+          "NDA020702"
+        ],
+        "brand_name": [
+          "Lipitor"
+        ],
+        "generic_name": [
+          "ATORVASTATIN CALCIUM"
+        ],
+        "manufacturer_name": [
+          "Viatris Specialty LLC"
+        ],
+        "product_ndc": [
+          "58151-155",
+          "58151-156",
+          "58151-157",
+          "58151-158"
+        ],
+        "product_type": [
+          "HUMAN PRESCRIPTION DRUG"
+        ],
+        "route": [
+          "ORAL"
+        ],
+        "substance_name": [
+          "ATORVASTATIN CALCIUM TRIHYDRATE"
+        ],
+        "rxcui": [
+          "259255",
+          "262095",
+          "617310",
+          "617311",
+          "617312",
+          "617314",
+          "617318",
+          "617320"
+        ],
+        "spl_id": [
+          "dd011a82-7356-4b83-86c4-b21cd9138fc6"
+        ],
+        "spl_set_id": [
+          "a60cc18b-0631-4cf0-b021-9f52224ece65"
+        ],
+        "package_ndc": [
+          "58151-155-77",
+          "58151-156-77",
+          "58151-157-77",
+          "58151-158-77"
+        ],
+        "is_original_packager": [
+          true
+        ],
+        "upc": [
+          "0358151155774",
+          "0358151156771",
+          "0358151158775",
+          "0358151157778"
+        ],
+        "unii": [
+          "48A5M73Z4Q"
+        ]
+      },
+      "warnings_and_cautions": [
+        "5 WARNINGS AND PRECAUTIONS • Myopathy and Rhabdomyolysis: Risk factors include age 65 years or greater, uncontrolled hypothyroidism, renal impairment, concomitant use with certain other drugs, and hig"
+      ],
+      "contraindications": [
+        "4 CONTRAINDICATIONS • Acute liver failure or decompensated cirrhosis [see Warnings and Precautions (5.3) ] • Hypersensitivity to atorvastatin or any excipients in LIPITOR. Hypersensitivity reactions, "
+      ],
+      "drug_interactions": [
+        "7 DRUG INTERACTIONS • See full prescribing information for details regarding concomitant use of LIPITOR with other drugs or grapefruit juice that increase the risk of myopathy and rhabdomyolysis ( 2.5",
+        "Drug Interactions Atorvastatin is a substrate of the hepatic transporters, OATP1B1 and OATP1B3 transporter. Metabolites of atorvastatin are substrates of OATP1B1. Atorvastatin is also identified as a "
+      ],
+      "adverse_reactions": [
+        "6 ADVERSE REACTIONS The following important adverse reactions are described below and elsewhere in the labeling: • Myopathy and Rhabdomyolysis [see Warnings and Precautions (5.1) ] • Immune-Mediated N"
+      ],
+      "overdosage": [
+        "10 OVERDOSAGE No specific antidotes for LIPITOR are known. Contact Poison Control (1-800-222-1222) for latest recommendations. Due to extensive drug binding to plasma proteins, hemodialysis is not exp"
+      ],
+      "indications_and_usage": [
+        "1 INDICATIONS AND USAGE LIPITOR is indicated: • To reduce the risk of: o Myocardial infarction (MI), stroke, revascularization procedures, and angina in adults with multiple risk factors for coronary "
+      ],
+      "dosage_and_administration": [
+        "2 DOSAGE AND ADMINISTRATION • Take orally once daily with or without food ( 2.1 ). • Assess LDL-C when clinically appropriate, as early as 4 weeks after initiating LIPITOR, and adjust dosage if necess"
+      ],
+      "spl_product_data_elements": [
+        "Lipitor atorvastatin calcium ATORVASTATIN CALCIUM TRIHYDRATE ATORVASTATIN CALCIUM CARBONATE CANDELILLA WAX CROSCARMELLOSE SODIUM HYDROXYPROPYL CELLULOSE (1600000 WAMW) LACTOSE MONOHYDRATE MAGNESIUM ST"
+      ]
+    }
+  ]
+}

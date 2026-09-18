@@ -6,6 +6,7 @@ import { OpenFDAResponse } from '../types.js';
 import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
+import { mapSafetyFields } from './label-fields.js';
 
 export const getDrugSafetyInfo = {
   name: 'get-drug-safety-info',
@@ -52,16 +53,7 @@ export const getDrugSafetyInfo = {
     const safetyInfo = {
       drug_name: drug?.openfda.brand_name?.[0] || drugName,
       generic_name: drug?.openfda.generic_name?.[0] || 'Unknown',
-      warnings: drug?.warnings || [],
-      contraindications: drug?.contraindications || [],
-      drug_interactions: drug?.drug_interactions || [],
-      precautions: drug?.precautions || [],
-      adverse_reactions: drug?.adverse_reactions || [],
-      overdosage: drug?.overdosage || [],
-      do_not_use: drug?.do_not_use || [],
-      ask_doctor: drug?.ask_doctor || [],
-      stop_use: drug?.stop_use || [],
-      pregnancy_or_breast_feeding: drug?.pregnancy_or_breast_feeding || [],
+      ...mapSafetyFields(drug as unknown as Record<string, unknown>),
     };
 
     return {
