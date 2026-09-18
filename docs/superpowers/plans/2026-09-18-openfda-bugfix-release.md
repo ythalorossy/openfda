@@ -2376,6 +2376,181 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 
 ---
 
+### Task 10: Resolve originator brands in `get-drug-by-name` too (P2-3, follow-through)
+
+**Added after the final whole-branch review**, which found that Task 7 fixed brand
+resolution only in `get-drug-safety-info`, leaving `get-drug-by-name` — the PRIMARY
+drug-lookup tool — still failing on `Cordarone` and `Glucophage`. The maintainer
+approved closing that inconsistency in this release.
+
+**Files:**
+- Modify: `src/drug/get-drug-by-name.ts`
+- Test: `tests/get-drug-by-name.test.ts` (create)
+
+**Interfaces:**
+- Consumes: `resolveLabel(term, limit?) => ResolveResult` and `notFoundMessage(term)`
+  from `src/drug/resolve-label.ts` (Task 7); `mapLabelFields(drug)` from
+  `src/drug/label-fields.ts` (Task 4).
+- Produces: no new exports. `get-drug-by-name`'s payload gains a `matched_via` key.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `tests/get-drug-by-name.test.ts`. Mirror the structure of
+`tests/resolve-label.test.ts`. Cover:
+
+```ts
+  it('resolves a plain brand name in a single request', async () => {
+    fetchStub = stubFetch([hit('ZESTRIL')]);
+    const result = await getDrugByName.handler({ drugName: 'Zestril' });
+    expect(fetchStub.calls.length).toBe(1);
+    expect(result.content[0].text).toContain('"matched_via": "openfda.brand_name"');
+  });
+
+  it('falls through to spl_product_data_elements for Cordarone', async () => {
+    fetchStub = stubFetch([empty, empty, empty, hit('AMIODARONE HCL')]);
+    const result = await getDrugByName.handler({ drugName: 'Cordarone' });
+    expect(fetchStub.calls.length).toBe(4);
+    expect(result.content[0].text).toContain(
+      '"matched_via": "spl_product_data_elements"'
+    );
+  });
+
+  it('returns suggestions, not a bare miss, when every tier fails', async () => {
+    fetchStub = stubFetch([empty, empty, empty, empty]);
+    const result = await getDrugByName.handler({ drugName: 'Notadrugatall' });
+    expect(fetchStub.calls.length).toBe(4);
+    expect(result.content[0].text).toContain('Suggestions');
+    expect(result.isError).toBeUndefined();
+  });
+
+  it('still returns every promised label field, defaulting to []', async () => {
+    fetchStub = stubFetch([hit('ZESTRIL')]);
+    const result = await getDrugByName.handler({ drugName: 'Zestril' });
+    const payload = JSON.parse(
+      result.content[0].text.slice(result.content[0].text.indexOf('{'))
+    );
+    for (const key of [
+      'boxed_warning', 'warnings', 'warnings_and_cautions', 'do_not_use',
+      'ask_doctor', 'ask_doctor_or_pharmacist', 'stop_use',
+      'pregnancy_or_breast_feeding', 'indications_and_usage',
+    ]) {
+      expect(payload).toHaveProperty(key);
+    }
+  });
+
+  it('surfaces an upstream error rather than reporting not-found', async () => {
+    // all four tiers error -> isError true, no "Suggestions" text
+  });
+```
+
+Define `empty` and `hit()` helpers as in `tests/resolve-label.test.ts`. Assert
+`fetchStub.calls.length` in EVERY test — `stubFetch` repeats its last response once
+exhausted, so a test without a call-count assertion can pass against a wrong number
+of requests.
+
+- [ ] **Step 2: Run and confirm failure**
+
+Run: `npx vitest run tests/get-drug-by-name.test.ts`
+Expected: FAIL — one request made, no `matched_via`, no suggestions on miss.
+
+- [ ] **Step 3: Rewrite the handler to use the shared resolver**
+
+Replace the builder/request/error-switch block with `resolveLabel`, mirroring
+`get-drug-safety-info.ts`:
+
+```ts
+  async handler({ drugName }: { drugName: string }) {
+    const resolved = await resolveLabel(drugName, 1);
+
+    if (!resolved.found) {
+      if (resolved.error) {
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `Failed to retrieve drug data for "${drugName}": ${resolved.error.message}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+      return {
+        content: [{ type: 'text' as const, text: notFoundMessage(drugName) }],
+      };
+    }
+
+    const drug = resolved.data.results[0];
+    const drugInfo = {
+      brand_name: drug?.openfda.brand_name,
+      generic_name: drug?.openfda.generic_name,
+      manufacturer_name: drug?.openfda.manufacturer_name,
+      product_ndc: drug?.openfda.product_ndc,
+      product_type: drug?.openfda.product_type,
+      route: drug?.openfda.route,
+      substance_name: drug?.openfda.substance_name,
+      matched_via: resolved.matched_via,
+      ...mapLabelFields(drug as unknown as Record<string, unknown>),
+    };
+
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: `Drug information retrieved successfully:\n\n${JSON.stringify(drugInfo, null, 2)}`,
+        },
+      ],
+    };
+  },
+```
+
+Imports become:
+
+```ts
+import { mapLabelFields } from './label-fields.js';
+import { resolveLabel, notFoundMessage } from './resolve-label.js';
+```
+
+`OpenFDABuilder`, `makeOpenFDARequest` and `OpenFDAResponse` become unused here —
+remove them or `npm run lint` fails.
+
+This also retires the byte-identical error-switch block the final review flagged as
+duplicated between this file and `get-drugsfda.ts`.
+
+- [ ] **Step 4: Update the tool description**
+
+It currently promises brand-name lookup only. State that it accepts a brand name,
+generic name or active substance, and that `matched_via` reports which field matched.
+
+- [ ] **Step 5: Run and confirm the tests pass**
+
+Run: `npx vitest run tests/get-drug-by-name.test.ts`
+
+- [ ] **Step 6: Full verification**
+
+Run: `npm run test:ci && npm run typecheck && npm run lint && npm run build:cli`
+
+Task 1's `tests/no-url-in-output.test.ts` guards must stay green — its behavioural
+test drives `get-drug-by-product-ndc`, not this file, but the `src/drug/` source scan
+covers the rewritten handler.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add src/drug/get-drug-by-name.ts tests/get-drug-by-name.test.ts
+git commit -m "fix: resolve originator brands in get-drug-by-name too
+
+Task 7 added tiered resolution to get-drug-safety-info, but left the
+primary lookup tool doing an exact openfda.brand_name search, so
+Cordarone and Glucophage still returned not-found from it.
+
+get-drug-by-name now shares the same resolver and reports matched_via.
+A plain brand name still costs exactly one request.
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
+```
+
+---
+
 ## Deferred, with reasons
 
 - **P3-2** (generic-name lookups surface only repackagers) — needs a relevance
