@@ -6,6 +6,7 @@ import { OpenFDAResponse } from '../types.js';
 import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
+import { summarizeResults, withTotals } from '../utils/format.js';
 
 export const getDrugByGenericName = {
   name: 'get-drug-by-generic-name',
@@ -71,7 +72,7 @@ export const getDrugByGenericName = {
       content: [
         {
           type: 'text',
-          text: `Found ${drugs.length} drug(s) with generic name "${genericName}":\n\n${JSON.stringify(drugs, null, 2)}`,
+          text: `${summarizeResults(drugs.length, drugData.meta?.results?.total, `labels with generic name "${genericName}"`)}\n\n${JSON.stringify(withTotals(drugs, drugData.meta?.results?.total, limit ?? 5), null, 2)}`,
         },
       ],
     };

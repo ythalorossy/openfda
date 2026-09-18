@@ -7,6 +7,7 @@ import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import { normalizeNDC } from '../utils/ndc.js';
+import { summarizeResults, withTotals } from '../utils/format.js';
 
 export const getDrugByNdc = {
   name: 'get-drug-by-ndc',
@@ -114,7 +115,7 @@ export const getDrugByNdc = {
       content: [
         {
           type: 'text',
-          text: `✅ Found ${results.length} drug(s) with ${totalPackages} package(s) for NDC "${ndcCode}"\n\n${searchSummary}\n\n${JSON.stringify(results, null, 2)}`,
+          text: `${summarizeResults(results.length, drugData.meta?.results?.total, `labels for NDC "${ndcCode}"`)} with ${totalPackages} package(s)\n\n${searchSummary}\n\n${JSON.stringify(withTotals(results, drugData.meta?.results?.total, 10), null, 2)}`,
         },
       ],
     };
