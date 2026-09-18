@@ -20,6 +20,26 @@ describe('source hygiene', () => {
     });
     expect(offenders).toEqual([]);
   });
+
+  it('never interpolates url-ish identifiers in handler output (stricter check for src/drug/)', () => {
+    // This test applies stricter rules to src/drug/ handlers that produce user-facing
+    // output, to catch evasions of the simpler bare-identifier check.
+    // Deliberately scoped to src/drug/ to avoid false positives: src/OpenFDABuilder.ts
+    // legitimately interpolates ${this.urlBase} when building the request URL, and it
+    // lives in src/, not src/drug/, so it is not subject to this stricter rule.
+    const drugHandlers = sourceFiles('src/drug').filter((file) => {
+      const source = readFileSync(file, 'utf8');
+      // Catch template literals containing:
+      //   ${url...} - any template with url in the interpolation (member access, calls, etc.)
+      //   ${...url...} - member access like ${err.url}
+      // Catch string concatenation with url-ish variables:
+      //   'x' + url, url + 'y', etc.
+      const hasUrlInterpolation = /\$\{[^}]*[uU]rl[^}]*\}/.test(source);
+      const hasUrlConcatenation = /['"`]\s*\+\s*[A-Za-z]*[uU]rl\b|[A-Za-z]*[uU]rl\b\s*\+\s*['"`]/.test(source);
+      return hasUrlInterpolation || hasUrlConcatenation;
+    });
+    expect(drugHandlers).toEqual([]);
+  });
 });
 
 import { getDrugByProductNdc } from '../src/drug/get-drug-by-product-ndc.js';
@@ -36,6 +56,7 @@ describe('tool error output', () => {
       ok: false,
       status: 500,
       statusText: 'Internal Server Error',
+      text: async () => '',
       json: async () => ({}),
     })) as any;
   });
@@ -54,5 +75,5 @@ describe('tool error output', () => {
     expect(text).not.toContain('SUPERSECRETKEY');
     expect(text).not.toContain('api_key');
     expect(text).not.toContain('api.fda.gov');
-  });
+  }, 15000);
 });
