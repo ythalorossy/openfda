@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "disclaimer": "Do not rely on openFDA to make decisions regarding medical care. While we make every effort to ensure that data is accurate, you should assume all results are unvalidated. We may limit or otherwise restrict your access to the API in line with our Terms of Service.",
+    "terms": "https://open.fda.gov/terms/",
+    "license": "https://open.fda.gov/license/",
+    "last_updated": "2026-09-18",
+    "results": {
+      "skip": 0,
+      "limit": 1,
+      "total": 1
+    }
+  },
+  "results": [
+    {
+      "openfda": {
+        "application_number": [
+          "ANDA040416"
+        ],
+        "brand_name": [
+          "Jantoven"
+        ],
+        "generic_name": [
+          "WARFARIN SODIUM"
+        ],
+        "manufacturer_name": [
+          "Upsher-Smith Laboratories, LLC"
+        ],
+        "product_ndc": [
+          "0832-1211",
+          "0832-1212",
+          "0832-1213",
+          "0832-1214",
+          "0832-1215",
+          "0832-1216",
+          "0832-1217",
+          "0832-1218",
+          "0832-1219"
+        ],
+        "product_type": [
+          "HUMAN PRESCRIPTION DRUG"
+        ],
+        "route": [
+          "ORAL"
+        ],
+        "substance_name": [
+          "WARFARIN SODIUM"
+        ],
+        "rxcui": [
+          "855288",
+          "855292",
+          "855296",
+          "855300",
+          "855302",
+          "855306",
+          "855312",
+          "855316",
+          "855318",
+          "855322",
+          "855324",
+          "855328",
+          "855332",
+          "855336",
+          "855338",
+          "855342",
+          "855344",
+          "855348"
+        ],
+        "spl_id": [
+          "396ff415-9bf2-8f45-e063-6394a90af63e"
+        ],
+        "spl_set_id": [
+          "19a69a72-ac5d-45d5-a94d-a5aaecbe4730"
+        ],
+        "package_ndc": [
+          "0832-1211-00",
+          "0832-1211-10",
+          "0832-1211-89",
+          "0832-1211-01",
+          "0832-1212-00",
+          "0832-1212-10",
+          "0832-1212-89",
+          "0832-1212-01",
+          "0832-1213-00",
+          "0832-1213-10",
+          "0832-1213-89",
+          "0832-1213-01",
+          "0832-1214-00",
+          "0832-1214-10",
+          "0832-1214-89",
+          "0832-1214-01",
+          "0832-1215-00",
+          "0832-1215-10",
+          "0832-1215-89",
+          "0832-1215-01",
+          "0832-1216-00",
+          "0832-1216-10",
+          "0832-1216-89",
+          "0832-1216-01",
+          "0832-1217-00",
+          "0832-1217-10",
+          "0832-1217-89",
+          "0832-1217-01",
+          "0832-1218-00",
+          "0832-1218-50",
+          "0832-1218-89",
+          "0832-1218-01",
+          "0832-1219-00",
+          "0832-1219-50",
+          "0832-1219-89",
+          "0832-1219-01"
+        ],
+        "is_original_packager": [
+          true
+        ],
+        "upc": [
+          "0308321217009",
+          "0308321212004",
+          "0308321215005",
+          "0308321211007"
+        ],
+        "unii": [
+          "6153CWM0CL"
+        ]
+      },
+      "boxed_warning": [
+        "WARNING: BLEEDING RISK Warfarin Sodium can cause major or fatal bleeding [see Warnings and Precautions (5.1) ]. Perform regular monitoring of INR in all treated patients [see Dosage and Administration"
+      ],
+      "warnings_and_cautions": [
+        "5 WARNINGS AND PRECAUTIONS Tissue necrosis: Necrosis or gangrene of skin or other tissues can occur, with severe cases requiring debridement or amputation. Discontinue JANTOVEN and consider alternativ"
+      ],
+      "contraindications": [
+        "4 CONTRAINDICATIONS JANTOVEN is contraindicated in: Pregnancy JANTOVEN is contraindicated in women who are pregnant except in pregnant women with mechanical heart valves, who are at high risk of throm"
+      ],
+      "drug_interactions": [
+        "7 DRUG INTERACTIONS Concomitant use of drugs that increase bleeding risk, antibiotics, antifungals, botanical (herbal) products, and inhibitors and inducers of CYP2C9, 1A2, or 3A4. ( 7 ) Consult label"
+      ],
+      "adverse_reactions": [
+        "6 ADVERSE REACTIONS The following serious adverse reactions to JANTOVEN are discussed in greater detail in other sections of the labeling: Hemorrhage [see Boxed Warning , Warnings and Precautions (5.1"
+      ],
+      "overdosage": [
+        "10 OVERDOSAGE 10.1 Signs and Symptoms Bleeding (e.g., appearance of blood in stools or urine, hematuria, excessive menstrual bleeding, melena, petechiae, excessive bruising or persistent oozing from s"
+      ],
+      "indications_and_usage": [
+        "1 INDICATIONS AND USAGE JANTOVEN ® is indicated for: Prophylaxis and treatment of venous thrombosis and its extension, pulmonary embolism (PE). Prophylaxis and treatment of thromboembolic complication"
+      ],
+      "dosage_and_administration": [
+        "2 DOSAGE AND ADMINISTRATION Individualize dosing regimen for each patient, and adjust based on INR response. ( 2.1 , 2.2 ) Knowledge of genotype can inform initial dose selection. ( 2.3 ) Monitoring: "
+      ],
+      "spl_product_data_elements": [
+        "Jantoven Warfarin Sodium LACTOSE MONOHYDRATE MAGNESIUM STEARATE POVIDONE, UNSPECIFIED STARCH, CORN FD&C RED NO. 40 WARFARIN SODIUM WARFARIN WRF;1;832 Jantoven Warfarin Sodium LACTOSE MONOHYDRATE MAGNE"
+      ]
+    }
+  ]
+}
