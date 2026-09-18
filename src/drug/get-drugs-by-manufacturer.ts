@@ -6,6 +6,7 @@ import { OpenFDAResponse } from '../types.js';
 import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
+import { summarizeResults, withTotals } from '../utils/format.js';
 
 export const getDrugsByManufacturer = {
   name: 'get-drugs-by-manufacturer',
@@ -71,7 +72,7 @@ export const getDrugsByManufacturer = {
       content: [
         {
           type: 'text',
-          text: `Found ${drugs.length} drug(s) from manufacturer "${manufacturerName}":\n\n${JSON.stringify(drugs, null, 2)}`,
+          text: `${summarizeResults(drugs.length, drugData.meta?.results?.total, `labels from manufacturer "${manufacturerName}"`)}\n\n${JSON.stringify(withTotals(drugs, drugData.meta?.results?.total, limit ?? 20), null, 2)}`,
         },
       ],
     };

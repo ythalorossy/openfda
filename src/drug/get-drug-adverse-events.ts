@@ -4,6 +4,7 @@
  */
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
+import { summarizeResults, withTotals } from '../utils/format.js';
 import z from 'zod';
 
 export const getDrugAdverseEvents = {
@@ -96,7 +97,7 @@ export const getDrugAdverseEvents = {
       content: [
         {
           type: 'text',
-          text: `Found ${events.length} adverse event report(s) for "${drugName}":\n\n${JSON.stringify(events, null, 2)}`,
+          text: `${summarizeResults(events.length, eventData.meta?.results?.total, `adverse event reports for "${drugName}"`)}\n\n${JSON.stringify(withTotals(events, eventData.meta?.results?.total, limit ?? 10), null, 2)}`,
         },
       ],
     };
