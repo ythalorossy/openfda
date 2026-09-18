@@ -8,6 +8,33 @@ import { summarizeResults, withTotals } from '../utils/format.js';
 import { describeOutcome } from './faers.js';
 import z from 'zod';
 
+interface ReactionPair {
+  reaction: string;
+  outcome: unknown;
+}
+
+/**
+ * Raw FAERS records repeat the same (reaction, outcome) pair within one
+ * report, which reads as two distinct events. `reactions` and `outcomes`
+ * must stay positionally aligned, so dedupe on the PAIR (not each array
+ * independently) before truncating, and derive both output arrays from the
+ * same deduped pairs. A same reaction term with a different outcome code is
+ * two genuine data points and must survive as two entries.
+ */
+function dedupeReactionPairs(reactionList: any[]): ReactionPair[] {
+  const seen = new Set<string>();
+  const pairs: ReactionPair[] = [];
+  for (const r of reactionList) {
+    const reaction = r?.reactionmeddrapt;
+    if (!reaction) continue;
+    const key = `${reaction}\u0000${String(r?.reactionoutcome)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    pairs.push({ reaction, outcome: r?.reactionoutcome });
+  }
+  return pairs.slice(0, 3);
+}
+
 export const getDrugAdverseEvents = {
   name: 'get-drug-adverse-events',
   description:
@@ -73,35 +100,25 @@ export const getDrugAdverseEvents = {
       };
     }
 
-    const events = eventData.results.map((event: any) => ({
-      report_id: event.safetyreportid,
-      serious: event.serious === '1' ? 'Yes' : 'No',
-      patient_age: event.patient?.patientonsetage || 'Unknown',
-      patient_sex:
-        event.patient?.patientsex === '1'
-          ? 'Male'
-          : event.patient?.patientsex === '2'
-            ? 'Female'
-            : 'Unknown',
-      // Raw FAERS records repeat the same reaction term within one report,
-      // which reads as two distinct events. Deduplicate before truncating so
-      // the 3-item slice carries three distinct terms.
-      reactions: [
-        ...new Set<string>(
-          (event.patient?.reaction ?? [])
-            .map((r: any) => r.reactionmeddrapt)
-            .filter(Boolean)
-        ),
-      ].slice(0, 3),
-      outcomes: [
-        ...new Set<string>(
-          (event.patient?.reaction ?? []).map((r: any) =>
-            describeOutcome(r.reactionoutcome)
-          )
-        ),
-      ].slice(0, 3),
-      report_date: event.receiptdate || 'Unknown',
-    }));
+    const events = eventData.results.map((event: any) => {
+      const pairs = dedupeReactionPairs(event.patient?.reaction ?? []);
+      return {
+        report_id: event.safetyreportid,
+        serious: event.serious === '1' ? 'Yes' : 'No',
+        patient_age: event.patient?.patientonsetage || 'Unknown',
+        patient_sex:
+          event.patient?.patientsex === '1'
+            ? 'Male'
+            : event.patient?.patientsex === '2'
+              ? 'Female'
+              : 'Unknown',
+        // Derived from the same deduped pairs so the two arrays stay the
+        // same length and positionally aligned (see dedupeReactionPairs).
+        reactions: pairs.map((p) => p.reaction),
+        outcomes: pairs.map((p) => describeOutcome(p.outcome)),
+        report_date: event.receiptdate || 'Unknown',
+      };
+    });
 
     return {
       content: [
