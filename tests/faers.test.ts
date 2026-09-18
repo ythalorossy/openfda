@@ -35,6 +35,17 @@ describe('get-drug-adverse-events reaction mapping', () => {
 
   beforeEach(() => {
     process.env = { ...originalEnv, OPENFDA_API_KEY: 'TEST_API_KEY' };
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+    fetchStub?.restore();
+  });
+
+  /** Run the handler against a single record with the given raw reactions. */
+  async function runWithReactions(
+    reaction: { reactionmeddrapt: string; reactionoutcome: string }[]
+  ) {
     fetchStub = stubFetch([
       {
         meta: { results: { skip: 0, limit: 1, total: 1 } },
@@ -42,25 +53,12 @@ describe('get-drug-adverse-events reaction mapping', () => {
           {
             safetyreportid: '123',
             serious: '1',
-            patient: {
-              reaction: [
-                { reactionmeddrapt: 'Tremor', reactionoutcome: '1' },
-                { reactionmeddrapt: 'Tremor', reactionoutcome: '1' },
-                { reactionmeddrapt: 'Gait disturbance', reactionoutcome: '5' },
-              ],
-            },
+            patient: { reaction },
           },
         ],
       },
     ]);
-  });
 
-  afterEach(() => {
-    process.env = originalEnv;
-    fetchStub.restore();
-  });
-
-  it('deduplicates repeated reaction terms and decodes outcome codes', async () => {
     const result = await getDrugAdverseEvents.handler({
       drugName: 'x',
       limit: 1,
@@ -73,10 +71,51 @@ describe('get-drug-adverse-events reaction mapping', () => {
     // asserting on the formatted whitespace of the whole string.
     const jsonStart = text.indexOf('\n\n') + 2;
     const payload = JSON.parse(text.slice(jsonStart));
-    const record = payload.results[0];
+    return payload.results[0];
+  }
+
+  it('deduplicates repeated (reaction, outcome) pairs and decodes outcome codes', async () => {
+    const record = await runWithReactions([
+      { reactionmeddrapt: 'Tremor', reactionoutcome: '1' },
+      { reactionmeddrapt: 'Tremor', reactionoutcome: '1' },
+      { reactionmeddrapt: 'Gait disturbance', reactionoutcome: '5' },
+    ]);
 
     expect(record.reactions).toHaveLength(2);
     expect(record.reactions).toEqual(['Tremor', 'Gait disturbance']);
+    expect(record.outcomes).toEqual(['Recovered/resolved', 'Fatal']);
+  });
+
+  it('keeps reactions and outcomes positionally aligned when no pairs repeat', async () => {
+    // Three DISTINCT reactions with outcomes [1, 1, 5]. If reactions and
+    // outcomes were deduplicated independently, outcomes would collapse to
+    // length 2 ([Recovered/resolved, Fatal]) while reactions stayed length
+    // 3, silently attributing "Fatal" to the wrong (middle) reaction.
+    const record = await runWithReactions([
+      { reactionmeddrapt: 'A', reactionoutcome: '1' },
+      { reactionmeddrapt: 'B', reactionoutcome: '1' },
+      { reactionmeddrapt: 'C', reactionoutcome: '5' },
+    ]);
+
+    expect(record.reactions).toHaveLength(record.outcomes.length);
+    expect(record.reactions).toEqual(['A', 'B', 'C']);
+    expect(record.outcomes).toEqual([
+      'Recovered/resolved',
+      'Recovered/resolved',
+      'Fatal',
+    ]);
+    // "Fatal" must sit at the same index as the reaction it belongs to (C).
+    const fatalIndex = record.outcomes.indexOf('Fatal');
+    expect(record.reactions[fatalIndex]).toBe('C');
+  });
+
+  it('keeps both pairs when the same reaction term has two different outcome codes', async () => {
+    const record = await runWithReactions([
+      { reactionmeddrapt: 'Tremor', reactionoutcome: '1' },
+      { reactionmeddrapt: 'Tremor', reactionoutcome: '5' },
+    ]);
+
+    expect(record.reactions).toEqual(['Tremor', 'Tremor']);
     expect(record.outcomes).toEqual(['Recovered/resolved', 'Fatal']);
   });
 });
