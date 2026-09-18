@@ -3,6 +3,8 @@
  * Licensed under the MIT License
  */
 
+import { checkApiKey } from './utils/env.js';
+
 type DatasetType = 'drug';
 
 // The ContextType type defines the valid OpenFDA API contexts that can be used with the OpenFDABuilder.
@@ -62,12 +64,19 @@ export class OpenFDABuilder {
     const context = this.params.get('context');
     const search = this.params.get('search');
     const limit = this.params.get('limit') ?? 1;
-    const apiKey = process.env.OPENFDA_API_KEY;
 
     if (!dataset || !context || !search) {
       throw new Error('Missing required parameters: context or search');
     }
 
-    return `${this.urlBase}/${dataset}/${context}.json?api_key=${apiKey}&search=${search}&limit=${limit}`;
+    const status = checkApiKey();
+    const query = new URLSearchParams();
+    // Omitted entirely when keyless: `api_key=undefined` is rejected with
+    // HTTP 403 API_KEY_INVALID, while no parameter at all is accepted.
+    if (status.ok && status.apiKey) query.set('api_key', status.apiKey);
+    query.set('search', String(search));
+    query.set('limit', String(limit));
+
+    return `${this.urlBase}/${dataset}/${context}.json?${query}`;
   }
 }

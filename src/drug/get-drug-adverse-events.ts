@@ -36,7 +36,7 @@ export const getDrugAdverseEvents = {
 
     if (seriousness !== 'all') {
       const serious = seriousness === 'serious' ? '1' : '2';
-      searchQuery += `+AND+serious:${serious}`;
+      searchQuery += ` AND serious:${serious}`;
     }
 
     const url = new OpenFDABuilder()
