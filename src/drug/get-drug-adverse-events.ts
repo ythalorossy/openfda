@@ -42,7 +42,7 @@ export const SKIP_MAX = 25000;
 export const getDrugAdverseEvents = {
   name: 'get-drug-adverse-events',
   description:
-    'Get adverse event reports for a drug. This provides safety information about reported side effects and reactions. Use brand name or generic name.',
+    'Get adverse event reports for a drug. This provides safety information about reported side effects and reactions. Use brand name or generic name. Without the sort parameter, results are a deterministic earliest-report_id slice, so a small sample is not representative.',
   inputSchema: z.object({
     drugName: z.string().describe('Drug name (brand or generic)'),
     limit: z
