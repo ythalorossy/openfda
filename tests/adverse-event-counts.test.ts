@@ -50,7 +50,11 @@ describe('get-drug-adverse-event-counts', () => {
     const text = result.content[0].text;
     const payload = JSON.parse(text.slice(text.indexOf('{')));
 
-    expect(payload.results[0]).toEqual({ term: 'FATIGUE', count: 9480 });
+    expect(payload.results[0]).toEqual({
+      term: 'FATIGUE',
+      term_code: 'FATIGUE',
+      count: 9480,
+    });
     expect(payload.results).toHaveLength(3);
   });
 
@@ -85,5 +89,70 @@ describe('get-drug-adverse-event-counts', () => {
 
     expect(result.content[0].text).toContain('No adverse event counts');
     expect(result.isError).toBeUndefined();
+  });
+
+  it('decodes coded terms and keeps the raw code alongside', async () => {
+    fetchStub.restore();
+    fetchStub = stubFetch([
+      {
+        meta: {},
+        // openFDA sends these as numbers, not strings.
+        results: [
+          { term: 1, count: 370930 },
+          { term: 2, count: 135235 },
+        ],
+      },
+    ]);
+
+    const result = await getDrugAdverseEventCounts.handler({
+      drugName: 'prednisone',
+      field: 'serious',
+    });
+    const text = result.content[0].text;
+    const payload = JSON.parse(text.slice(text.indexOf('{')));
+
+    expect(payload.results[0]).toEqual({
+      term: 'Serious',
+      term_code: 1,
+      count: 370930,
+    });
+    expect(payload.results[1].term).toBe('Not serious');
+  });
+
+  it('decodes patient sex', async () => {
+    fetchStub.restore();
+    fetchStub = stubFetch([
+      { meta: {}, results: [{ term: 2, count: 284037 }, { term: 0, count: 2150 }] },
+    ]);
+
+    const result = await getDrugAdverseEventCounts.handler({
+      drugName: 'prednisone',
+      field: 'patient.patientsex',
+    });
+    const text = result.content[0].text;
+    const payload = JSON.parse(text.slice(text.indexOf('{')));
+
+    expect(payload.results[0].term).toBe('Female');
+    expect(payload.results[1].term).toBe('Unknown');
+  });
+
+  it('leaves text fields untouched', async () => {
+    fetchStub.restore();
+    fetchStub = stubFetch([
+      { meta: {}, results: [{ term: 'DRUG INEFFECTIVE', count: 9480 }] },
+    ]);
+
+    const result = await getDrugAdverseEventCounts.handler({
+      drugName: 'prednisone',
+      field: 'patient.reaction.reactionmeddrapt.exact',
+    });
+    const text = result.content[0].text;
+    const payload = JSON.parse(text.slice(text.indexOf('{')));
+
+    expect(payload.results[0]).toEqual({
+      term: 'DRUG INEFFECTIVE',
+      term_code: 'DRUG INEFFECTIVE',
+      count: 9480,
+    });
   });
 });

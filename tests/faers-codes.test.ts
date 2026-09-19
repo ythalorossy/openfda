@@ -63,4 +63,14 @@ describe('describeCountTerm', () => {
     expect(describeCountTerm('serious', undefined)).toBe('Not reported');
     expect(describeCountTerm('serious', null)).toBe('Not reported');
   });
+
+  it('reports an absent term honestly for an unmapped (text) field too', () => {
+    // The null-check must run before the `if (!map)` early return, or an
+    // unmapped field given a null/undefined term stringifies to the literal
+    // "undefined"/"null" instead of the honest 'Not reported'. openFDA does
+    // return term: undefined for some aggregations (e.g. receivedate).
+    expect(describeCountTerm('occurcountry.exact', undefined)).toBe(
+      'Not reported'
+    );
+  });
 });

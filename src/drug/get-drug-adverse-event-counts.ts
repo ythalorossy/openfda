@@ -6,6 +6,7 @@ import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import { buildEventSearch, EVENT_MATCHED_VIA } from './event-search.js';
+import { describeCountTerm } from './faers.js';
 
 /**
  * Fields verified to aggregate against the live API. `receivedate` is
@@ -21,14 +22,16 @@ const COUNTABLE_FIELDS = [
 ] as const;
 
 interface CountTerm {
-  term: string;
+  // openFDA sends coded fields (e.g. serious, patient.patientsex) as
+  // NUMBERS, not strings, and text fields as strings.
+  term: string | number;
   count: number;
 }
 
 export const getDrugAdverseEventCounts = {
   name: 'get-drug-adverse-event-counts',
   description:
-    'Rank adverse-event values for a drug by frequency — for example the most commonly reported reactions. Returns aggregated {term, count} pairs as results, not individual reports, along with matched_via, counted_by (the field that was aggregated) and returned (how many ranked terms came back). Note that openFDA omits a result total on aggregated responses, so this tool reports no total; use get-drug-adverse-events for individual reports and their total.',
+    'Rank adverse-event values for a drug by frequency — for example the most commonly reported reactions. Returns aggregated {term, term_code, count} pairs as results, not individual reports, along with matched_via, counted_by (the field that was aggregated) and returned (how many ranked terms came back). For coded fields (serious, patient.patientsex, patient.reaction.reactionoutcome), term is a decoded human-readable label (e.g. "Serious", "Female") and term_code is the raw upstream value; for text fields term and term_code are identical. Note that openFDA omits a result total on aggregated responses, so this tool reports no total; use get-drug-adverse-events for individual reports and their total.',
   // Raw upstream records wrapped in an envelope: declare only the envelope
   // keys this tool guarantees (matched_via, counted_by, returned, results),
   // never inner record fields, because those vary per record. There is no
@@ -102,7 +105,13 @@ export const getDrugAdverseEventCounts = {
       matched_via: EVENT_MATCHED_VIA,
       counted_by: countField,
       returned: data.results.length,
-      results: data.results,
+      // Decode coded enums; text fields pass through. term_code keeps the
+      // raw value so callers aggregating by code are unaffected.
+      results: data.results.map((row) => ({
+        term: describeCountTerm(countField, row.term),
+        term_code: row.term,
+        count: row.count,
+      })),
     };
 
     return {
