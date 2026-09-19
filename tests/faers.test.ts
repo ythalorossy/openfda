@@ -118,4 +118,32 @@ describe('get-drug-adverse-events reaction mapping', () => {
     expect(record.reactions).toEqual(['Tremor', 'Tremor']);
     expect(record.outcomes).toEqual(['Recovered/resolved', 'Fatal']);
   });
+
+  it('reports seriousness with the same labels the counts tool uses', async () => {
+    // runWithReactions' fixture record sets serious: '1'.
+    fetchStub = stubFetch([
+      {
+        meta: { results: { skip: 0, limit: 1, total: 1 } },
+        results: [
+          {
+            safetyreportid: '123',
+            serious: '1',
+            patient: { reaction: [] },
+          },
+        ],
+      },
+    ]);
+
+    const result = await getDrugAdverseEvents.handler({
+      drugName: 'x',
+      limit: 1,
+      seriousness: 'all',
+    });
+    const text = result.content[0].text;
+
+    // Both tools now read from faers.ts SERIOUSNESS, so a reader comparing
+    // the two sees the same vocabulary.
+    expect(text).toContain('"serious": "Serious"');
+    expect(text).not.toContain('"serious": "Yes"');
+  });
 });

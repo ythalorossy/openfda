@@ -59,9 +59,9 @@ export const CODED_COUNT_FIELDS: Record<string, Record<string, string>> = {
  * so the code is stringified before lookup.
  */
 export function describeCountTerm(field: string, term: unknown): string {
+  if (term === undefined || term === null || term === '') return 'Not reported';
   const map = CODED_COUNT_FIELDS[field];
   if (!map) return String(term);
-  if (term === undefined || term === null || term === '') return 'Not reported';
   const key = String(term);
   return map[key] ?? `Unrecognized ${field} code "${key}"`;
 }
