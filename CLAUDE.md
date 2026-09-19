@@ -16,6 +16,7 @@ npm run test       # Run Vitest tests
 npm run test:ci    # Run tests in CI mode (no watch)
 npm run typecheck  # TypeScript type checking
 npm run lint       # Run ESLint
+npm run smoke      # Manual end-to-end check against the built dist/ (hits the live API)
 ```
 
 For single test file: `npx vitest run tests/ApiHandler.test.ts`
@@ -25,6 +26,7 @@ For single test file: `npx vitest run tests/ApiHandler.test.ts`
 - **`vite.config.ts`**: Vite build configuration; externalizes the SDK for StdioServerTransport compatibility, and injects `__APP_VERSION__` from `package.json` at build time so the version reported in `serverInfo` cannot drift from the published version
 - **`tests/`**: Vitest test suite (94 tests across 17 files: ApiHandler, OpenFDABuilder, ToolManager, ToolManager.keyguard, env, ndc, ndc-query, adverse-events-query, product-ndc-tool, faers, format, label-fields, resolve-label, get-drug-by-name, redact, no-url-in-output, version)
 - **`scripts/capture-fixtures.mjs`**: Manual, live-API script that captures trimmed label fixtures into `tests/fixtures/` (not run in CI)
+- **`scripts/smoke-local.mjs`** (`npm run smoke`): Manual end-to-end check that drives the built `dist/index.js` over stdio as a real MCP client would, asserting the behaviours the 1.1.0 fixes introduced. Hits the live API, so it is deliberately NOT part of `npm test`; run it after `npm run build:cli` and before publishing. `npm run smoke -- --no-key` exercises the missing-key path instead.
 
 ## Architecture
 
