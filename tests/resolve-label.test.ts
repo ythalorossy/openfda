@@ -100,9 +100,16 @@ describe('resolveGenericName', () => {
     ).toBe('AMIODARONE');
   });
 
-  it('says Unknown honestly when neither field is present', () => {
-    // It does NOT mine spl_product_data_elements — that is free text and
-    // extracting an ingredient from it would be guesswork.
-    expect(resolveGenericName({})).toBe('Unknown');
+  it('returns null, not the string "Unknown", when neither field is present', () => {
+    // "Unknown" reads like data — indistinguishable from a drug whose generic
+    // name is genuinely recorded as unknown. Labels reached through the
+    // spl_product_data_elements tier (Rayos, Cordarone) have an empty openfda
+    // object, so there is nothing to backfill and nothing honest to say.
+    expect(resolveGenericName({})).toBeNull();
+    expect(resolveGenericName({ generic_name: [], substance_name: [] })).toBeNull();
+  });
+
+  it('never emits the literal string Unknown', () => {
+    expect(resolveGenericName({})).not.toBe('Unknown');
   });
 });
