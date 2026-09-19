@@ -36,6 +36,9 @@ function dedupeReactionPairs(reactionList: any[]): ReactionPair[] {
   return pairs.slice(0, 3);
 }
 
+/** openFDA rejects skip above this: "Skip value must 25000 or less." */
+export const SKIP_MAX = 25000;
+
 export const getDrugAdverseEvents = {
   name: 'get-drug-adverse-events',
   description:
@@ -52,16 +55,49 @@ export const getDrugAdverseEvents = {
       .optional()
       .default('all')
       .describe('Filter by event seriousness'),
+    skip: z
+      .number()
+      .int()
+      .min(0)
+      .max(SKIP_MAX)
+      .optional()
+      .describe(
+        `Offset into the result set, for paging past the limit. Maximum ${SKIP_MAX}.`
+      ),
+    sort: z
+      .enum(['receivedate:desc', 'receivedate:asc'])
+      .optional()
+      .describe(
+        'Order results by report receive date. Without it, results are a deterministic earliest-report_id slice, so a small sample is not representative.'
+      ),
   }),
   async handler({
     drugName,
     limit,
     seriousness,
+    skip,
+    sort,
   }: {
     drugName: string;
     limit?: number;
     seriousness?: 'serious' | 'non-serious' | 'all';
+    skip?: number;
+    sort?: 'receivedate:desc' | 'receivedate:asc';
   }) {
+    // Validate locally rather than forwarding a request openFDA will reject
+    // with an opaque BAD_REQUEST.
+    if (skip !== undefined && skip > SKIP_MAX) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `skip must be ${SKIP_MAX} or less (openFDA's ceiling); received ${skip}. To reach records beyond that, narrow the search or use sort to bring the records you want into range.`,
+          },
+        ],
+        isError: true,
+      };
+    }
+
     let searchQuery = buildEventSearch(drugName);
 
     if (seriousness !== 'all') {
@@ -72,12 +108,16 @@ export const getDrugAdverseEvents = {
       searchQuery = `(${searchQuery}) AND serious:${serious}`;
     }
 
-    const url = new OpenFDABuilder()
+    const builder = new OpenFDABuilder()
       .dataset('drug')
       .context('event')
       .search(searchQuery)
-      .limit(limit)
-      .build();
+      .limit(limit);
+
+    if (skip !== undefined) builder.skip(skip);
+    if (sort !== undefined) builder.sort(sort);
+
+    const url = builder.build();
 
     const { data: eventData, error } = await makeOpenFDARequest<any>(url);
 
