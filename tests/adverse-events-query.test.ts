@@ -95,4 +95,42 @@ describe('get-drug-adverse-events query encoding', () => {
     expect(payload.total).toBe(143346);
     expect(payload.matched_via).toContain('union');
   });
+
+  it('passes skip and sort through to the request', async () => {
+    await getDrugAdverseEvents.handler({
+      drugName: 'citalopram',
+      limit: 1,
+      seriousness: 'all',
+      skip: 20,
+      sort: 'receivedate:desc',
+    });
+
+    const url = fetchStub.calls[0];
+    expect(url).toContain('skip=20');
+    expect(url).toContain('sort=receivedate%3Adesc');
+  });
+
+  it('rejects skip above the openFDA ceiling without making a request', async () => {
+    const result = await getDrugAdverseEvents.handler({
+      drugName: 'citalopram',
+      limit: 1,
+      seriousness: 'all',
+      skip: 25001,
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('25000');
+    expect(fetchStub.calls.length).toBe(0);
+  });
+
+  it('omits skip and sort when not supplied', async () => {
+    await getDrugAdverseEvents.handler({
+      drugName: 'citalopram',
+      limit: 1,
+      seriousness: 'all',
+    });
+
+    expect(fetchStub.calls[0]).not.toContain('skip=');
+    expect(fetchStub.calls[0]).not.toContain('sort=');
+  });
 });
