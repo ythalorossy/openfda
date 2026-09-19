@@ -30,7 +30,8 @@
     "lint": "eslint . --ext .ts",
     "typecheck": "tsc --noEmit",
     "prepare": "npm run build:cli",
-    "smoke": "node scripts/smoke-local.mjs"
+    "smoke": "node scripts/smoke-local.mjs",
+    "probe:drugsfda": "node scripts/probe-drugsfda-paths.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
