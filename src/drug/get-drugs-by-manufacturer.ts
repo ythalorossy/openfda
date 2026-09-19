@@ -7,6 +7,7 @@ import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import { summarizeResults, withTotals } from '../utils/format.js';
+import { resolveGenericName } from './resolve-label.js';
 
 export const getDrugsByManufacturer = {
   name: 'get-drugs-by-manufacturer',
@@ -72,7 +73,9 @@ export const getDrugsByManufacturer = {
 
     const drugs = drugData.results.map((drug) => ({
       brand_name: drug?.openfda.brand_name?.[0] || 'Unknown',
-      generic_name: drug?.openfda.generic_name?.[0] || 'Unknown',
+      generic_name: resolveGenericName(
+        (drug?.openfda ?? {}) as unknown as Record<string, unknown>
+      ),
       product_type: drug?.openfda.product_type?.[0] || 'Unknown',
       route: drug?.openfda.route || [],
       ndc: drug?.openfda.product_ndc?.[0] || 'Unknown',

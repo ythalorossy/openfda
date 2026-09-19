@@ -38,7 +38,9 @@ const shapeRecord = (
   const base = {
     application_number: record.application_number,
     sponsor_name: record.sponsor_name,
-    openfda: record.openfda,
+    // openFDA omits openfda entirely on most records (43/50 for a LILLY
+    // sponsor_name search); emit it either way, matching te_code above.
+    openfda: record.openfda ?? {},
     products: products.map(normaliseProduct),
     submission_count: submissions.length,
   };
@@ -55,7 +57,7 @@ const shapeRecord = (
 export const getDrugsfda = {
   name: 'get-drugsfda',
   description:
-    'Search Drugs@FDA application data by section and field. Returns application, sponsor, product and submission records as results, up to limit. Reports matched_via (the resolved field path), the total number of records matched, and returned, the number actually sent back. detail controls record shape: summary (default) returns application_number, sponsor_name, openfda, products and a submission_count; full adds the submissions array, capped at 10 per record, plus submissions_truncated when more were omitted. Note: openfda.route is the SPL route of administration and products[].route is the Drugs@FDA product route. They use different controlled vocabularies — the same product can be SUBCUTANEOUS in one and INJECTION in the other — so joining on route across tools will silently miss.',
+    'Search Drugs@FDA application data by section and field. Returns application, sponsor, product and submission records as results, up to limit. Reports matched_via (the resolved field path), the total number of records matched, and returned, the number actually sent back. detail controls record shape: summary (default) returns application_number, sponsor_name, openfda, products and a submission_count; full adds the submissions array, capped at 10 per record, plus submissions_truncated when more were omitted. This default changed in 1.3.0: submissions is no longer returned unless detail is set to full. Note: openfda.route is the SPL route of administration and products[].route is the Drugs@FDA product route. They use different controlled vocabularies — the same product can be SUBCUTANEOUS in one and INJECTION in the other — so joining on route across tools will silently miss.',
   // Raw upstream records wrapped in an envelope: declare only the envelope
   // keys this tool guarantees (matched_via, total, returned, limit,
   // results), never inner record fields, because those vary per record.

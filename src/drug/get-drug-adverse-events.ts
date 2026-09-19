@@ -5,7 +5,7 @@
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import { summarizeResults, withTotals } from '../utils/format.js';
-import { describeOutcome, SERIOUSNESS } from './faers.js';
+import { describeOutcome, SERIOUSNESS, PATIENT_SEX } from './faers.js';
 import { buildEventSearch, EVENT_MATCHED_VIA } from './event-search.js';
 import z from 'zod';
 
@@ -166,11 +166,7 @@ export const getDrugAdverseEvents = {
         serious: SERIOUSNESS[String(event.serious)] ?? 'Not reported',
         patient_age: event.patient?.patientonsetage || 'Unknown',
         patient_sex:
-          event.patient?.patientsex === '1'
-            ? 'Male'
-            : event.patient?.patientsex === '2'
-              ? 'Female'
-              : 'Unknown',
+          PATIENT_SEX[String(event.patient?.patientsex)] ?? 'Not reported',
         // Derived from the same deduped pairs so the two arrays stay the
         // same length and positionally aligned (see dedupeReactionPairs).
         reactions: pairs.map((p) => p.reaction),
