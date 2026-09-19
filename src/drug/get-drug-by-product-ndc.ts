@@ -12,7 +12,23 @@ import { invalidNdcMessage } from '../utils/ndc-formats.js';
 export const getDrugByProductNdc = {
   name: 'get-drug-by-product-ndc',
   description:
-    'Get drug information by product NDC. Accepts the dashed forms 4-4 (0456-4020), 5-3 (58151-155) and 5-4 (12345-1234), plus undashed 9-digit (5-4) and 11-digit (5-4-2) input. Undashed 8- and 10-digit input is rejected as ambiguous — dash it. This ignores package variations and finds all packages for a product.',
+    'Get drug information by product NDC. Accepts the dashed forms 4-4 (0456-4020), 5-3 (58151-155) and 5-4 (12345-1234), plus undashed 9-digit (5-4) and 11-digit (5-4-2) input. Undashed 8- and 10-digit input is rejected as ambiguous — dash it. This ignores package variations and finds all packages for a product. Returns product_ndc, available_packages, brand_name, generic_name, manufacturer_name, product_type, route, substance_name, active_ingredient, purpose and dosage_and_administration; every field is always present, empty when the label has none.',
+  // Fixed payload of named fields (one record, not an envelope over many):
+  // every key here is always set on the success path, defaulting to an
+  // empty array when the upstream label omits it.
+  returnsFields: [
+    'product_ndc',
+    'available_packages',
+    'brand_name',
+    'generic_name',
+    'manufacturer_name',
+    'product_type',
+    'route',
+    'substance_name',
+    'active_ingredient',
+    'purpose',
+    'dosage_and_administration',
+  ] as const,
   inputSchema: z.object({
     productNDC: z
       .string()

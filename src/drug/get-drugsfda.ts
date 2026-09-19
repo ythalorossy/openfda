@@ -15,7 +15,17 @@ const fieldList = (section: string) =>
 export const getDrugsfda = {
   name: 'get-drugsfda',
   description:
-    'Search Drugs@FDA application data by section and field. Returns application, sponsor, product and submission records. Reports how many records matched in total, not just how many were returned.',
+    'Search Drugs@FDA application data by section and field. Returns application, sponsor, product and submission records as results, up to limit. Reports matched_via (the resolved field path), the total number of records matched, and returned, the number actually sent back.',
+  // Raw upstream records wrapped in an envelope: declare only the envelope
+  // keys this tool guarantees (matched_via, total, returned, limit,
+  // results), never inner record fields, because those vary per record.
+  returnsFields: [
+    'matched_via',
+    'total',
+    'returned',
+    'limit',
+    'results',
+  ] as const,
   inputSchema: z.object({
     sectionName: z
       .enum([...SECTION_NAMES] as [string, ...string[]])

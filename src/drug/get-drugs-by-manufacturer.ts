@@ -11,7 +11,17 @@ import { summarizeResults, withTotals } from '../utils/format.js';
 export const getDrugsByManufacturer = {
   name: 'get-drugs-by-manufacturer',
   description:
-    'Get all drugs manufactured by a specific company. Useful for finding alternatives or checking manufacturer portfolios.',
+    'Get all drugs manufactured by a specific company. Useful for finding alternatives or checking manufacturer portfolios. Returns results, up to limit, reporting matched_via, the total matched, and returned, the number actually sent back.',
+  // Raw upstream records wrapped in an envelope: declare only the envelope
+  // keys this tool guarantees (matched_via, total, returned, limit,
+  // results), never inner record fields, because those vary per record.
+  returnsFields: [
+    'matched_via',
+    'total',
+    'returned',
+    'limit',
+    'results',
+  ] as const,
   inputSchema: z.object({
     manufacturerName: z.string().describe('Manufacturer/company name'),
     limit: z
