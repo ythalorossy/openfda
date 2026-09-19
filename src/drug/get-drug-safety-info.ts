@@ -2,66 +2,43 @@
  * Copyright (c) 2025 Ythalo Saldanha
  * Licensed under the MIT License
  */
-import { OpenFDAResponse } from '../types.js';
 import z from 'zod';
-import { OpenFDABuilder } from '../OpenFDABuilder.js';
-import { makeOpenFDARequest } from '../ApiHandler.js';
+import { mapSafetyFields } from './label-fields.js';
+import { resolveLabel, notFoundMessage } from './resolve-label.js';
 
 export const getDrugSafetyInfo = {
   name: 'get-drug-safety-info',
   description:
-    'Get comprehensive safety information for a drug including warnings, contraindications, drug interactions, and precautions. Use brand name.',
+    'Get comprehensive safety information for a drug including the boxed warning, warnings and cautions, contraindications, drug interactions, and precautions. Accepts a brand name, generic name, or active substance; the response reports which field matched via matched_via.',
   inputSchema: z.object({
     drugName: z.string().describe('Drug brand name'),
   }),
   async handler({ drugName }: { drugName: string }) {
-    const url = new OpenFDABuilder()
-      .dataset('drug')
-      .context('label')
-      .search(`openfda.brand_name:"${drugName}"`)
-      .limit(1)
-      .build();
+    const resolved = await resolveLabel(drugName, 1);
 
-    const { data: drugData, error } =
-      await makeOpenFDARequest<OpenFDAResponse>(url);
-
-    if (error) {
+    if (!resolved.found) {
+      if (resolved.error) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Failed to retrieve safety information for "${drugName}": ${resolved.error.message}`,
+            },
+          ],
+          isError: true,
+        };
+      }
       return {
-        content: [
-          {
-            type: 'text',
-            text: `Failed to retrieve safety information for "${drugName}": ${error.message}`,
-          },
-        ],
-        isError: true,
+        content: [{ type: 'text', text: notFoundMessage(drugName) }],
       };
     }
 
-    if (!drugData?.results || drugData.results.length === 0) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `No safety information found for "${drugName}".`,
-          },
-        ],
-      };
-    }
-
-    const drug = drugData.results[0];
+    const drug = resolved.data.results[0];
     const safetyInfo = {
       drug_name: drug?.openfda.brand_name?.[0] || drugName,
       generic_name: drug?.openfda.generic_name?.[0] || 'Unknown',
-      warnings: drug?.warnings || [],
-      contraindications: drug?.contraindications || [],
-      drug_interactions: drug?.drug_interactions || [],
-      precautions: drug?.precautions || [],
-      adverse_reactions: drug?.adverse_reactions || [],
-      overdosage: drug?.overdosage || [],
-      do_not_use: drug?.do_not_use || [],
-      ask_doctor: drug?.ask_doctor || [],
-      stop_use: drug?.stop_use || [],
-      pregnancy_or_breast_feeding: drug?.pregnancy_or_breast_feeding || [],
+      matched_via: resolved.matched_via,
+      ...mapSafetyFields(drug as unknown as Record<string, unknown>),
     };
 
     return {

@@ -50,7 +50,7 @@ export const getDrugsfda = {
     const { data, error } = await makeOpenFDARequest<OpenFDAResponse>(url);
 
     if (error) {
-      let errorMessage = `${url} Failed to retrieve drugsfda data for "${searchValue}" in ${sectionName}.${fieldName}: ${error.message}`;
+      let errorMessage = `Failed to retrieve drugsfda data for "${searchValue}" in ${sectionName}.${fieldName}: ${error.message}`;
 
       switch (error.type) {
         case 'http':

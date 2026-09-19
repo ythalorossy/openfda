@@ -4,6 +4,7 @@
  */
 
 import { OpenFDAError } from './types';
+import { redactApiKey } from './utils/redact.js';
 
 // Configuration for retry logic
 interface RequestConfig {
@@ -129,11 +130,13 @@ async function makeOpenFDARequest<T>(
       } catch (parseError) {
         const parsingError: OpenFDAError = {
           type: 'parsing',
-          message: `Failed to parse JSON response: ${
-            parseError instanceof Error
-              ? parseError.message
-              : 'Unknown parsing error'
-          }`,
+          message: redactApiKey(
+            `Failed to parse JSON response: ${
+              parseError instanceof Error
+                ? parseError.message
+                : 'Unknown parsing error'
+            }`
+          ),
           details: parseError,
         };
 
@@ -174,9 +177,9 @@ async function makeOpenFDARequest<T>(
       } else {
         networkError = {
           type: 'unknown',
-          message: `Unexpected error: ${
-            error.message || 'Unknown error occurred'
-          }`,
+          message: redactApiKey(
+            `Unexpected error: ${error.message || 'Unknown error occurred'}`
+          ),
           details: error,
         };
       }

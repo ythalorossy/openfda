@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "disclaimer": "Do not rely on openFDA to make decisions regarding medical care. While we make every effort to ensure that data is accurate, you should assume all results are unvalidated. We may limit or otherwise restrict your access to the API in line with our Terms of Service.",
+    "terms": "https://open.fda.gov/terms/",
+    "license": "https://open.fda.gov/license/",
+    "last_updated": "2026-09-18",
+    "results": {
+      "skip": 0,
+      "limit": 1,
+      "total": 91
+    }
+  },
+  "results": [
+    {
+      "openfda": {
+        "application_number": [
+          "ANDA077031"
+        ],
+        "brand_name": [
+          "Citalopram"
+        ],
+        "generic_name": [
+          "CITALOPRAM HYDROBROMIDE"
+        ],
+        "manufacturer_name": [
+          "REMEDYREPACK INC."
+        ],
+        "product_ndc": [
+          "70518-4334"
+        ],
+        "product_type": [
+          "HUMAN PRESCRIPTION DRUG"
+        ],
+        "route": [
+          "ORAL"
+        ],
+        "substance_name": [
+          "CITALOPRAM HYDROBROMIDE"
+        ],
+        "rxcui": [
+          "309314"
+        ],
+        "spl_id": [
+          "5aacc6ac-f606-7dbf-e063-6394a90ad7ce"
+        ],
+        "spl_set_id": [
+          "0109f365-bebd-4810-a56f-4451e10245db"
+        ],
+        "package_ndc": [
+          "70518-4334-1",
+          "70518-4334-0",
+          "70518-4334-2"
+        ],
+        "original_packager_product_ndc": [
+          "65862-007"
+        ],
+        "unii": [
+          "I1E9D14F36"
+        ]
+      },
+      "boxed_warning": [
+        "WARNING: SUICIDAL THOUGHTS AND BEHAVIORS Antidepressants increased the risk of suicidal thoughts and behaviors in pediatric and young adult patients in short-term studies. Closely monitor all antidepr"
+      ],
+      "warnings_and_cautions": [
+        "5 WARNINGS AND PRECAUTIONS QT-Prolongation and Torsade de Pointes : Dose-dependent QTc prolongation, Torsade de pointes, ventricular tachycardia, and sudden death have occurred. Avoid use of citalopra"
+      ],
+      "contraindications": [
+        "4 CONTRAINDICATIONS Citalopram tablets are contraindicated in patients: taking, or within 14 days of stopping, MAOIs (including MAOIs such as linezolid or intravenous methylene blue) because of an inc"
+      ],
+      "drug_interactions": [
+        "7 DRUG INTERACTIONS Table 5 presents clinically important drug interactions with citalopram. Table 5: Clinically Important Drug Interactions with Citalopram Monoamine Oxidase Inhibitors (MAOIs) Clinic"
+      ],
+      "adverse_reactions": [
+        "6 ADVERSE REACTIONS The following adverse reactions are discussed in greater detail in other sections of the labeling: Hypersensitivity reactions [see Contraindications (4) ] Suicidal thoughts and beh"
+      ],
+      "overdosage": [
+        "10 OVERDOSAGE The following have been reported with citalopram tablet overdosage: Seizures, which may be delayed, and altered mental status including coma. Cardiovascular toxicity, which may be delaye"
+      ],
+      "indications_and_usage": [
+        "1 INDICATIONS AND USAGE Citalopram tablets are indicated for the treatment of major depressive disorder (MDD) in adults [see Clinical Studies (14) ] . Citalopram tablets are a selective serotonin reup"
+      ],
+      "dosage_and_administration": [
+        "2 DOSAGE AND ADMINISTRATION Administer once daily with or without food ( 2 ) . Initial dosage is 20 mg once daily; after one week may increase to maximum dosage of 40 mg once daily ( 2.1 ). Patients g"
+      ],
+      "spl_product_data_elements": [
+        "Citalopram Citalopram Hydrobromide CITALOPRAM HYDROBROMIDE CITALOPRAM COPOVIDONE K25-31 STARCH, CORN CROSCARMELLOSE SODIUM LACTOSE MONOHYDRATE MAGNESIUM STEARATE HYPROMELLOSE 2910 (6 MPA.S) MICROCRYST"
+      ]
+    }
+  ]
+}

@@ -14,20 +14,25 @@ A Model Context Protocol (MCP) server for querying drug information from the Ope
 - Get adverse event (side effect) reports for a drug (by brand or generic name)
 - Retrieve all drugs manufactured by a specific company
 - Get comprehensive drug safety information (warnings, contraindications, interactions, precautions, etc.)
+- Retrieve full Drugs@FDA application data for a given section and field
 - Normalize and validate NDC (National Drug Code) formats
 - Helpful error messages and suggestions for failed queries
 
 1. **Set up your OpenFDA API Key**
 
-   The MCP server requires an OpenFDA API key to access the OpenFDA API.  
-   Create a `.env` file in the root of your project and add the following line:
+   The server reads `OPENFDA_API_KEY` from its process environment. It is
+   launched by your MCP client, so the key belongs in the `env` block of your
+   client configuration (shown below) — **a `.env` file is not read.**
 
-   ```env
-   OPENFDA_API_KEY=your_openfda_api_key_here
-   ```
+   Get a key from [OpenFDA API Key Registration](https://open.fda.gov/apis/authentication/).
+   A key raises your limit from 40 to 240 requests per minute.
 
-   > **Note:** Never commit your real API key to version control.  
-   > You can obtain an API key from [OpenFDA API Key Registration](https://open.fda.gov/apis/authentication/).
+   Without a key, every tool call returns a configuration error rather than
+   failing confusingly upstream. To run on the unauthenticated tier anyway,
+   set `OPENFDA_ALLOW_KEYLESS=1` — note that tier reports no rate-limit
+   headers, so exhausting it surfaces as slow, intermittent failures.
+
+   > **Note:** Never commit your real API key to version control.
 
 2. **Example MCP Server Configuration**
 
@@ -39,6 +44,7 @@ A Model Context Protocol (MCP) server for querying drug information from the Ope
           "openfda": {
               "command": "npx",
               "args": [
+                  "-y",
                   "@ythalorossy/openfda"
               ],
               "env": {
@@ -52,14 +58,15 @@ A Model Context Protocol (MCP) server for querying drug information from the Ope
                   "get-drugs-by-manufacturer",
                   "get-drug-safety-info",
                   "get-drug-by-ndc",
-                  "get-drug-by-product-ndc"
+                  "get-drug-by-product-ndc",
+                  "get-drugsfda"
               ]
           }
       }
     }
    ```
 
-   Replace the asterisks with your actual API key, or ensure it is loaded from your `.env` file.
+   Replace the asterisks with your actual API key.
 
 ## Want to run it locally?
 
@@ -73,7 +80,7 @@ npm run build
 Then start the server:
 
 ```bash
-node bin/index.js
+node dist/index.js
 ```
 
 Or use it directly with npx:
@@ -84,7 +91,7 @@ npx @ythalorossy/openfda
 
 ## Configuration
 
-Create a `.env` file for any required environment variables.
+Export `OPENFDA_API_KEY` in your shell before running locally: `export OPENFDA_API_KEY=your_key`.
 
 ## License
 
