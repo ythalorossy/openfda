@@ -59,6 +59,24 @@ export class OpenFDABuilder {
     return this;
   }
 
+  /** Aggregate by a field instead of returning records. */
+  count(field: string): this {
+    this.params.set('count', field);
+    return this;
+  }
+
+  /** Offset into the result set. openFDA rejects values above 25000. */
+  skip(n: number): this {
+    this.params.set('skip', n);
+    return this;
+  }
+
+  /** e.g. 'receivedate:desc'. */
+  sort(order: string): this {
+    this.params.set('sort', order);
+    return this;
+  }
+
   build(): string {
     const dataset = this.params.get('dataset');
     const context = this.params.get('context');
@@ -76,6 +94,12 @@ export class OpenFDABuilder {
     if (status.ok && status.apiKey) query.set('api_key', status.apiKey);
     query.set('search', String(search));
     query.set('limit', String(limit));
+    // Optional parameters: emitted only when explicitly set, so an unset
+    // value never reaches openFDA as an empty string.
+    for (const key of ['count', 'skip', 'sort'] as const) {
+      const value = this.params.get(key);
+      if (value !== undefined) query.set(key, String(value));
+    }
 
     return `${this.urlBase}/${dataset}/${context}.json?${query}`;
   }
