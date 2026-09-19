@@ -22,8 +22,8 @@ For single test file: `npx vitest run tests/ApiHandler.test.ts`
 
 ## Key Files
 
-- **`vite.config.ts`**: Vite build configuration; externalizes SDK for StdioServerTransport compatibility
-- **`tests/`**: Vitest test suite (78 tests across 15 files: ApiHandler, OpenFDABuilder, ToolManager, ToolManager.keyguard, env, ndc, ndc-query, adverse-events-query, product-ndc-tool, faers, format, label-fields, resolve-label, redact, no-url-in-output)
+- **`vite.config.ts`**: Vite build configuration; externalizes the SDK for StdioServerTransport compatibility, and injects `__APP_VERSION__` from `package.json` at build time so the version reported in `serverInfo` cannot drift from the published version
+- **`tests/`**: Vitest test suite (94 tests across 17 files: ApiHandler, OpenFDABuilder, ToolManager, ToolManager.keyguard, env, ndc, ndc-query, adverse-events-query, product-ndc-tool, faers, format, label-fields, resolve-label, get-drug-by-name, redact, no-url-in-output, version)
 - **`scripts/capture-fixtures.mjs`**: Manual, live-API script that captures trimmed label fixtures into `tests/fixtures/` (not run in CI)
 
 ## Architecture
@@ -48,9 +48,10 @@ Tools are registered in `src/index.ts` using `ToolManager.registerTool()` with:
 - **`types.ts`**: TypeScript interfaces for OpenFDA API responses and error types.
 - **`src/utils/env.ts`**: `checkApiKey()` / `warnIfKeyless()` — decides whether a request may run keyed, keyless (`OPENFDA_ALLOW_KEYLESS=1`), or not at all.
 - **`src/utils/redact.ts`**: Strips `api_key` values out of any string before it can reach tool output, logs, or error messages.
+- **`src/utils/ndc.ts`**: `normalizeNDC()` — the single validator/normalizer for both NDC tools. Accepts 4-4, 5-3 and 5-4 product NDCs and their package forms; rejects ambiguous undashed 8- and 10-digit input.
 - **`src/utils/format.ts`**: `summarizeResults()` / `withTotals()` — reports `Showing N of M` using the upstream result total instead of the caller's limit.
 - **`src/drug/label-fields.ts`**: Maps raw label JSON to the fields tools return, including `boxed_warning` and `warnings_and_cautions` (always present, empty array when absent).
-- **`src/drug/resolve-label.ts`**: `resolveLabel()` — resolves a drug name through four tiers in order (`openfda.brand_name`, `openfda.generic_name`, `openfda.substance_name`, `spl_product_data_elements`), reporting which tier matched via `matched_via`. Used by `get-drug-safety-info`.
+- **`src/drug/resolve-label.ts`**: `resolveLabel()` — resolves a drug name through four tiers in order (`openfda.brand_name`, `openfda.generic_name`, `openfda.substance_name`, `spl_product_data_elements`), stopping at the first tier with results and reporting which one matched via `matched_via`. Used by both `get-drug-safety-info` and `get-drug-by-name`.
 - **`src/drug/faers.ts`**: Decodes FAERS `reactionoutcome` codes to human-readable labels.
 - **Tool implementations** (`src/drug/`): Individual tool handlers (`get-drug-by-name.ts`, `get-drug-by-ndc.ts`, etc.) exported via `src/drug/index.ts`
 
@@ -60,13 +61,13 @@ Tools are registered in `src/index.ts` using `ToolManager.registerTool()` with:
 3. Handler formats response as MCP-compatible JSON text
 
 ### Available Tools
-- `get-drug-by-name` - Search by brand name
+- `get-drug-by-name` - Look up a drug by brand, generic or substance name via the four-tier resolver, reporting `matched_via`
 - `get-drug-by-generic-name` - Search by active ingredient
 - `get-drug-adverse-events` - Adverse event reports, with FAERS outcome codes decoded to labels and (reaction, outcome) pairs deduplicated
 - `get-drugs-by-manufacturer` - Drugs by company
 - `get-drug-safety-info` - Warnings, contraindications, interactions; resolves brand/generic/substance names through four tiers, reporting `matched_via`
 - `get-drug-by-ndc` - Search by National Drug Code
-- `get-drug-by-product-ndc` - Search by product NDC only (accepts 5-4 and 5-3 formats)
+- `get-drug-by-product-ndc` - Search by product NDC only. Accepts dashed 4-4 (`0456-4020`), 5-3 (`58151-155`) and 5-4 (`12345-1234`), plus undashed 9- and 11-digit input. Undashed 8- and 10-digit input is rejected as ambiguous rather than guessed.
 - `get-drugsfda` - Drugs@FDA application data by section (`application`, `openfda`, `products`, `submissions`, `application_docs`) and field
 
 ## Environment
