@@ -20,8 +20,9 @@ A Model Context Protocol (MCP) server for querying drug information from the Ope
 - Helpful error messages and suggestions for failed queries
 
 > **Route vocabularies differ across tools.** `openfda.route` (used by
-> `get-drug-by-name`, `get-drug-safety-info`, etc. — the SPL route of
-> administration) and `products[].route` (used by `get-drugsfda` — the
+> `get-drug-by-name`, `get-drug-by-generic-name`, `get-drug-by-ndc`,
+> `get-drug-by-product-ndc` and `get-drugs-by-manufacturer` — the SPL route
+> of administration) and `products[].route` (used by `get-drugsfda` — the
 > Drugs@FDA product route) are different controlled vocabularies. The same
 > insulin glargine product is reported as `SUBCUTANEOUS` in one and
 > `INJECTION` in the other, so joining or filtering on route across tools
