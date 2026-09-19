@@ -42,6 +42,10 @@ export const getDrugByNdc = {
       searchQuery += ` OR openfda.package_ndc:"${packageNDC}"`;
     }
 
+    const matchedVia = packageNDC
+      ? 'openfda.product_ndc OR openfda.package_ndc'
+      : 'openfda.product_ndc';
+
     const url = new OpenFDABuilder()
       .dataset('drug')
       .context('label')
@@ -116,7 +120,7 @@ export const getDrugByNdc = {
       content: [
         {
           type: 'text',
-          text: `${summarizeResults(results.length, drugData.meta?.results?.total, `labels for NDC "${ndcCode}"`)} with ${totalPackages} package(s)\n\n${searchSummary}\n\n${JSON.stringify(withTotals(results, drugData.meta?.results?.total, 10), null, 2)}`,
+          text: `${summarizeResults(results.length, drugData.meta?.results?.total, `labels for NDC "${ndcCode}"`)} with ${totalPackages} package(s)\n\n${searchSummary}\n\n${JSON.stringify({ matched_via: matchedVia, ...withTotals(results, drugData.meta?.results?.total, 10) }, null, 2)}`,
         },
       ],
     };

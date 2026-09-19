@@ -72,7 +72,7 @@ export const getDrugsByManufacturer = {
       content: [
         {
           type: 'text',
-          text: `${summarizeResults(drugs.length, drugData.meta?.results?.total, `labels from manufacturer "${manufacturerName}"`)}\n\n${JSON.stringify(withTotals(drugs, drugData.meta?.results?.total, limit ?? 20), null, 2)}`,
+          text: `${summarizeResults(drugs.length, drugData.meta?.results?.total, `labels from manufacturer "${manufacturerName}"`)}\n\n${JSON.stringify({ matched_via: 'openfda.manufacturer_name', ...withTotals(drugs, drugData.meta?.results?.total, limit ?? 20) }, null, 2)}`,
         },
       ],
     };
