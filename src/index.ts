@@ -15,6 +15,7 @@ import {
   getDrugByNdc,
   getDrugByProductNdc,
   getDrugsfda,
+  getDrugAdverseEventCounts,
 } from './drug/index.js';
 
 // Replaced at build time by vite (see vite.config.ts) with the version from
@@ -47,6 +48,7 @@ toolManager.registerTool(getDrugSafetyInfo);
 toolManager.registerTool(getDrugByNdc);
 toolManager.registerTool(getDrugByProductNdc);
 toolManager.registerTool(getDrugsfda);
+toolManager.registerTool(getDrugAdverseEventCounts);
 
 async function main() {
   warnIfKeyless();

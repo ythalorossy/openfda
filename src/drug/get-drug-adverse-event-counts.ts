@@ -1,0 +1,111 @@
+/*
+ * Copyright (c) 2025 Ythalo Saldanha
+ * Licensed under the MIT License
+ */
+import z from 'zod';
+import { OpenFDABuilder } from '../OpenFDABuilder.js';
+import { makeOpenFDARequest } from '../ApiHandler.js';
+import { buildEventSearch, EVENT_MATCHED_VIA } from './event-search.js';
+
+/**
+ * Fields verified to aggregate against the live API. `receivedate` is
+ * excluded deliberately: counting it returns `term: undefined`.
+ */
+const COUNTABLE_FIELDS = [
+  'patient.reaction.reactionmeddrapt.exact',
+  'patient.reaction.reactionoutcome',
+  'serious',
+  'patient.patientsex',
+  'occurcountry.exact',
+  'patient.drug.openfda.generic_name.exact',
+] as const;
+
+interface CountTerm {
+  term: string;
+  count: number;
+}
+
+export const getDrugAdverseEventCounts = {
+  name: 'get-drug-adverse-event-counts',
+  description:
+    'Rank adverse-event values for a drug by frequency — for example the most commonly reported reactions. Returns aggregated {term, count} pairs, not individual reports. Note that openFDA omits a result total on aggregated responses, so this tool reports no total; use get-drug-adverse-events for individual reports and their total.',
+  inputSchema: z.object({
+    drugName: z.string().describe('Drug name (brand, generic or substance)'),
+    field: z
+      .enum(COUNTABLE_FIELDS)
+      .optional()
+      .default('patient.reaction.reactionmeddrapt.exact')
+      .describe('Field to aggregate by'),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .optional()
+      .default(10)
+      .describe('Maximum number of ranked terms to return'),
+  }),
+  async handler({
+    drugName,
+    field,
+    limit,
+  }: {
+    drugName: string;
+    field?: (typeof COUNTABLE_FIELDS)[number];
+    limit?: number;
+  }) {
+    const countField = field ?? 'patient.reaction.reactionmeddrapt.exact';
+    const max = limit ?? 10;
+
+    const url = new OpenFDABuilder()
+      .dataset('drug')
+      .context('event')
+      .search(buildEventSearch(drugName))
+      .count(countField)
+      .limit(max)
+      .build();
+
+    const { data, error } = await makeOpenFDARequest<{
+      results?: CountTerm[];
+    }>(url);
+
+    if (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to retrieve adverse event counts for "${drugName}": ${error.message}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+
+    if (!data?.results || data.results.length === 0) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `No adverse event counts found for "${drugName}".`,
+          },
+        ],
+      };
+    }
+
+    const payload = {
+      matched_via: EVENT_MATCHED_VIA,
+      counted_by: countField,
+      returned: data.results.length,
+      results: data.results,
+    };
+
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: `Top ${data.results.length} values of ${countField} for "${drugName}" (aggregated responses carry no result total)\n\n${JSON.stringify(payload, null, 2)}`,
+        },
+      ],
+    };
+  },
+};
