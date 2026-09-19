@@ -33,17 +33,21 @@ export type ResolveResult =
 
 export async function resolveLabel(
   term: string,
-  limit = 1
+  limit = 1,
+  skip?: number
 ): Promise<ResolveResult> {
   let lastError: OpenFDAError | undefined;
 
   for (const field of RESOLUTION_TIERS) {
-    const url = new OpenFDABuilder()
+    const builder = new OpenFDABuilder()
       .dataset('drug')
       .context('label')
       .search(`${field}:"${term}"`)
-      .limit(limit)
-      .build();
+      .limit(limit);
+
+    if (skip !== undefined) builder.skip(skip);
+
+    const url = builder.build();
 
     const { data, error } = await makeOpenFDARequest<OpenFDAResponse>(url);
 
