@@ -78,22 +78,29 @@ export const getDrugByName = {
     const drugInfo = resolved.data.results.map((drug) => ({
       // substance_name first: a combination product must be obvious at a
       // glance, because the top match for a brand is often a combination.
-      substance_name: drug?.openfda.substance_name,
-      brand_name: drug?.openfda.brand_name,
-      generic_name: drug?.openfda.generic_name,
-      manufacturer_name: drug?.openfda.manufacturer_name,
-      product_ndc: drug?.openfda.product_ndc,
-      product_type: drug?.openfda.product_type,
-      route: drug?.openfda.route,
+      substance_name: drug?.openfda.substance_name ?? [],
+      brand_name: drug?.openfda.brand_name ?? [],
+      generic_name: drug?.openfda.generic_name ?? [],
+      manufacturer_name: drug?.openfda.manufacturer_name ?? [],
+      product_ndc: drug?.openfda.product_ndc ?? [],
+      product_type: drug?.openfda.product_type ?? [],
+      route: drug?.openfda.route ?? [],
       matched_via: resolved.matched_via,
       ...mapLabelFields(drug as unknown as Record<string, unknown>),
     }));
+
+    const payload = {
+      // Only present when the caller supplied it, mirroring
+      // get-drug-adverse-events so paged responses stay distinguishable.
+      ...(skip !== undefined ? { skip } : {}),
+      ...withTotals(drugInfo, resolved.data.meta?.results?.total, limit ?? 1),
+    };
 
     return {
       content: [
         {
           type: 'text' as const,
-          text: `${summarizeResults(drugInfo.length, resolved.data.meta?.results?.total, `labels matching "${drugName}"`)}\n\n${JSON.stringify(withTotals(drugInfo, resolved.data.meta?.results?.total, limit ?? 1), null, 2)}`,
+          text: `${summarizeResults(drugInfo.length, resolved.data.meta?.results?.total, `labels matching "${drugName}"`)}\n\n${JSON.stringify(payload, null, 2)}`,
         },
       ],
     };
