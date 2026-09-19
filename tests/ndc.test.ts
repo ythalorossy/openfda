@@ -42,12 +42,11 @@ describe('normalizeNDC', () => {
     });
   });
 
-  it('accepts an 8-digit undashed NDC as 5-3', () => {
-    expect(normalizeNDC('58151155')).toEqual({
-      productNDC: '58151-155',
-      packageNDC: null,
-      isValid: true,
-    });
+  it('rejects an 8-digit undashed NDC as ambiguous (5-3 vs 4-4)', () => {
+    // Both readings are real, common formats, so picking one could silently
+    // return a different drug's label. The caller must dash it.
+    expect(normalizeNDC('58151155').isValid).toBe(false);
+    expect(normalizeNDC('04564020').isValid).toBe(false);
   });
 
   it('accepts an 11-digit undashed NDC as 5-4-2', () => {

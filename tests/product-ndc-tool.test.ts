@@ -51,13 +51,26 @@ describe('get-drug-by-product-ndc', () => {
   });
 
   it('echoes undashed input back as the normalized, dashed product NDC', async () => {
-    const result = await getDrugByProductNdc.handler({ productNDC: '58151155' });
+    // 9 digits is read as 5-4. (8-digit undashed is deliberately rejected as
+    // ambiguous — see the ambiguity test below.)
+    const result = await getDrugByProductNdc.handler({ productNDC: '123451234' });
 
     const text = result.content[0].text;
-    expect(text).toContain('"product_ndc": "58151-155"');
-    expect(text).not.toContain('"product_ndc": "58151155"');
+    expect(text).toContain('"product_ndc": "12345-1234"');
+    expect(text).not.toContain('"product_ndc": "123451234"');
     // The normalized value should also be what the surrounding prose reports,
     // consistent with the packages listed alongside it.
-    expect(text).toContain('Product NDC "58151-155" found');
+    expect(text).toContain('Product NDC "12345-1234" found');
+  });
+
+  it('rejects ambiguous undashed 8- and 10-digit input without a request', async () => {
+    for (const ambiguous of ['58151155', '1234512340']) {
+      fetchStub.calls.length = 0;
+      const result = await getDrugByProductNdc.handler({ productNDC: ambiguous });
+
+      expect(result.isError, `${ambiguous} should be rejected`).toBe(true);
+      expect(result.content[0].text).toContain('ambiguous');
+      expect(fetchStub.calls.length, `${ambiguous} must not hit the API`).toBe(0);
+    }
   });
 });
