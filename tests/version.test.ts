@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
+
+const distExists = existsSync('dist/index.js');
 
 describe('server version', () => {
   it('is not hardcoded in src/index.ts', () => {
@@ -16,14 +18,15 @@ describe('server version', () => {
     expect(config).toMatch(/package\.json/);
   });
 
-  it('the built bundle reports the current package version', () => {
-    const { version } = JSON.parse(readFileSync('package.json', 'utf8'));
-    let bundle: string;
-    try {
-      bundle = readFileSync('dist/index.js', 'utf8');
-    } catch {
-      return; // dist is gitignored; skip when the build has not run
+  it.skipIf(!distExists)(
+    'the built bundle reports the current package version',
+    () => {
+      // dist is gitignored; this explicitly skips (with a stated reason,
+      // visible in the test run) rather than silently returning, so the
+      // assertion never looks like it passed when it never ran.
+      const { version } = JSON.parse(readFileSync('package.json', 'utf8'));
+      const bundle = readFileSync('dist/index.js', 'utf8');
+      expect(bundle).toContain(version);
     }
-    expect(bundle).toContain(version);
-  });
+  );
 });

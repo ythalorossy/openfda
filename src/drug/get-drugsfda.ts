@@ -6,70 +6,91 @@ import z from 'zod';
 import { OpenFDAResponse } from '../types.js';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
+import { summarizeResults, withTotals } from '../utils/format.js';
+import { SECTIONS, SECTION_NAMES, resolveField } from './drugsfda-sections.js';
+
+const fieldList = (section: string) =>
+  `${section}: ${Object.keys(SECTIONS[section]!.fields).join(', ')}`;
 
 export const getDrugsfda = {
   name: 'get-drugsfda',
   description:
-    'Get drugsfda data by section and field. Search OpenFDA drugsfda endpoint by specifying a section (application, openfda, products, submissions, application_docs), a field name within that section, and a search value.',
+    'Search Drugs@FDA application data by section and field. Returns application, sponsor, product and submission records as results, up to limit. Reports matched_via (the resolved field path), the total number of records matched, and returned, the number actually sent back.',
+  // Raw upstream records wrapped in an envelope: declare only the envelope
+  // keys this tool guarantees (matched_via, total, returned, limit,
+  // results), never inner record fields, because those vary per record.
+  returnsFields: [
+    'matched_via',
+    'total',
+    'returned',
+    'limit',
+    'results',
+  ] as const,
   inputSchema: z.object({
     sectionName: z
-      .string()
-      .describe(
-        'Section within drugsfda. Valid values: application, openfda, products, submissions, application_docs'
-      ),
+      .enum([...SECTION_NAMES] as [string, ...string[]])
+      .describe(`Section to search. One of: ${SECTION_NAMES.join(', ')}`),
     fieldName: z
       .string()
       .describe(
-        'Field name within the selected section. ' +
-          'application: application_number. ' +
-          'openfda: application_number, brand_name, generic_name, manufacturer_name, nui, package_ndc, pharm_class_cs, pharm_class_epc, pharm_class_pe, pharm_class_moa, product_ndc, route, rxcui, spl_id, spl_set_id, substance_name, unii. ' +
-          'products: active_ingredients.name, active_ingredients.strength, dosage_form, marketing_status, product_number, reference_drug, reference_standard, route, te_code. ' +
-          'submissions: application_docs, review_priority, submission_class_code, submission_class_code_description, submission_number, submission_property_type.code, submission_public_notes, submission_status, submission_status_date, submission_type. ' +
-          'application_docs: applications_doc_id, applications_doc_date, application_docs_title, applications_doc_type, applications_doc_url'
+        `Field within the section. ${SECTION_NAMES.map(fieldList).join('. ')}`
       ),
     searchValue: z
       .string()
-      .describe('Value to search for in the specified field'),
+      .describe(
+        'Value to search for. Sponsor names are stored uppercase and are normalised automatically.'
+      ),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .optional()
+      .default(5)
+      .describe('Maximum number of records to return'),
   }),
   async handler({
     sectionName,
     fieldName,
     searchValue,
+    limit,
   }: {
     sectionName: string;
     fieldName: string;
     searchValue: string;
+    limit?: number;
   }) {
+    const max = limit ?? 5;
+
+    // Validate before any request, so a typo is never indistinguishable from
+    // genuinely absent data.
+    const resolved = resolveField(sectionName, fieldName);
+    if (!resolved.ok) {
+      return {
+        content: [{ type: 'text' as const, text: resolved.message }],
+        isError: true,
+      };
+    }
+
+    const value = resolved.uppercase ? searchValue.toUpperCase() : searchValue;
+
     const url = new OpenFDABuilder()
       .dataset('drug')
       .context('drugsfda')
-      .search(`${sectionName}.${fieldName}:"${searchValue}"`)
-      .limit(1)
+      .search(`${resolved.path}:"${value}"`)
+      .limit(max)
       .build();
 
     const { data, error } = await makeOpenFDARequest<OpenFDAResponse>(url);
 
     if (error) {
-      let errorMessage = `Failed to retrieve drugsfda data for "${searchValue}" in ${sectionName}.${fieldName}: ${error.message}`;
-
-      switch (error.type) {
-        case 'http':
-          if (error.status === 404) {
-            errorMessage += `\n\nSuggestions:\n- Verify the field name is correct for the section\n- Check the search value spelling`;
-          } else if (error.status === 401 || error.status === 403) {
-            errorMessage += `\n\nPlease check the API key configuration.`;
-          }
-          break;
-        case 'network':
-          errorMessage += `\n\nPlease check your internet connection and try again.`;
-          break;
-        case 'timeout':
-          errorMessage += `\n\nThe request took too long. Please try again.`;
-          break;
-      }
-
       return {
-        content: [{ type: 'text' as const, text: errorMessage }],
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to retrieve Drugs@FDA data for "${value}" in ${resolved.path}: ${error.message}`,
+          },
+        ],
         isError: true,
       };
     }
@@ -79,17 +100,19 @@ export const getDrugsfda = {
         content: [
           {
             type: 'text' as const,
-            text: `No drugsfda data found for "${searchValue}" in ${sectionName}.${fieldName}. Please verify the search parameters.`,
+            text: `No Drugs@FDA records found for "${value}" in ${resolved.path}.`,
           },
         ],
       };
     }
 
+    const total = data.meta?.results?.total;
+
     return {
       content: [
         {
           type: 'text' as const,
-          text: `drugsfda data retrieved successfully:\n\n${JSON.stringify(data.results[0], null, 2)}`,
+          text: `${summarizeResults(data.results.length, total, `Drugs@FDA records matching ${resolved.path}`)}\n\n${JSON.stringify({ matched_via: resolved.path, ...withTotals(data.results, total, max) }, null, 2)}`,
         },
       ],
     };
