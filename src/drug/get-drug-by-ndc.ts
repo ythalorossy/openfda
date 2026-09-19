@@ -8,11 +8,12 @@ import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import { normalizeNDC } from '../utils/ndc.js';
 import { summarizeResults, withTotals } from '../utils/format.js';
+import { invalidNdcMessage } from '../utils/ndc-formats.js';
 
 export const getDrugByNdc = {
   name: 'get-drug-by-ndc',
   description:
-    'Get drug information by National Drug Code (NDC). Accepts both product NDC (XXXXX-XXXX) and package NDC (XXXXX-XXXX-XX) formats. Also accepts NDC codes without dashes.',
+    'Get drug information by National Drug Code (NDC). Accepts dashed formats: 4-4 (0456-4020), 5-3 (58151-155), 5-4 (12345-1234), and package NDC. Also accepts undashed 9-digit and 11-digit input. Undashed 8- and 10-digit input is rejected as ambiguous.',
   inputSchema: z.object({
     ndcCode: z
       .string()
@@ -28,7 +29,7 @@ export const getDrugByNdc = {
         content: [
           {
             type: 'text',
-            text: `Invalid NDC format: "${ndcCode}"\n\n✅ Accepted formats:\n• Product NDC: 12345-1234\n• Package NDC: 12345-1234-01\n• Without dashes: 123451234 or 12345123401`,
+            text: invalidNdcMessage(ndcCode, 'NDC'),
           },
         ],
         isError: true,
