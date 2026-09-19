@@ -210,13 +210,34 @@ const run = async () => {
     ['found despite mixed-case input', !/No Drugs@FDA records/.test(t)],
   ]);
 
+  // sectionName is a Zod enum, so an invalid value is rejected by MCP's
+  // input validation before the handler runs — the handler's own "Unknown
+  // section" wording is unreachable over the real protocol. That is a
+  // deliberate schema-level choice (it also tells a model every valid
+  // option up front), not a bug, so assert what the protocol actually
+  // returns rather than the handler's prose.
   t = await call('get-drugsfda', {
     sectionName: 'bogus',
     fieldName: 'x',
     searchValue: 'y',
   });
-  show('N2  invalid section is distinguishable from no-results', t, [
-    ['names the problem', /Unknown section/.test(t)],
+  show('N2  invalid section is rejected with the valid options, not a silent miss', t, [
+    ['is a validation error, not success', /Input validation error/i.test(t)],
+    ['names at least two valid sections', /products/.test(t) && /submissions/.test(t)],
+    ['does not look like a miss', !/No Drugs@FDA records/.test(t)],
+  ]);
+
+  // fieldName is a plain z.string(), so this path IS still handled by
+  // resolveField() and its "Unknown field" wording IS reachable over the
+  // real protocol — the branch N2 no longer exercises.
+  t = await call('get-drugsfda', {
+    sectionName: 'products',
+    fieldName: 'bogus_field',
+    searchValue: 'y',
+  });
+  show('N3  invalid field is rejected with the valid options, not a silent miss', t, [
+    ['names the offending field', /bogus_field/.test(t)],
+    ['lists at least two valid fields', /dosage_form/.test(t) && /marketing_status/.test(t)],
     ['does not look like a miss', !/No Drugs@FDA records/.test(t)],
   ]);
 
