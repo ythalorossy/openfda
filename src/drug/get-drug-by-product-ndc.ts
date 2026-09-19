@@ -11,12 +11,12 @@ import { normalizeNDC } from '../utils/ndc.js';
 export const getDrugByProductNdc = {
   name: 'get-drug-by-product-ndc',
   description:
-    'Get drug information by product NDC (5-4 such as 12345-1234, or 5-3 such as 58151-155; also accepts undashed 8, 9, or 11-digit input). This ignores package variations and finds all packages for a product.',
+    'Get drug information by product NDC. Accepts the dashed forms 4-4 (0456-4020), 5-3 (58151-155) and 5-4 (12345-1234), and undashed 8, 9 or 11-digit input which is assumed to have a 5-digit labeler. This ignores package variations and finds all packages for a product.',
   inputSchema: z.object({
     productNDC: z
       .string()
       .describe(
-        'Product NDC, 5-4 (12345-1234) or 5-3 (58151-155), or undashed 8, 9, or 11-digit input'
+        'Product NDC: dashed 4-4 (0456-4020), 5-3 (58151-155) or 5-4 (12345-1234), or undashed 8/9/11-digit (assumes a 5-digit labeler)'
       ),
   }),
   async handler({ productNDC }: { productNDC: string }) {
@@ -27,7 +27,7 @@ export const getDrugByProductNdc = {
         content: [
           {
             type: 'text',
-            text: `Invalid product NDC format: "${productNDC}"\n\n✅ Accepted formats:\n• 5-4 product NDC: 12345-1234\n• 5-3 product NDC: 58151-155\n• Undashed: 123451234 or 58151155\n\nNote: a 10-digit undashed NDC is ambiguous and is not accepted; include the dashes.`,
+            text: `Invalid product NDC format: "${productNDC}"\n\n✅ Accepted formats:\n• 4-4 product NDC: 0456-4020\n• 5-3 product NDC: 58151-155\n• 5-4 product NDC: 12345-1234\n• Undashed 8, 9 or 11 digits: 58151155, 123451234, 12345123401 (a 5-digit labeler is assumed)\n\nNote: a 10-digit undashed NDC is ambiguous (4-4-2, 5-3-2 and 5-4-1 all have ten digits), so dash it instead. If your labeler code has 4 digits, always dash it.`,
           },
         ],
         isError: true,

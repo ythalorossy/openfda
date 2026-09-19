@@ -58,6 +58,30 @@ describe('normalizeNDC', () => {
     });
   });
 
+  it('accepts a 4-4 product NDC, which openFDA emits for Celexa', () => {
+    expect(normalizeNDC('0456-4020')).toEqual({
+      productNDC: '0456-4020',
+      packageNDC: null,
+      isValid: true,
+    });
+  });
+
+  it('accepts a 4-4-2 package NDC and derives the 4-4 product NDC', () => {
+    expect(normalizeNDC('0456-4020-01')).toEqual({
+      productNDC: '0456-4020',
+      packageNDC: '0456-4020-01',
+      isValid: true,
+    });
+  });
+
+  it('rejects a 4-3 dashed NDC, which is not a real NDC format', () => {
+    expect(normalizeNDC('0456-402').isValid).toBe(false);
+  });
+
+  it('rejects a 6-digit labeler segment', () => {
+    expect(normalizeNDC('123456-1234').isValid).toBe(false);
+  });
+
   it('rejects a 10-digit undashed NDC as ambiguous', () => {
     expect(normalizeNDC('1234512340').isValid).toBe(false);
   });
