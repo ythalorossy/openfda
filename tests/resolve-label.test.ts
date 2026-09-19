@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { resolveLabel, RESOLUTION_TIERS } from '../src/drug/resolve-label';
+import { resolveLabel, RESOLUTION_TIERS, resolveGenericName } from '../src/drug/resolve-label';
 import { stubFetch } from './helpers/stubFetch';
 
 const empty = { meta: { results: { skip: 0, limit: 1, total: 0 } }, results: [] };
@@ -75,5 +75,34 @@ describe('resolveLabel', () => {
     expect(fetchStub.calls.length).toBe(2);
     expect(fetchStub.calls[0]).toContain('openfda.brand_name');
     expect(fetchStub.calls[1]).toContain('openfda.generic_name');
+  });
+});
+
+describe('resolveGenericName', () => {
+  it('prefers openfda.generic_name', () => {
+    expect(
+      resolveGenericName({
+        generic_name: ['AMIODARONE HYDROCHLORIDE'],
+        substance_name: ['AMIODARONE'],
+      })
+    ).toBe('AMIODARONE HYDROCHLORIDE');
+  });
+
+  it('falls back to substance_name', () => {
+    expect(resolveGenericName({ substance_name: ['AMIODARONE'] })).toBe(
+      'AMIODARONE'
+    );
+  });
+
+  it('treats an empty array as absent', () => {
+    expect(
+      resolveGenericName({ generic_name: [], substance_name: ['AMIODARONE'] })
+    ).toBe('AMIODARONE');
+  });
+
+  it('says Unknown honestly when neither field is present', () => {
+    // It does NOT mine spl_product_data_elements — that is free text and
+    // extracting an ingredient from it would be guesswork.
+    expect(resolveGenericName({})).toBe('Unknown');
   });
 });

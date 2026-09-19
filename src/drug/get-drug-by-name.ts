@@ -5,6 +5,7 @@
 import z from 'zod';
 import { mapLabelFields } from './label-fields.js';
 import { resolveLabel, notFoundMessage } from './resolve-label.js';
+import { summarizeResults, withTotals } from '../utils/format.js';
 
 export const getDrugByName = {
   name: 'get-drug-by-name',
@@ -50,7 +51,7 @@ export const getDrugByName = {
       content: [
         {
           type: 'text' as const,
-          text: `Drug information retrieved successfully:\n\n${JSON.stringify(drugInfo, null, 2)}`,
+          text: `${summarizeResults(1, resolved.data.meta?.results?.total, `labels matching "${drugName}"`)}\n\n${JSON.stringify(withTotals([drugInfo], resolved.data.meta?.results?.total, 1), null, 2)}`,
         },
       ],
     };
