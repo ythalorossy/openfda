@@ -6,6 +6,7 @@ import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import { summarizeResults, withTotals } from '../utils/format.js';
 import { describeOutcome } from './faers.js';
+import { buildEventSearch, EVENT_MATCHED_VIA } from './event-search.js';
 import z from 'zod';
 
 interface ReactionPair {
@@ -61,11 +62,14 @@ export const getDrugAdverseEvents = {
     limit?: number;
     seriousness?: 'serious' | 'non-serious' | 'all';
   }) {
-    let searchQuery = `patient.drug.medicinalproduct:"${drugName}"`;
+    let searchQuery = buildEventSearch(drugName);
 
     if (seriousness !== 'all') {
       const serious = seriousness === 'serious' ? '1' : '2';
-      searchQuery += ` AND serious:${serious}`;
+      // Parenthesise the OR group: without it, `a OR b OR c AND serious:1`
+      // binds the AND to the last term only and the filter silently applies
+      // to one index instead of all three.
+      searchQuery = `(${searchQuery}) AND serious:${serious}`;
     }
 
     const url = new OpenFDABuilder()
@@ -124,7 +128,7 @@ export const getDrugAdverseEvents = {
       content: [
         {
           type: 'text',
-          text: `${summarizeResults(events.length, eventData.meta?.results?.total, `adverse event reports for "${drugName}"`)}\n\n${JSON.stringify(withTotals(events, eventData.meta?.results?.total, limit ?? 10), null, 2)}`,
+          text: `${summarizeResults(events.length, eventData.meta?.results?.total, `adverse event reports for "${drugName}"`)}\n\n${JSON.stringify({ matched_via: EVENT_MATCHED_VIA, ...withTotals(events, eventData.meta?.results?.total, limit ?? 10) }, null, 2)}`,
         },
       ],
     };
