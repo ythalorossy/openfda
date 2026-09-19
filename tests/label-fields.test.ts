@@ -37,6 +37,23 @@ describe('mapSafetyFields', () => {
       expect(value, `${key} should default to []`).toEqual([]);
     }
   });
+
+  it('exposes the same OTC Drug Facts fields as mapLabelFields', () => {
+    const otcFields = [
+      'do_not_use',
+      'ask_doctor',
+      'ask_doctor_or_pharmacist',
+      'stop_use',
+      'pregnancy_or_breast_feeding',
+    ];
+    const safety = mapSafetyFields({});
+    const label = mapLabelFields({});
+
+    for (const field of otcFields) {
+      expect(safety, `mapSafetyFields is missing ${field}`).toHaveProperty(field);
+      expect(label, `mapLabelFields is missing ${field}`).toHaveProperty(field);
+    }
+  });
 });
 
 describe('mapLabelFields', () => {

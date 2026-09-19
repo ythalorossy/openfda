@@ -13,7 +13,7 @@ import {
 export const getDrugSafetyInfo = {
   name: 'get-drug-safety-info',
   description:
-    'Get safety information for a drug. Returns drug_name, generic_name, boxed_warning, warnings, warnings_and_cautions, contraindications, drug_interactions, precautions, adverse_reactions, overdosage, do_not_use, ask_doctor, stop_use and pregnancy_or_breast_feeding. Every field is always present, empty when the label has none, so an empty boxed_warning means the drug has none rather than that it was not checked. generic_name is null when the label carries no structured generic or substance name. Accepts a brand, generic or substance name and reports matched_via.',
+    'Get safety information for a drug. Returns drug_name, generic_name, boxed_warning, warnings, warnings_and_cautions, contraindications, drug_interactions, precautions, adverse_reactions, overdosage, do_not_use, ask_doctor, ask_doctor_or_pharmacist, stop_use and pregnancy_or_breast_feeding. Every field is always present, empty when the label has none, so an empty boxed_warning means the drug has none rather than that it was not checked. generic_name is null when the label carries no structured generic or substance name. Accepts a brand, generic or substance name and reports matched_via.',
   returnsFields: [
     'drug_name',
     'generic_name',
@@ -28,6 +28,7 @@ export const getDrugSafetyInfo = {
     'overdosage',
     'do_not_use',
     'ask_doctor',
+    'ask_doctor_or_pharmacist',
     'stop_use',
     'pregnancy_or_breast_feeding',
   ] as const,
