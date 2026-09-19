@@ -9,6 +9,8 @@
  * stdio exactly as an MCP client would, so it exercises the shipped artifact
  * rather than the TypeScript sources.
  *
+ * Asserts behaviours introduced by the 1.1.0 and 1.2.0 fixes.
+ *
  * This HITS THE LIVE openFDA API and is NOT part of the test suite — the
  * vitest suite is fully offline. Run it by hand before publishing.
  *
@@ -181,6 +183,41 @@ const run = async () => {
   show('P3-4/5  FAERS codes decoded, reactions deduped', t, [
     ['decoded label present', /Recovered|Fatal|Not recovered|Unknown|Not reported/.test(t)],
     ['no bare numeric outcome', !/"outcomes": \[\s*"[1-6]"/.test(t)],
+  ]);
+
+  t = await call('get-drug-adverse-event-counts', { drugName: 'citalopram', limit: 3 });
+  show('L1  adverse-event counts rank terms by frequency', t, [
+    ['returns ranked terms', /"term":/.test(t) && /"count":/.test(t)],
+    ['states it has no total', /no result total/i.test(t)],
+  ]);
+
+  t = await call('get-drugsfda', {
+    sectionName: 'products',
+    fieldName: 'marketing_status',
+    searchValue: 'Discontinued',
+    limit: 3,
+  });
+  show('N1  get-drugsfda reports a real total', t, [
+    ['shows N of M', /Showing 3 of \d{3,}/.test(t)],
+  ]);
+
+  t = await call('get-drugsfda', {
+    sectionName: 'application',
+    fieldName: 'sponsor_name',
+    searchValue: 'Upjohn',
+  });
+  show('sponsor_name is normalised to uppercase', t, [
+    ['found despite mixed-case input', !/No Drugs@FDA records/.test(t)],
+  ]);
+
+  t = await call('get-drugsfda', {
+    sectionName: 'bogus',
+    fieldName: 'x',
+    searchValue: 'y',
+  });
+  show('N2  invalid section is distinguishable from no-results', t, [
+    ['names the problem', /Unknown section/.test(t)],
+    ['does not look like a miss', !/No Drugs@FDA records/.test(t)],
   ]);
 
   console.log('\nDone.\n');
