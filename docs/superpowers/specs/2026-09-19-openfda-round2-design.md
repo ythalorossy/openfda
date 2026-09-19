@@ -44,7 +44,8 @@ field names are fabricated**. The real shape is
 data; `submissions.application_docs.type:"Label"` returns 5,088.
 
 Also noted, not in the brief: `sponsor_name` is a real top-level searchable
-field (191 hits for `"PFIZER"`) that the schema does not offer.
+field (29,335 records carry it) that the schema does not offer. It is added in
+this release — see §1a.
 
 ### Capability probes behind the L1/L2 design
 
@@ -66,8 +67,9 @@ A `SECTIONS` lookup table replaces the prose field list in the description.
 Each entry maps a section to its real query prefix and its verified fields:
 
 - `openfda`, `products`, `submissions` — prefix equals the section name.
-- `application` — **empty prefix**, so the query emits bare
-  `application_number`. That field is top-level in a drugsfda result.
+- `application` — **empty prefix**, so the query emits bare field names.
+  Fields: `application_number` and `sponsor_name`, both top-level in a
+  drugsfda result.
 - `application_docs` — prefix `submissions.application_docs`, fields
   `id`, `url`, `date`, `type`.
 
@@ -81,6 +83,31 @@ Changes:
 - Adds optional `limit` (default 5, maximum 100, enforced by the Zod schema)
   and threads `meta.results.total` through `summarizeResults`/`withTotals`,
   matching every other list tool.
+
+## §1a — New capability: `sponsor_name` (added at the maintainer's request)
+
+`sponsor_name` joins `application_number` in the empty-prefix `application`
+section. Verified: `_exists_:sponsor_name` matches 29,335 records, and
+`sponsor_name:"UPJOHN" AND application_number:"NDA020702"` returns 1.
+
+**It is case-sensitive and stored uppercase.** Measured:
+
+| Query | Result |
+|---|---|
+| `sponsor_name:"UPJOHN"` | 13 |
+| `sponsor_name:"Upjohn"` | NOT_FOUND |
+| `sponsor_name:"upjohn"` | NOT_FOUND |
+
+A caller typing `Pfizer` would otherwise get a silent no-results that looks
+identical to a genuine miss — the same indistinguishability N2 exists to fix.
+
+So the handler **upper-cases the search value for `sponsor_name` only**, and
+the field's description states that sponsor names are stored uppercase and the
+input is normalized.
+
+This normalization must NOT be applied index-wide: `openfda.brand_name:"Lipitor"`
+is case-insensitive and matches fine, so the behaviour is field-specific and is
+driven by a per-field flag in the `SECTIONS` table, not a blanket transform.
 
 ## §2 — Adverse-event search (N4)
 
@@ -164,6 +191,8 @@ Offline, fixture-backed, as in round 1:
 3. Every section in `SECTIONS` builds the query path that live probing proved
    real — in particular `application` with no prefix and `application_docs`
    under `submissions` (N3)
+3a. `sponsor_name` is upper-cased before the query is built, and
+   `openfda.brand_name` is NOT, proving the normalization is per-field (§1a)
 4. The event OR query includes all three fields and encodes as `+OR+`, never
    `%2BOR%2B` (N4)
 5. A citalopram total matches the recorded union figure (N4)
@@ -180,5 +209,5 @@ paths. Not in CI.
 
 ## Out of scope
 
-`sponsor_name` as a new searchable section. Real, but a capability addition
-rather than a fix; noted for a later release.
+Nothing. All six defects, all five limitations, and the `sponsor_name`
+capability are in this release.
