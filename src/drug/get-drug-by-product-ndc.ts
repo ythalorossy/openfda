@@ -6,21 +6,28 @@ import { OpenFDAResponse } from '../types.js';
 import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
+import { normalizeNDC } from '../utils/ndc.js';
 
 export const getDrugByProductNdc = {
   name: 'get-drug-by-product-ndc',
   description:
-    'Get drug information by product NDC only (XXXXX-XXXX format). This ignores package variations and finds all packages for a product.',
+    'Get drug information by product NDC. Accepts the dashed forms 4-4 (0456-4020), 5-3 (58151-155) and 5-4 (12345-1234), plus undashed 9-digit (5-4) and 11-digit (5-4-2) input. Undashed 8- and 10-digit input is rejected as ambiguous — dash it. This ignores package variations and finds all packages for a product.',
   inputSchema: z.object({
-    productNDC: z.string().describe('Product NDC in format XXXXX-XXXX'),
+    productNDC: z
+      .string()
+      .describe(
+        'Product NDC: dashed 4-4 (0456-4020), 5-3 (58151-155) or 5-4 (12345-1234); undashed 9-digit (123451234) or 11-digit (12345123401) also work'
+      ),
   }),
   async handler({ productNDC }: { productNDC: string }) {
-    if (!/^\d{5}-\d{4}$/.test(productNDC.trim())) {
+    const { productNDC: normalizedNDC, isValid } = normalizeNDC(productNDC);
+
+    if (!isValid) {
       return {
         content: [
           {
             type: 'text',
-            text: `Invalid product NDC format: "${productNDC}"\n\n✅ Required format: XXXXX-XXXX (e.g., 12345-1234)`,
+            text: `Invalid product NDC format: "${productNDC}"\n\n✅ Accepted formats:\n• 4-4 product NDC: 0456-4020\n• 5-3 product NDC: 58151-155\n• 5-4 product NDC: 12345-1234\n• Undashed 9 digits: 123451234 (read as 5-4)\n• Undashed 11 digits: 12345123401 (read as 5-4-2)\n\nUndashed 8- and 10-digit input is rejected because the split is ambiguous: 8 digits could be 5-3 or 4-4, and 10 could be 4-4-2, 5-3-2 or 5-4-1. Guessing could return a different drug, so add the dashes instead.`,
           },
         ],
         isError: true,
@@ -30,7 +37,7 @@ export const getDrugByProductNdc = {
     const url = new OpenFDABuilder()
       .dataset('drug')
       .context('label')
-      .search(`openfda.product_ndc:"${productNDC.trim()}"`)
+      .search(`openfda.product_ndc:"${normalizedNDC}"`)
       .limit(1)
       .build();
 
@@ -42,7 +49,7 @@ export const getDrugByProductNdc = {
         content: [
           {
             type: 'text',
-            text: `${url}Failed to retrieve drug data for product NDC "${productNDC}": ${error.message}`,
+            text: `Failed to retrieve drug data for product NDC "${productNDC}": ${error.message}`,
           },
         ],
         isError: true,
@@ -65,11 +72,11 @@ export const getDrugByProductNdc = {
 
     const allPackagesForProduct =
       drug.openfda.package_ndc?.filter((ndc) =>
-        ndc.startsWith(productNDC.trim())
+        ndc.startsWith(normalizedNDC)
       ) || [];
 
     const drugInfo = {
-      product_ndc: productNDC,
+      product_ndc: normalizedNDC,
       available_packages: allPackagesForProduct,
       brand_name: drug.openfda.brand_name || [],
       generic_name: drug.openfda.generic_name || [],
@@ -86,7 +93,7 @@ export const getDrugByProductNdc = {
       content: [
         {
           type: 'text',
-          text: `✅ Product NDC "${productNDC}" found with ${allPackagesForProduct.length} package variation(s):\n\n${JSON.stringify(drugInfo, null, 2)}`,
+          text: `✅ Product NDC "${normalizedNDC}" found with ${allPackagesForProduct.length} package variation(s):\n\n${JSON.stringify(drugInfo, null, 2)}`,
         },
       ],
     };

@@ -16,14 +16,17 @@ npm run test       # Run Vitest tests
 npm run test:ci    # Run tests in CI mode (no watch)
 npm run typecheck  # TypeScript type checking
 npm run lint       # Run ESLint
+npm run smoke      # Manual end-to-end check against the built dist/ (hits the live API)
 ```
 
 For single test file: `npx vitest run tests/ApiHandler.test.ts`
 
 ## Key Files
 
-- **`vite.config.ts`**: Vite build configuration; externalizes SDK for StdioServerTransport compatibility
-- **`tests/`**: Vitest test suite (13 tests across ApiHandler, OpenFDABuilder, ToolManager)
+- **`vite.config.ts`**: Vite build configuration; externalizes the SDK for StdioServerTransport compatibility, and injects `__APP_VERSION__` from `package.json` at build time so the version reported in `serverInfo` cannot drift from the published version
+- **`tests/`**: Vitest test suite (94 tests across 17 files: ApiHandler, OpenFDABuilder, ToolManager, ToolManager.keyguard, env, ndc, ndc-query, adverse-events-query, product-ndc-tool, faers, format, label-fields, resolve-label, get-drug-by-name, redact, no-url-in-output, version)
+- **`scripts/capture-fixtures.mjs`**: Manual, live-API script that captures trimmed label fixtures into `tests/fixtures/` (not run in CI)
+- **`scripts/smoke-local.mjs`** (`npm run smoke`): Manual end-to-end check that drives the built `dist/index.js` over stdio as a real MCP client would, asserting the behaviours the 1.1.0 fixes introduced. Hits the live API, so it is deliberately NOT part of `npm test`; run it after `npm run build:cli` and before publishing. `npm run smoke -- --no-key` exercises the missing-key path instead.
 
 ## Architecture
 
@@ -34,19 +37,25 @@ The MCP server is initialized with `McpServer` from `@modelcontextprotocol/sdk`.
 Tools are registered in `src/index.ts` using `ToolManager.registerTool()` with:
 - `name`: MCP tool identifier
 - `description`: Human-readable description for AI consumers
-- `schema`: Zod schema for input validation
-- `handler`: Async function receiving parsed input, returns `{ content: [{ type: 'text', text: string }] }`
+- `inputSchema`: Zod object schema for input validation
+- `handler`: Async function receiving parsed input, returns `{ content: [{ type: 'text', text: string }], isError?: boolean }`
 
-### Tool Registration Gotcha
-The MCP SDK has a bug with Zod schema validation. Always use `schema.shape` instead of passing `schema` directly to `server.tool()`.
+### Tool Registration Chokepoint
+`ToolManager.registerTool()` wraps every handler with a call to `checkApiKey()` (`src/utils/env.ts`) before it runs. A missing `OPENFDA_API_KEY` (without `OPENFDA_ALLOW_KEYLESS=1`) returns an actionable configuration error and never reaches `definition.handler`, so no tool can make a network request with a missing key.
 
 ### Key Modules
-- **`OpenFDABuilder`** (`src/OpenFDABuilder.ts`): Constructs OpenFDA API URLs using fluent builder pattern. Accepts context (`label`, `event`, `ndc`), search query, and limit.
+- **`OpenFDABuilder`** (`src/OpenFDABuilder.ts`): Constructs OpenFDA API URLs using fluent builder pattern. Accepts context (`label`, `event`, `ndc`, `drugsfda`), search query, and limit. Omits `api_key` entirely when running keyless.
 - **`ApiHandler`** (`src/ApiHandler.ts`): HTTP client with retry logic (exponential backoff), timeout handling, and OpenFDA-specific error categorization.
-- **`ToolManager`** (`src/ToolManager.ts`): Thin wrapper around `McpServer.tool()` registration.
+- **`ToolManager`** (`src/ToolManager.ts`): Wraps `McpServer.registerTool()` registration and enforces the API-key chokepoint described above.
 - **`types.ts`**: TypeScript interfaces for OpenFDA API responses and error types.
+- **`src/utils/env.ts`**: `checkApiKey()` / `warnIfKeyless()` — decides whether a request may run keyed, keyless (`OPENFDA_ALLOW_KEYLESS=1`), or not at all.
+- **`src/utils/redact.ts`**: Strips `api_key` values out of any string before it can reach tool output, logs, or error messages.
+- **`src/utils/ndc.ts`**: `normalizeNDC()` — the single validator/normalizer for both NDC tools. Accepts 4-4, 5-3 and 5-4 product NDCs and their package forms; rejects ambiguous undashed 8- and 10-digit input.
+- **`src/utils/format.ts`**: `summarizeResults()` / `withTotals()` — reports `Showing N of M` using the upstream result total instead of the caller's limit.
+- **`src/drug/label-fields.ts`**: Maps raw label JSON to the fields tools return, including `boxed_warning` and `warnings_and_cautions` (always present, empty array when absent).
+- **`src/drug/resolve-label.ts`**: `resolveLabel()` — resolves a drug name through four tiers in order (`openfda.brand_name`, `openfda.generic_name`, `openfda.substance_name`, `spl_product_data_elements`), stopping at the first tier with results and reporting which one matched via `matched_via`. Used by both `get-drug-safety-info` and `get-drug-by-name`.
+- **`src/drug/faers.ts`**: Decodes FAERS `reactionoutcome` codes to human-readable labels.
 - **Tool implementations** (`src/drug/`): Individual tool handlers (`get-drug-by-name.ts`, `get-drug-by-ndc.ts`, etc.) exported via `src/drug/index.ts`
-- **`src/food/`**: NDC search implementation
 
 ### API Request Flow
 1. Tool handler receives input → `OpenFDABuilder` constructs URL
@@ -54,15 +63,15 @@ The MCP SDK has a bug with Zod schema validation. Always use `schema.shape` inst
 3. Handler formats response as MCP-compatible JSON text
 
 ### Available Tools
-- `get-drug-by-name` - Search by brand name
+- `get-drug-by-name` - Look up a drug by brand, generic or substance name via the four-tier resolver, reporting `matched_via`
 - `get-drug-by-generic-name` - Search by active ingredient
-- `get-drug-adverse-events` - Adverse event reports
+- `get-drug-adverse-events` - Adverse event reports, with FAERS outcome codes decoded to labels and (reaction, outcome) pairs deduplicated
 - `get-drugs-by-manufacturer` - Drugs by company
-- `get-drug-safety-info` - Warnings, contraindications, interactions
+- `get-drug-safety-info` - Warnings, contraindications, interactions; resolves brand/generic/substance names through four tiers, reporting `matched_via`
 - `get-drug-by-ndc` - Search by National Drug Code
-- `get-drug-by-product-ndc` - Search by product NDC only
-- `get-drugsfda` - Full drug FDALabel data
+- `get-drug-by-product-ndc` - Search by product NDC only. Accepts dashed 4-4 (`0456-4020`), 5-3 (`58151-155`) and 5-4 (`12345-1234`), plus undashed 9- and 11-digit input. Undashed 8- and 10-digit input is rejected as ambiguous rather than guessed.
+- `get-drugsfda` - Drugs@FDA application data by section (`application`, `openfda`, `products`, `submissions`, `application_docs`) and field
 
 ## Environment
 
-Requires `OPENFDA_API_KEY` environment variable (from OpenFDA API authentication). Create a `.env` file locally; the server reads it at runtime.
+Requires `OPENFDA_API_KEY` from your MCP client's `env` block; the server reads it directly from `process.env` at runtime and **does not load a `.env` file** (no `dotenv` dependency is declared). Set `OPENFDA_ALLOW_KEYLESS=1` to opt in to openFDA's unauthenticated tier (40 requests/minute, 1,000/day per IP, no rate-limit headers) instead of supplying a key.

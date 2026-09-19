@@ -5,6 +5,7 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import { z } from 'zod';
+import { checkApiKey } from './utils/env.js';
 
 type ToolDefinition = {
   name: string;
@@ -30,7 +31,18 @@ class ToolManager {
         description: definition.description,
         inputSchema: definition.inputSchema,
       },
-      definition.handler as any
+      (async (input: z.infer<any>) => {
+        // Single chokepoint: every tool inherits the key check, so a missing
+        // key can never reach the network or produce a misleading 403.
+        const status = checkApiKey();
+        if (!status.ok) {
+          return {
+            content: [{ type: 'text' as const, text: status.message }],
+            isError: true,
+          };
+        }
+        return definition.handler(input);
+      }) as any
     );
 }
 

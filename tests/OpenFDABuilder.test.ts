@@ -20,7 +20,7 @@ describe('OpenFDABuilder', () => {
       .limit(5)
       .build();
     expect(url).toBe(
-      'https://api.fda.gov/drug/label.json?api_key=TEST_API_KEY&search=openfda.brand_name:"Advil"&limit=5'
+      'https://api.fda.gov/drug/label.json?api_key=TEST_API_KEY&search=openfda.brand_name%3A%22Advil%22&limit=5'
     );
   });
 
@@ -55,16 +55,59 @@ describe('OpenFDABuilder', () => {
     expect(url).toContain('&limit=0');
   });
 
-  it('should include undefined in URL if API key is missing', () => {
+  it('omits api_key entirely when running keyless', () => {
     delete process.env.OPENFDA_API_KEY;
-    const builder = new OpenFDABuilder()
+    process.env.OPENFDA_ALLOW_KEYLESS = '1';
+    const url = new OpenFDABuilder()
       .dataset('drug')
       .context('label')
       .search('some_query')
-      .limit(1);
-    const url = builder.build();
+      .limit(1)
+      .build();
+    expect(url).not.toContain('api_key');
     expect(url).toBe(
-      'https://api.fda.gov/drug/label.json?api_key=undefined&search=some_query&limit=1'
+      'https://api.fda.gov/drug/label.json?search=some_query&limit=1'
     );
+  });
+
+  it('never emits the literal string api_key=undefined', () => {
+    delete process.env.OPENFDA_API_KEY;
+    process.env.OPENFDA_ALLOW_KEYLESS = '1';
+    const url = new OpenFDABuilder()
+      .dataset('drug')
+      .context('label')
+      .search('some_query')
+      .build();
+    expect(url).not.toContain('undefined');
+  });
+
+  it('percent-encodes quotes and colons in the search query', () => {
+    const url = new OpenFDABuilder()
+      .dataset('drug')
+      .context('label')
+      .search('openfda.brand_name:"Advil"')
+      .build();
+    expect(url).toContain('search=openfda.brand_name%3A%22Advil%22');
+  });
+
+  it('encodes a drug name containing an ampersand without corrupting the query', () => {
+    const url = new OpenFDABuilder()
+      .dataset('drug')
+      .context('label')
+      .search('openfda.brand_name:"Tylenol & Codeine"')
+      .build();
+    expect(url).toContain('%26');
+    // the ampersand must not start a new query parameter
+    expect(url.split('&').length).toBe(3); // api_key, search, limit
+  });
+
+  it('encodes a space-separated AND filter as +AND+ on the wire', () => {
+    const url = new OpenFDABuilder()
+      .dataset('drug')
+      .context('event')
+      .search('patient.drug.medicinalproduct:"x" AND serious:1')
+      .build();
+    expect(url).toContain('+AND+');
+    expect(url).not.toContain('%2BAND%2B');
   });
 });

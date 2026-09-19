@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "disclaimer": "Do not rely on openFDA to make decisions regarding medical care. While we make every effort to ensure that data is accurate, you should assume all results are unvalidated. We may limit or otherwise restrict your access to the API in line with our Terms of Service.",
+    "terms": "https://open.fda.gov/terms/",
+    "license": "https://open.fda.gov/license/",
+    "last_updated": "2026-09-18",
+    "results": {
+      "skip": 0,
+      "limit": 1,
+      "total": 1
+    }
+  },
+  "results": [
+    {
+      "openfda": {
+        "application_number": [
+          "NDA019839",
+          "NDA020990"
+        ],
+        "brand_name": [
+          "Zoloft"
+        ],
+        "generic_name": [
+          "SERTRALINE HYDROCHLORIDE"
+        ],
+        "manufacturer_name": [
+          "Viatris Specialty LLC"
+        ],
+        "product_ndc": [
+          "58151-574",
+          "58151-575",
+          "58151-576",
+          "58151-601"
+        ],
+        "product_type": [
+          "HUMAN PRESCRIPTION DRUG"
+        ],
+        "route": [
+          "ORAL"
+        ],
+        "substance_name": [
+          "SERTRALINE HYDROCHLORIDE"
+        ],
+        "rxcui": [
+          "208149",
+          "208161",
+          "212233",
+          "312938",
+          "312940",
+          "312941",
+          "861064",
+          "861066"
+        ],
+        "spl_id": [
+          "fd27d2f5-1ade-4dbf-b2d2-bb98daf7da3a"
+        ],
+        "spl_set_id": [
+          "fda754f6-d0f3-4dce-a17a-927d64f912f7"
+        ],
+        "package_ndc": [
+          "58151-574-93",
+          "58151-575-32",
+          "58151-575-88",
+          "58151-575-93",
+          "58151-576-32",
+          "58151-576-88",
+          "58151-576-93",
+          "58151-601-35"
+        ],
+        "is_original_packager": [
+          true
+        ],
+        "unii": [
+          "UTI8907Y6X"
+        ]
+      },
+      "boxed_warning": [
+        "WARNING: SUICIDAL THOUGHTS AND BEHAVIORS Antidepressants increased the risk of suicidal thoughts and behavior in pediatric and young adult patients in short-term studies. Closely monitor all antidepre"
+      ],
+      "warnings_and_cautions": [
+        "5 WARNINGS AND PRECAUTIONS • Serotonin Syndrome: Increased risk when co-administered with other serotonergic agents, but also when taken alone. If it occurs, discontinue ZOLOFT and serotonergic agents"
+      ],
+      "contraindications": [
+        "4 CONTRAINDICATIONS ZOLOFT is contraindicated in patients: • Taking, or within 14 days of stopping, MAOIs, (including the MAOIs linezolid and intravenous methylene blue) because of an increased risk o"
+      ],
+      "drug_interactions": [
+        "7 DRUG INTERACTIONS • Protein-bound drugs: Monitor for adverse reactions and reduce dosage of ZOLOFT or other protein-bound drugs (e.g., warfarin) as warranted. ( 7.1 , 12.3 ) • CYP2D6 substrates: Red"
+      ],
+      "adverse_reactions": [
+        "6 ADVERSE REACTIONS The following adverse reactions are described in more detail in other sections of the prescribing information: • Hypersensitivity reactions to sertraline [See Contraindications (4)"
+      ],
+      "overdosage": [
+        "10 OVERDOSAGE The following have been reported with sertraline tablet overdosage: • Seizures, which may be delayed, and altered mental status including coma. • Cardiovascular toxicity, which may be de"
+      ],
+      "indications_and_usage": [
+        "1 INDICATIONS AND USAGE ZOLOFT is indicated for the treatment of the following [See Clinical Studies (14) ] : • Major depressive disorder (MDD) • Obsessive-compulsive disorder (OCD) • Panic disorder ("
+      ],
+      "dosage_and_administration": [
+        "2 DOSAGE AND ADMINISTRATION Indication Starting Dosage Maximum Dosage MDD ( 2.1 ) 50 mg per day 200 mg per day OCD ( 2.1 ) 25 mg per day (ages 6-12) 50 mg per day (ages ≥ 13) 200 mg per day PD, PTSD, "
+      ],
+      "spl_product_data_elements": [
+        "Zoloft sertraline hydrochloride SERTRALINE HYDROCHLORIDE SERTRALINE DIBASIC CALCIUM PHOSPHATE DIHYDRATE D&C YELLOW NO. 10 FD&C BLUE NO. 1 FD&C RED NO. 40 HYDROXYPROPYL CELLULOSE (1600000 WAMW) HYPROME"
+      ]
+    }
+  ]
+}

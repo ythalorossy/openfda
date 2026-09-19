@@ -5,6 +5,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { ToolManager } from './ToolManager.js';
+import { warnIfKeyless } from './utils/env.js';
 import {
   getDrugByName,
   getDrugByGenericName,
@@ -16,10 +17,16 @@ import {
   getDrugsfda,
 } from './drug/index.js';
 
+// Replaced at build time by vite (see vite.config.ts) with the version from
+// package.json. The fallback only applies when running unbundled, e.g. vitest.
+declare const __APP_VERSION__: string;
+const VERSION =
+  typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0-dev';
+
 const server = new McpServer(
   {
     name: 'openfda',
-    version: '1.0.0',
+    version: VERSION,
     description: 'OpenFDA Model Context Protocol',
   },
   {
@@ -42,6 +49,7 @@ toolManager.registerTool(getDrugByProductNdc);
 toolManager.registerTool(getDrugsfda);
 
 async function main() {
+  warnIfKeyless();
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error('OpenFDA MCP Server running on stdio');
