@@ -70,20 +70,21 @@ export const notFoundMessage = (term: string): string =>
 
 /**
  * openfda.generic_name is absent on some labels — notably ones reached through
- * the spl_product_data_elements tier, which reported "Unknown" for Cordarone
- * despite the label being amiodarone throughout.
+ * the spl_product_data_elements tier (Rayos, Cordarone), which have an empty
+ * openfda object. "Unknown" reads like data and is indistinguishable from a
+ * real value, so null is returned when neither structured field is present.
  *
  * Deliberately does NOT parse spl_product_data_elements: it is a free-text
  * blob of product elements, and extracting an ingredient from it would be
- * guesswork. When neither structured field is present, "Unknown" is honest.
+ * guesswork. (Tested and rejected — yields excipient text for Glucophage.)
  */
-export function resolveGenericName(openfda: Record<string, unknown>): string {
+export function resolveGenericName(
+  openfda: Record<string, unknown>
+): string | null {
   const first = (value: unknown): string | undefined =>
     Array.isArray(value) && typeof value[0] === 'string' && value[0]
       ? value[0]
       : undefined;
 
-  return (
-    first(openfda?.generic_name) ?? first(openfda?.substance_name) ?? 'Unknown'
-  );
+  return first(openfda?.generic_name) ?? first(openfda?.substance_name) ?? null;
 }
