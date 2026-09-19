@@ -70,13 +70,13 @@ Tools are registered in `src/index.ts` using `ToolManager.registerTool()` with:
 ### Available Tools
 - `get-drug-by-name` - Look up a drug by brand, generic or substance name via the four-tier resolver, reporting `matched_via` and a total
 - `get-drug-by-generic-name` - Search by active ingredient
-- `get-drug-adverse-events` - Adverse event reports, searching three FAERS indexes ORed together (`medicinalproduct`, `openfda.generic_name`, `openfda.substance_name`), with FAERS outcome codes decoded to labels and (reaction, outcome) pairs deduplicated. Accepts `skip` (maximum 25000) and `sort` (`receivedate:desc` / `receivedate:asc`); without `sort`, results are a deterministic earliest-`report_id` slice
-- `get-drug-adverse-event-counts` - Ranks adverse-event values (e.g. reactions, outcomes, patient sex) for a drug by frequency, returning `{term, count}` pairs. Reports no result total, because openFDA omits one on aggregated responses
-- `get-drugs-by-manufacturer` - Drugs by company
+- `get-drug-adverse-events` - Adverse event reports, searching three FAERS indexes ORed together (`medicinalproduct`, `openfda.generic_name`, `openfda.substance_name`), with FAERS outcome codes decoded to labels and (reaction, outcome) pairs deduplicated, reporting `matched_via`. Accepts `skip` (maximum 25000) and `sort` (`receivedate:desc` / `receivedate:asc`); without `sort`, results are a deterministic earliest-`report_id` slice
+- `get-drug-adverse-event-counts` - Ranks adverse-event values (e.g. reactions, outcomes, patient sex) for a drug by frequency, returning `{term, count}` pairs and reporting `matched_via`. Reports no result total, because openFDA omits one on aggregated responses
+- `get-drugs-by-manufacturer` - Drugs by company, reporting `matched_via`
 - `get-drug-safety-info` - Warnings, contraindications, interactions; resolves brand/generic/substance names through four tiers, reporting `matched_via`
-- `get-drug-by-ndc` - Search by National Drug Code
+- `get-drug-by-ndc` - Search by National Drug Code, reporting `matched_via`
 - `get-drug-by-product-ndc` - Search by product NDC only. Accepts dashed 4-4 (`0456-4020`), 5-3 (`58151-155`) and 5-4 (`12345-1234`), plus undashed 9- and 11-digit input. Undashed 8- and 10-digit input is rejected as ambiguous rather than guessed.
-- `get-drugsfda` - Drugs@FDA application data, searched by section and field against a table of verified paths (`application`: `application_number`, `sponsor_name`; `openfda`: `application_number`, `brand_name`, `generic_name`, `manufacturer_name`, `route`, `substance_name`, `product_ndc`; `products`: `dosage_form`, `marketing_status`, `product_number`, `reference_drug`, `route`, `te_code`; `submissions`: `review_priority`, `submission_class_code`, `submission_number`, `submission_status`, `submission_status_date`, `submission_type`; `application_docs`: `id`, `url`, `date`, `type`). Accepts `limit` and reports `Showing N of M`; `sponsor_name` is stored uppercase and normalised automatically
+- `get-drugsfda` - Drugs@FDA application data, searched by section and field against a table of verified paths (`application`: `application_number`, `sponsor_name`; `openfda`: `application_number`, `brand_name`, `generic_name`, `manufacturer_name`, `route`, `substance_name`, `product_ndc`; `products`: `dosage_form`, `marketing_status`, `product_number`, `reference_drug`, `route`, `te_code`; `submissions`: `review_priority`, `submission_class_code`, `submission_number`, `submission_status`, `submission_status_date`, `submission_type`; `application_docs`: `id`, `url`, `date`, `type`). Accepts `limit` and reports `Showing N of M` and `matched_via`; `sponsor_name` is stored uppercase and normalised automatically
 
 ## Environment
 

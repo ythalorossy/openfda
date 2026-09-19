@@ -42,7 +42,21 @@ export const SKIP_MAX = 25000;
 export const getDrugAdverseEvents = {
   name: 'get-drug-adverse-events',
   description:
-    'Get adverse event reports for a drug. This provides safety information about reported side effects and reactions. Use brand name or generic name. Without the sort parameter, results are a deterministic earliest-report_id slice, so a small sample is not representative.',
+    'Get adverse event reports for a drug. This provides safety information about reported side effects and reactions. Use brand name or generic name. Without the sort parameter, results are a deterministic earliest-report_id slice, so a small sample is not representative. Returns results, up to limit, reporting matched_via, the total matched, and returned, the number actually sent back. When skip is set, the response also reports the offset (not declared here, since it is only present when skip is supplied).',
+  // Raw upstream records wrapped in an envelope: declare only the envelope
+  // keys this tool ALWAYS guarantees (matched_via, total, returned, limit,
+  // results), never inner record fields, because those vary per record.
+  // `skip` is deliberately NOT declared: it is only present in the payload
+  // when the caller supplies `skip`, and a conditional field must not be
+  // declared here (an earlier round established that declaring a
+  // sometimes-absent field makes this guard assert something false).
+  returnsFields: [
+    'matched_via',
+    'total',
+    'returned',
+    'limit',
+    'results',
+  ] as const,
   inputSchema: z.object({
     drugName: z.string().describe('Drug name (brand or generic)'),
     limit: z
@@ -164,11 +178,30 @@ export const getDrugAdverseEvents = {
       };
     });
 
+    const total = eventData.meta?.results?.total;
+    // page 1 and page 3 of the same query otherwise render identical
+    // "Showing 10 of N" headers; the offset is the only thing that tells
+    // them apart, so surface it in both the header and the payload, and
+    // only when it was actually supplied.
+    const header =
+      skip !== undefined
+        ? `${summarizeResults(events.length, total, `adverse event reports for "${drugName}"`)}, starting at offset ${skip}`
+        : summarizeResults(
+            events.length,
+            total,
+            `adverse event reports for "${drugName}"`
+          );
+    const payload = {
+      matched_via: EVENT_MATCHED_VIA,
+      ...(skip !== undefined ? { skip } : {}),
+      ...withTotals(events, total, limit ?? 10),
+    };
+
     return {
       content: [
         {
           type: 'text',
-          text: `${summarizeResults(events.length, eventData.meta?.results?.total, `adverse event reports for "${drugName}"`)}\n\n${JSON.stringify({ matched_via: EVENT_MATCHED_VIA, ...withTotals(events, eventData.meta?.results?.total, limit ?? 10) }, null, 2)}`,
+          text: `${header}\n\n${JSON.stringify(payload, null, 2)}`,
         },
       ],
     };

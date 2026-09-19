@@ -13,7 +13,17 @@ import { invalidNdcMessage } from '../utils/ndc-formats.js';
 export const getDrugByNdc = {
   name: 'get-drug-by-ndc',
   description:
-    'Get drug information by National Drug Code (NDC). Accepts dashed formats: 4-4 (0456-4020), 5-3 (58151-155), 5-4 (12345-1234), and package NDC. Also accepts undashed 9-digit and 11-digit input. Undashed 8- and 10-digit input is rejected as ambiguous.',
+    'Get drug information by National Drug Code (NDC). Accepts dashed formats: 4-4 (0456-4020), 5-3 (58151-155), 5-4 (12345-1234), and package NDC. Also accepts undashed 9-digit and 11-digit input. Undashed 8- and 10-digit input is rejected as ambiguous. Returns results, up to limit, reporting matched_via, the total matched, and returned, the number actually sent back.',
+  // Raw upstream records wrapped in an envelope: declare only the envelope
+  // keys this tool guarantees (matched_via, total, returned, limit,
+  // results), never inner record fields, because those vary per record.
+  returnsFields: [
+    'matched_via',
+    'total',
+    'returned',
+    'limit',
+    'results',
+  ] as const,
   inputSchema: z.object({
     ndcCode: z
       .string()

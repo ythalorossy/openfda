@@ -133,4 +133,45 @@ describe('get-drug-adverse-events query encoding', () => {
     expect(fetchStub.calls[0]).not.toContain('skip=');
     expect(fetchStub.calls[0]).not.toContain('sort=');
   });
+
+  it('reports the offset in the header and payload when skip is set, so paged results do not look identical', async () => {
+    fetchStub.restore();
+    fetchStub = stubFetch([
+      {
+        meta: { results: { skip: 20, limit: 10, total: 143346 } },
+        results: [{ safetyreportid: '21', patient: { reaction: [] } }],
+      },
+    ]);
+
+    const result = await getDrugAdverseEvents.handler({
+      drugName: 'citalopram',
+      limit: 10,
+      skip: 20,
+    });
+    const text = result.content[0].text;
+
+    expect(text).toContain('offset 20');
+    const payload = JSON.parse(text.slice(text.indexOf('{')));
+    expect(payload.skip).toBe(20);
+  });
+
+  it('omits the offset from the header and payload when skip is not set', async () => {
+    fetchStub.restore();
+    fetchStub = stubFetch([
+      {
+        meta: { results: { skip: 0, limit: 10, total: 143346 } },
+        results: [{ safetyreportid: '1', patient: { reaction: [] } }],
+      },
+    ]);
+
+    const result = await getDrugAdverseEvents.handler({
+      drugName: 'citalopram',
+      limit: 10,
+    });
+    const text = result.content[0].text;
+
+    expect(text).not.toContain('offset');
+    const payload = JSON.parse(text.slice(text.indexOf('{')));
+    expect(payload.skip).toBeUndefined();
+  });
 });

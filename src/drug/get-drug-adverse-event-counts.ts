@@ -28,7 +28,13 @@ interface CountTerm {
 export const getDrugAdverseEventCounts = {
   name: 'get-drug-adverse-event-counts',
   description:
-    'Rank adverse-event values for a drug by frequency — for example the most commonly reported reactions. Returns aggregated {term, count} pairs, not individual reports. Note that openFDA omits a result total on aggregated responses, so this tool reports no total; use get-drug-adverse-events for individual reports and their total.',
+    'Rank adverse-event values for a drug by frequency — for example the most commonly reported reactions. Returns aggregated {term, count} pairs as results, not individual reports, along with matched_via, counted_by (the field that was aggregated) and returned (how many ranked terms came back). Note that openFDA omits a result total on aggregated responses, so this tool reports no total; use get-drug-adverse-events for individual reports and their total.',
+  // Raw upstream records wrapped in an envelope: declare only the envelope
+  // keys this tool guarantees (matched_via, counted_by, returned, results),
+  // never inner record fields, because those vary per record. There is no
+  // `total` or `limit` here — openFDA omits a total on aggregated
+  // responses, so this tool deliberately does not declare one.
+  returnsFields: ['matched_via', 'counted_by', 'returned', 'results'] as const,
   inputSchema: z.object({
     drugName: z.string().describe('Drug name (brand, generic or substance)'),
     field: z
