@@ -35,6 +35,14 @@ describe('get-drug-by-product-ndc', () => {
     expect(result.isError).toBeUndefined();
   });
 
+  it('reaches the API for a 4-4 product NDC such as Celexa 0456-4020', async () => {
+    const result = await getDrugByProductNdc.handler({ productNDC: '0456-4020' });
+
+    expect(fetchStub.calls.length).toBe(1);
+    expect(result.isError).toBeUndefined();
+    expect(fetchStub.calls[0]).toContain('0456-4020');
+  });
+
   it('rejects genuine garbage without making a request', async () => {
     const result = await getDrugByProductNdc.handler({ productNDC: 'nope' });
 
