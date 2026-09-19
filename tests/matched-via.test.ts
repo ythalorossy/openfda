@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { getDrugsByManufacturer } from '../src/drug/get-drugs-by-manufacturer.js';
-import { getDrugByNdc } from '../src/drug/get-drug-by-ndc.js';
-import { stubFetch } from './helpers/stubFetch.js';
+import { getDrugsByManufacturer } from '../src/drug/get-drugs-by-manufacturer';
+import { getDrugByNdc } from '../src/drug/get-drug-by-ndc';
+import { stubFetch } from './helpers/stubFetch';
 
 describe('matched_via is reported by every search tool', () => {
   const originalEnv = process.env;
@@ -48,5 +48,22 @@ describe('matched_via is reported by every search tool', () => {
 
     expect(result.content[0].text).toContain('"matched_via"');
     expect(result.content[0].text).toContain('product_ndc');
+  });
+
+  it('get-drug-by-ndc reports OR when input includes package segment', async () => {
+    fetchStub = stubFetch([
+      {
+        meta: { results: { skip: 0, limit: 10, total: 1 } },
+        results: [
+          { openfda: { brand_name: ['LIPITOR'], package_ndc: ['12345-1234-01'] } },
+        ],
+      },
+    ]);
+
+    const result = await getDrugByNdc.handler({ ndcCode: '12345-1234-01' });
+
+    expect(result.content[0].text).toContain(
+      '"matched_via": "openfda.product_ndc OR openfda.package_ndc"'
+    );
   });
 });
