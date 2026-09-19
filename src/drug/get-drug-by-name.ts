@@ -10,7 +10,7 @@ import { summarizeResults, withTotals } from '../utils/format.js';
 export const getDrugByName = {
   name: 'get-drug-by-name',
   description:
-    'Look up a drug by brand, generic or substance name. Returns brand_name, generic_name, manufacturer_name, product_ndc, substance_name, indications_and_usage, and the safety narrative: boxed_warning, warnings, warnings_and_cautions, do_not_use, ask_doctor, stop_use and pregnancy_or_breast_feeding. Every field is always present, empty when the label has none. Reports matched_via to say which field matched, and a total for how many labels matched.',
+    'Look up a drug by brand, generic or substance name. Returns brand_name, generic_name, manufacturer_name, product_ndc, substance_name, indications_and_usage, and the safety narrative: boxed_warning, warnings, warnings_and_cautions, do_not_use, ask_doctor, ask_doctor_or_pharmacist, stop_use and pregnancy_or_breast_feeding. Every field is always present, empty when the label has none. Reports matched_via to say which field matched, and a total for how many labels matched.',
   returnsFields: [
     'brand_name',
     'generic_name',
@@ -22,6 +22,7 @@ export const getDrugByName = {
     'warnings_and_cautions',
     'do_not_use',
     'ask_doctor',
+    'ask_doctor_or_pharmacist',
     'stop_use',
     'pregnancy_or_breast_feeding',
     'indications_and_usage',

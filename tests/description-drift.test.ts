@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { getDrugByName } from '../src/drug/get-drug-by-name';
 import { getDrugSafetyInfo } from '../src/drug/get-drug-safety-info';
+import { getDrugAdverseEvents } from '../src/drug/get-drug-adverse-events';
 import { stubFetch } from './helpers/stubFetch';
 
 const TOOLS = [
@@ -29,6 +30,14 @@ describe('tool descriptions do not drift from what tools return', () => {
     // The headline fix of 1.1.0 was invisible to a model reading the schema.
     expect(getDrugByName.description).toContain('boxed_warning');
     expect((getDrugByName as any).returnsFields).toContain('boxed_warning');
+  });
+
+  it('get-drug-adverse-events surfaces the unsorted-sampling caveat at the top level', () => {
+    // The caveat also lives in the `sort` param's describe(); a model reading
+    // only the top-level description must still see it. Match on a
+    // distinctive substring rather than the whole sentence, so a future
+    // rewording doesn't make this brittle.
+    expect(getDrugAdverseEvents.description).toContain('report_id');
   });
 });
 
