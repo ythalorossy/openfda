@@ -5,11 +5,29 @@
 import z from 'zod';
 import { mapLabelFields } from './label-fields.js';
 import { resolveLabel, notFoundMessage } from './resolve-label.js';
+import { summarizeResults, withTotals } from '../utils/format.js';
 
 export const getDrugByName = {
   name: 'get-drug-by-name',
   description:
-    'Get drug information by brand name, generic name, or active substance. Returns the brand name, generic name, manufacturer name, product NDC, product type, route, substance name, indications and usage, warnings, do not use, ask doctor, ask doctor or pharmacist, stop use, pregnancy or breast feeding. The response reports which field matched via matched_via.',
+    'Look up a drug by brand, generic or substance name. Returns brand_name, generic_name, manufacturer_name, product_ndc, substance_name, indications_and_usage, and the safety narrative: boxed_warning, warnings, warnings_and_cautions, do_not_use, ask_doctor, ask_doctor_or_pharmacist, stop_use and pregnancy_or_breast_feeding. Every field is always present, empty when the label has none. Reports matched_via to say which field matched, and a total for how many labels matched.',
+  returnsFields: [
+    'brand_name',
+    'generic_name',
+    'manufacturer_name',
+    'product_ndc',
+    'substance_name',
+    'boxed_warning',
+    'warnings',
+    'warnings_and_cautions',
+    'do_not_use',
+    'ask_doctor',
+    'ask_doctor_or_pharmacist',
+    'stop_use',
+    'pregnancy_or_breast_feeding',
+    'indications_and_usage',
+    'matched_via',
+  ] as const,
   inputSchema: z.object({
     drugName: z.string().describe('Drug name'),
   }),
@@ -50,7 +68,7 @@ export const getDrugByName = {
       content: [
         {
           type: 'text' as const,
-          text: `Drug information retrieved successfully:\n\n${JSON.stringify(drugInfo, null, 2)}`,
+          text: `${summarizeResults(1, resolved.data.meta?.results?.total, `labels matching "${drugName}"`)}\n\n${JSON.stringify(withTotals([drugInfo], resolved.data.meta?.results?.total, 1), null, 2)}`,
         },
       ],
     };

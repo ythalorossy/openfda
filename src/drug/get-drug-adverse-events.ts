@@ -6,6 +6,7 @@ import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import { summarizeResults, withTotals } from '../utils/format.js';
 import { describeOutcome } from './faers.js';
+import { buildEventSearch, EVENT_MATCHED_VIA } from './event-search.js';
 import z from 'zod';
 
 interface ReactionPair {
@@ -35,10 +36,27 @@ function dedupeReactionPairs(reactionList: any[]): ReactionPair[] {
   return pairs.slice(0, 3);
 }
 
+/** openFDA rejects skip above this: "Skip value must 25000 or less." */
+export const SKIP_MAX = 25000;
+
 export const getDrugAdverseEvents = {
   name: 'get-drug-adverse-events',
   description:
-    'Get adverse event reports for a drug. This provides safety information about reported side effects and reactions. Use brand name or generic name.',
+    'Get adverse event reports for a drug. This provides safety information about reported side effects and reactions. Use brand name or generic name. Without the sort parameter, results are a deterministic earliest-report_id slice, so a small sample is not representative. Returns results, up to limit, reporting matched_via, the total matched, and returned, the number actually sent back. When skip is set, the response also reports the offset (not declared here, since it is only present when skip is supplied).',
+  // Raw upstream records wrapped in an envelope: declare only the envelope
+  // keys this tool ALWAYS guarantees (matched_via, total, returned, limit,
+  // results), never inner record fields, because those vary per record.
+  // `skip` is deliberately NOT declared: it is only present in the payload
+  // when the caller supplies `skip`, and a conditional field must not be
+  // declared here (an earlier round established that declaring a
+  // sometimes-absent field makes this guard assert something false).
+  returnsFields: [
+    'matched_via',
+    'total',
+    'returned',
+    'limit',
+    'results',
+  ] as const,
   inputSchema: z.object({
     drugName: z.string().describe('Drug name (brand or generic)'),
     limit: z
@@ -51,29 +69,69 @@ export const getDrugAdverseEvents = {
       .optional()
       .default('all')
       .describe('Filter by event seriousness'),
+    skip: z
+      .number()
+      .int()
+      .min(0)
+      .max(SKIP_MAX)
+      .optional()
+      .describe(
+        `Offset into the result set, for paging past the limit. Maximum ${SKIP_MAX}.`
+      ),
+    sort: z
+      .enum(['receivedate:desc', 'receivedate:asc'])
+      .optional()
+      .describe(
+        'Order results by report receive date. Without it, results are a deterministic earliest-report_id slice, so a small sample is not representative.'
+      ),
   }),
   async handler({
     drugName,
     limit,
     seriousness,
+    skip,
+    sort,
   }: {
     drugName: string;
     limit?: number;
     seriousness?: 'serious' | 'non-serious' | 'all';
+    skip?: number;
+    sort?: 'receivedate:desc' | 'receivedate:asc';
   }) {
-    let searchQuery = `patient.drug.medicinalproduct:"${drugName}"`;
+    // Validate locally rather than forwarding a request openFDA will reject
+    // with an opaque BAD_REQUEST.
+    if (skip !== undefined && skip > SKIP_MAX) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `skip must be ${SKIP_MAX} or less (openFDA's ceiling); received ${skip}. To reach records beyond that, narrow the search or use sort to bring the records you want into range.`,
+          },
+        ],
+        isError: true,
+      };
+    }
+
+    let searchQuery = buildEventSearch(drugName);
 
     if (seriousness !== 'all') {
       const serious = seriousness === 'serious' ? '1' : '2';
-      searchQuery += ` AND serious:${serious}`;
+      // Parenthesise the OR group: without it, `a OR b OR c AND serious:1`
+      // binds the AND to the last term only and the filter silently applies
+      // to one index instead of all three.
+      searchQuery = `(${searchQuery}) AND serious:${serious}`;
     }
 
-    const url = new OpenFDABuilder()
+    const builder = new OpenFDABuilder()
       .dataset('drug')
       .context('event')
       .search(searchQuery)
-      .limit(limit)
-      .build();
+      .limit(limit);
+
+    if (skip !== undefined) builder.skip(skip);
+    if (sort !== undefined) builder.sort(sort);
+
+    const url = builder.build();
 
     const { data: eventData, error } = await makeOpenFDARequest<any>(url);
 
@@ -120,11 +178,30 @@ export const getDrugAdverseEvents = {
       };
     });
 
+    const total = eventData.meta?.results?.total;
+    // page 1 and page 3 of the same query otherwise render identical
+    // "Showing 10 of N" headers; the offset is the only thing that tells
+    // them apart, so surface it in both the header and the payload, and
+    // only when it was actually supplied.
+    const header =
+      skip !== undefined
+        ? `${summarizeResults(events.length, total, `adverse event reports for "${drugName}"`)}, starting at offset ${skip}`
+        : summarizeResults(
+            events.length,
+            total,
+            `adverse event reports for "${drugName}"`
+          );
+    const payload = {
+      matched_via: EVENT_MATCHED_VIA,
+      ...(skip !== undefined ? { skip } : {}),
+      ...withTotals(events, total, limit ?? 10),
+    };
+
     return {
       content: [
         {
           type: 'text',
-          text: `${summarizeResults(events.length, eventData.meta?.results?.total, `adverse event reports for "${drugName}"`)}\n\n${JSON.stringify(withTotals(events, eventData.meta?.results?.total, limit ?? 10), null, 2)}`,
+          text: `${header}\n\n${JSON.stringify(payload, null, 2)}`,
         },
       ],
     };

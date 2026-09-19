@@ -36,3 +36,9 @@ coverage/
 
 # MCPs
 .mcp.json
+
+# Serena agent state
+.serena/
+
+# Scratch files
+BUGFIX_PROMPT.md

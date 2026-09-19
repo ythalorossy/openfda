@@ -56,8 +56,24 @@ describe('getDrugByName', () => {
       'ask_doctor', 'ask_doctor_or_pharmacist', 'stop_use',
       'pregnancy_or_breast_feeding', 'indications_and_usage',
     ]) {
-      expect(payload).toHaveProperty(key);
+      expect(payload.results[0]).toHaveProperty(key);
     }
+  });
+
+  it('reports how many labels matched, not just the one returned', async () => {
+    fetchStub = stubFetch([
+      {
+        meta: { results: { skip: 0, limit: 1, total: 37 } },
+        results: [{ openfda: { brand_name: ['OXYCONTIN'] } }],
+      },
+    ]);
+
+    const result = await getDrugByName.handler({ drugName: 'OxyContin' });
+    const text = result.content[0].text;
+
+    expect(text).toContain('37');
+    const payload = JSON.parse(text.slice(text.indexOf('{')));
+    expect(payload.total).toBe(37);
   });
 
   it('surfaces an upstream error rather than reporting not-found', async () => {

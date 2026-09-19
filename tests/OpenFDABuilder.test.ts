@@ -110,4 +110,50 @@ describe('OpenFDABuilder', () => {
     expect(url).toContain('+AND+');
     expect(url).not.toContain('%2BAND%2B');
   });
+
+  it('omits count, skip and sort when they are not set', () => {
+    const url = new OpenFDABuilder()
+      .dataset('drug')
+      .context('event')
+      .search('x')
+      .build();
+    expect(url).not.toContain('count=');
+    expect(url).not.toContain('skip=');
+    expect(url).not.toContain('sort=');
+  });
+
+  it('emits count when set', () => {
+    const url = new OpenFDABuilder()
+      .dataset('drug')
+      .context('event')
+      .search('x')
+      .count('patient.reaction.reactionmeddrapt.exact')
+      .build();
+    expect(url).toContain(
+      'count=patient.reaction.reactionmeddrapt.exact'
+    );
+  });
+
+  it('emits skip and sort when set', () => {
+    const url = new OpenFDABuilder()
+      .dataset('drug')
+      .context('event')
+      .search('x')
+      .skip(20)
+      .sort('receivedate:desc')
+      .build();
+    expect(url).toContain('skip=20');
+    expect(url).toContain('sort=receivedate%3Adesc');
+  });
+
+  it('still encodes the search query when the new params are present', () => {
+    const url = new OpenFDABuilder()
+      .dataset('drug')
+      .context('event')
+      .search('a:"x" OR b:"y"')
+      .skip(5)
+      .build();
+    expect(url).toContain('+OR+');
+    expect(url).not.toContain('%2BOR%2B');
+  });
 });

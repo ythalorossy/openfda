@@ -11,10 +11,11 @@ A Model Context Protocol (MCP) server for querying drug information from the Ope
 - Retrieve drug label information by brand name
 - Retrieve drug information by generic (active ingredient) name
 - Get all brand versions of a generic drug
-- Get adverse event (side effect) reports for a drug (by brand or generic name)
+- Get adverse event (side effect) reports for a drug (by brand or generic name), with paging via `skip` (maximum 25000) and ordering via `sort` (`receivedate:desc` / `receivedate:asc`) — without `sort`, results are a deterministic earliest-`report_id` slice, so a small sample is not representative
+- Rank adverse-event values for a drug by frequency (e.g. the most commonly reported reactions) via `get-drug-adverse-event-counts`; note that openFDA omits a result total on aggregated responses, so this tool reports no total
 - Retrieve all drugs manufactured by a specific company
 - Get comprehensive drug safety information (warnings, contraindications, interactions, precautions, etc.)
-- Retrieve full Drugs@FDA application data for a given section and field
+- Retrieve full Drugs@FDA application data for a given section and field, with a `limit` parameter and a real `Showing N of M` total; can also search by `sponsor_name`, which is stored uppercase and normalised automatically
 - Normalize and validate NDC (National Drug Code) formats
 - Helpful error messages and suggestions for failed queries
 
@@ -59,7 +60,8 @@ A Model Context Protocol (MCP) server for querying drug information from the Ope
                   "get-drug-safety-info",
                   "get-drug-by-ndc",
                   "get-drug-by-product-ndc",
-                  "get-drugsfda"
+                  "get-drugsfda",
+                  "get-drug-adverse-event-counts"
               ]
           }
       }

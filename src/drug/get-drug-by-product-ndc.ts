@@ -7,11 +7,28 @@ import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import { normalizeNDC } from '../utils/ndc.js';
+import { invalidNdcMessage } from '../utils/ndc-formats.js';
 
 export const getDrugByProductNdc = {
   name: 'get-drug-by-product-ndc',
   description:
-    'Get drug information by product NDC. Accepts the dashed forms 4-4 (0456-4020), 5-3 (58151-155) and 5-4 (12345-1234), plus undashed 9-digit (5-4) and 11-digit (5-4-2) input. Undashed 8- and 10-digit input is rejected as ambiguous — dash it. This ignores package variations and finds all packages for a product.',
+    'Get drug information by product NDC. Accepts the dashed forms 4-4 (0456-4020), 5-3 (58151-155) and 5-4 (12345-1234), plus undashed 9-digit (5-4) and 11-digit (5-4-2) input. Undashed 8- and 10-digit input is rejected as ambiguous — dash it. This ignores package variations and finds all packages for a product. Returns product_ndc, available_packages, brand_name, generic_name, manufacturer_name, product_type, route, substance_name, active_ingredient, purpose and dosage_and_administration; every field is always present, empty when the label has none.',
+  // Fixed payload of named fields (one record, not an envelope over many):
+  // every key here is always set on the success path, defaulting to an
+  // empty array when the upstream label omits it.
+  returnsFields: [
+    'product_ndc',
+    'available_packages',
+    'brand_name',
+    'generic_name',
+    'manufacturer_name',
+    'product_type',
+    'route',
+    'substance_name',
+    'active_ingredient',
+    'purpose',
+    'dosage_and_administration',
+  ] as const,
   inputSchema: z.object({
     productNDC: z
       .string()
@@ -27,7 +44,7 @@ export const getDrugByProductNdc = {
         content: [
           {
             type: 'text',
-            text: `Invalid product NDC format: "${productNDC}"\n\n✅ Accepted formats:\n• 4-4 product NDC: 0456-4020\n• 5-3 product NDC: 58151-155\n• 5-4 product NDC: 12345-1234\n• Undashed 9 digits: 123451234 (read as 5-4)\n• Undashed 11 digits: 12345123401 (read as 5-4-2)\n\nUndashed 8- and 10-digit input is rejected because the split is ambiguous: 8 digits could be 5-3 or 4-4, and 10 could be 4-4-2, 5-3-2 or 5-4-1. Guessing could return a different drug, so add the dashes instead.`,
+            text: invalidNdcMessage(productNDC, 'product NDC'),
           },
         ],
         isError: true,
