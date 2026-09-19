@@ -4,7 +4,11 @@
  */
 import z from 'zod';
 import { mapSafetyFields } from './label-fields.js';
-import { resolveLabel, notFoundMessage } from './resolve-label.js';
+import {
+  resolveLabel,
+  notFoundMessage,
+  resolveGenericName,
+} from './resolve-label.js';
 
 export const getDrugSafetyInfo = {
   name: 'get-drug-safety-info',
@@ -36,7 +40,9 @@ export const getDrugSafetyInfo = {
     const drug = resolved.data.results[0];
     const safetyInfo = {
       drug_name: drug?.openfda.brand_name?.[0] || drugName,
-      generic_name: drug?.openfda.generic_name?.[0] || 'Unknown',
+      generic_name: resolveGenericName(
+        (drug?.openfda ?? {}) as unknown as Record<string, unknown>
+      ),
       matched_via: resolved.matched_via,
       ...mapSafetyFields(drug as unknown as Record<string, unknown>),
     };

@@ -63,3 +63,23 @@ export async function resolveLabel(
 /** Wording for the not-found path; the README promises suggestions. */
 export const notFoundMessage = (term: string): string =>
   `No label found for "${term}".\n\nSearched, in order: ${RESOLUTION_TIERS.join(', ')}.\n\nSuggestions:\n- Check the spelling.\n- Try the generic name instead of the brand (e.g. "amiodarone" rather than "Cordarone").\n- Try the originator brand rather than a repackager's name.\n- Some discontinued brands have no current FDA label.`;
+
+/**
+ * openfda.generic_name is absent on some labels — notably ones reached through
+ * the spl_product_data_elements tier, which reported "Unknown" for Cordarone
+ * despite the label being amiodarone throughout.
+ *
+ * Deliberately does NOT parse spl_product_data_elements: it is a free-text
+ * blob of product elements, and extracting an ingredient from it would be
+ * guesswork. When neither structured field is present, "Unknown" is honest.
+ */
+export function resolveGenericName(openfda: Record<string, unknown>): string {
+  const first = (value: unknown): string | undefined =>
+    Array.isArray(value) && typeof value[0] === 'string' && value[0]
+      ? value[0]
+      : undefined;
+
+  return (
+    first(openfda?.generic_name) ?? first(openfda?.substance_name) ?? 'Unknown'
+  );
+}
