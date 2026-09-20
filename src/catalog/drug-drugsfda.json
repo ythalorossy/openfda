@@ -1,0 +1,222 @@
+{
+  "endpoint": "drugsfda",
+  "source_url": "https://open.fda.gov/fields/drugsfda.yaml",
+  "fetched_at": "2026-09-20T23:36:19.640Z",
+  "fields": [
+    {
+      "path": "application_number",
+      "type": "string",
+      "description": "This corresponds to the NDA, ANDA, or BLA number reported by the labeler for products which have the corresponding Marketing Category designated. If the designated Marketing Category is OTC Monograph Final or OTC Monograph Not Final, then the application number will be the CFR citation corresponding"
+    },
+    {
+      "path": "openfda",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "openfda.application_number",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.brand_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.generic_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.manufacturer_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.nui",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.package_ndc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_cs",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_epc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_moa",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_pe",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.product_ndc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.route",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.rxcui",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.spl_id",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.spl_set_id",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.substance_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.unii",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "products",
+      "type": "object",
+      "description": "Information about the drug products."
+    },
+    {
+      "path": "products.active_ingredients",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "products.active_ingredients.name",
+      "type": "string",
+      "description": "The names of the active, medicinal ingredients in the drug product."
+    },
+    {
+      "path": "products.active_ingredients.strength",
+      "type": "string",
+      "description": "The strength of the active, medicinal ingredients in the drug product."
+    },
+    {
+      "path": "products.brand_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "products.dosage_form",
+      "type": "string",
+      "description": "The drug’s dosage form. There is no standard, but values may include terms like `tablet` or `solution for injection`."
+    },
+    {
+      "path": "products.marketing_status",
+      "type": "string",
+      "description": "Indicates how a drug product is sold in the United States."
+    },
+    {
+      "path": "products.product_number",
+      "type": "string",
+      "description": "A product number is assigned to each drug product associated with an NDA (New Drug Application), ANDA (Abbreviated New Drug Application) and Biologic License Application (BLA) . If a drug product is available in multiple strengths, there are multiple product numbers."
+    },
+    {
+      "path": "products.reference_drug",
+      "type": "string",
+      "description": "Indicates whether the drug product is a reference drug."
+    },
+    {
+      "path": "products.reference_standard",
+      "type": "string",
+      "description": "Indicates whether the drug product is a reference standard."
+    },
+    {
+      "path": "products.route",
+      "type": "string",
+      "description": "The route of administation of the drug product."
+    },
+    {
+      "path": "products.te_code",
+      "type": "string",
+      "description": "The coding system for therapeutic equivalence evaluations allows users to determine whether FDA has evaluated a particular approved product as therapeutically equivalent to other pharmaceutically equivalent products (first letter) and to provide additional information on the basis of FDA's evaluatio"
+    },
+    {
+      "path": "sponsor_name",
+      "type": "string",
+      "description": "The company that submitted an application to FDA for approval to market the drug product in the United States."
+    },
+    {
+      "path": "submissions",
+      "type": "object",
+      "description": "Submissions are used to group supporting documents relative to an application. A submission belongs to only one specific application. There must be at least one submission for each application."
+    },
+    {
+      "path": "submissions.application_docs",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "submissions.review_priority",
+      "type": "string",
+      "description": "Pending."
+    },
+    {
+      "path": "submissions.submission_class_code",
+      "type": "string",
+      "description": "The Submission Classification Code, previously known as the Chemistry Classification Code, is assigned as a “Type” code."
+    },
+    {
+      "path": "submissions.submission_class_code_description",
+      "type": "string",
+      "description": "The Submission Classification Code, previously known as the Chemistry Classification Code, is assigned as a “Type” code. This is a full description of the classification code."
+    },
+    {
+      "path": "submissions.submission_number",
+      "type": "string",
+      "description": "A unique identifier for each submission under that application."
+    },
+    {
+      "path": "submissions.submission_property_type",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "submissions.submission_public_notes",
+      "type": "string",
+      "description": "Publicly available notes regarding the submission."
+    },
+    {
+      "path": "submissions.submission_status",
+      "type": "string",
+      "description": "The current status of this submission."
+    },
+    {
+      "path": "submissions.submission_status_date",
+      "type": "string",
+      "description": "The date the status was applied to the submission."
+    },
+    {
+      "path": "submissions.submission_type",
+      "type": "string",
+      "description": "The type of the individual submission. Used in combination with submission_number."
+    }
+  ]
+}

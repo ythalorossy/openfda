@@ -1,0 +1,502 @@
+{
+  "endpoint": "event",
+  "source_url": "https://open.fda.gov/fields/drugevent.yaml",
+  "fetched_at": "2026-09-20T23:36:19.371Z",
+  "fields": [
+    {
+      "path": "authoritynumb",
+      "type": "string",
+      "description": "Populated with the Regulatory Authority’s case report number, when available."
+    },
+    {
+      "path": "companynumb",
+      "type": "string",
+      "description": "Identifier for the company providing the report. This is self-assigned."
+    },
+    {
+      "path": "duplicate",
+      "type": "string",
+      "description": "This value is `1` if earlier versions of this report were submitted to FDA. openFDA only shows the most recent version."
+    },
+    {
+      "path": "fulfillexpeditecriteria",
+      "type": "string",
+      "description": "Identifies expedited reports (those that were processed within 15 days)."
+    },
+    {
+      "path": "occurcountry",
+      "type": "string",
+      "description": "The name of the country where the event occurred."
+    },
+    {
+      "path": "patient",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "patient.drug",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.actiondrug",
+      "type": "string",
+      "description": "Actions taken with the drug."
+    },
+    {
+      "path": "patient.drug.activesubstance",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.activesubstance.activesubstancename",
+      "type": "string",
+      "description": "Product active ingredient, which may be different than other drug identifiers (when provided)."
+    },
+    {
+      "path": "patient.drug.drugadditional",
+      "type": "string",
+      "description": "Dechallenge outcome information—whether the event abated after product use stopped or the dose was reduced. Only present when this was attempted and the data was provided."
+    },
+    {
+      "path": "patient.drug.drugadministrationroute",
+      "type": "string",
+      "description": "The drug’s route of administration."
+    },
+    {
+      "path": "patient.drug.drugauthorizationnumb",
+      "type": "string",
+      "description": "Drug authorization or application number (NDA or ANDA), if provided."
+    },
+    {
+      "path": "patient.drug.drugbatchnumb",
+      "type": "string",
+      "description": "Drug product lot number, if provided."
+    },
+    {
+      "path": "patient.drug.drugcharacterization",
+      "type": "string",
+      "description": "Reported role of the drug in the adverse event report. These values are not validated by FDA."
+    },
+    {
+      "path": "patient.drug.drugcumulativedosagenumb",
+      "type": "string",
+      "description": "The cumulative dose taken until the first reaction was experienced, if provided."
+    },
+    {
+      "path": "patient.drug.drugcumulativedosageunit",
+      "type": "string",
+      "description": "The unit for `drugcumulativedosagenumb`."
+    },
+    {
+      "path": "patient.drug.drugdosageform",
+      "type": "string",
+      "description": "The drug’s dosage form. There is no standard, but values may include terms like `tablet` or `solution for injection`."
+    },
+    {
+      "path": "patient.drug.drugdosagetext",
+      "type": "string",
+      "description": "Additional detail about the dosage taken. Frequently unknown, but occasionally including information like a brief textual description of the schedule of administration."
+    },
+    {
+      "path": "patient.drug.drugenddate",
+      "type": "string",
+      "description": "Date the patient stopped taking the drug."
+    },
+    {
+      "path": "patient.drug.drugenddateformat",
+      "type": "string",
+      "description": "Encoding format of the field `drugenddateformat`. Always set to `102` (YYYYMMDD)."
+    },
+    {
+      "path": "patient.drug.drugindication",
+      "type": "string",
+      "description": "Indication for the drug’s use."
+    },
+    {
+      "path": "patient.drug.drugintervaldosagedefinition",
+      "type": "string",
+      "description": "The unit for the interval in the field `drugintervaldosageunitnumb.`"
+    },
+    {
+      "path": "patient.drug.drugintervaldosageunitnumb",
+      "type": "string",
+      "description": "Number of units in the field `drugintervaldosagedefinition`."
+    },
+    {
+      "path": "patient.drug.drugrecurreadministration",
+      "type": "string",
+      "description": "Whether the reaction occured after readministration of the drug."
+    },
+    {
+      "path": "patient.drug.drugrecurrence",
+      "type": "unknown",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.drugrecurrence.drugrecuraction",
+      "type": "string",
+      "description": "Populated with the Reaction/Event information if/when `drugrecurreadministration` equals `1`."
+    },
+    {
+      "path": "patient.drug.drugrecurrence.drugrecuractionmeddraversion",
+      "type": "string",
+      "description": "The version of MedDRA from which the term in `drugrecuraction` is drawn."
+    },
+    {
+      "path": "patient.drug.drugseparatedosagenumb",
+      "type": "string",
+      "description": "The number of separate doses that were administered."
+    },
+    {
+      "path": "patient.drug.drugstartdate",
+      "type": "string",
+      "description": "Date the patient began taking the drug."
+    },
+    {
+      "path": "patient.drug.drugstartdateformat",
+      "type": "string",
+      "description": "Encoding format of the field `drugstartdate`. Always set to `102` (YYYYMMDD)."
+    },
+    {
+      "path": "patient.drug.drugstructuredosagenumb",
+      "type": "string",
+      "description": "The number portion of a dosage; when combined with `drugstructuredosageunit` the complete dosage information is represented. For example, *300* in `300 mg`."
+    },
+    {
+      "path": "patient.drug.drugstructuredosageunit",
+      "type": "string",
+      "description": "The unit for the field `drugstructuredosagenumb`. For example, *mg* in `300 mg`."
+    },
+    {
+      "path": "patient.drug.drugtreatmentduration",
+      "type": "string",
+      "description": "The interval of the field `drugtreatmentdurationunit` for which the patient was taking the drug."
+    },
+    {
+      "path": "patient.drug.drugtreatmentdurationunit",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.medicinalproduct",
+      "type": "string",
+      "description": "Drug name. This may be the valid trade name of the product (such as `ADVIL` or `ALEVE`) or the generic name (such as `IBUPROFEN`). This field is not systematically normalized. It may contain misspellings or idiosyncratic descriptions of drugs, such as combination products such as those used for birt"
+    },
+    {
+      "path": "patient.drug.openfda",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.application_number",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.brand_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.generic_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.manufacturer_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.nui",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.package_ndc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.pharm_class_cs",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.pharm_class_epc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.pharm_class_moa",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.pharm_class_pe",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.product_ndc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.product_type",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.route",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.rxcui",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.spl_id",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.spl_set_id",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.substance_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.drug.openfda.unii",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.patientagegroup",
+      "type": "string",
+      "description": "Populated with Patient Age Group code."
+    },
+    {
+      "path": "patient.patientdeath",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "patient.patientdeath.patientdeathdate",
+      "type": "string",
+      "description": "If the patient died, the date that the patient died."
+    },
+    {
+      "path": "patient.patientdeath.patientdeathdateformat",
+      "type": "string",
+      "description": "Encoding format of the field `patientdeathdate`. Always set to `102` (YYYYMMDD)."
+    },
+    {
+      "path": "patient.patientonsetage",
+      "type": "string",
+      "description": "Age of the patient when the event first occured."
+    },
+    {
+      "path": "patient.patientonsetageunit",
+      "type": "string",
+      "description": "The unit for the interval in the field `patientonsetage.`"
+    },
+    {
+      "path": "patient.patientsex",
+      "type": "string",
+      "description": "The sex of the patient."
+    },
+    {
+      "path": "patient.patientweight",
+      "type": "string",
+      "description": "The patient weight, in kg (kilograms)."
+    },
+    {
+      "path": "patient.reaction",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient.reaction.reactionmeddrapt",
+      "type": "string",
+      "description": "Patient reaction, as a MedDRA term. Note that these terms are encoded in British English. For instance, diarrhea is spelled `diarrohea`. MedDRA is a standardized medical terminology."
+    },
+    {
+      "path": "patient.reaction.reactionmeddraversionpt",
+      "type": "string",
+      "description": "The version of MedDRA from which the term in `reactionmeddrapt` is drawn."
+    },
+    {
+      "path": "patient.reaction.reactionoutcome",
+      "type": "string",
+      "description": "Outcome of the reaction in `reactionmeddrapt` at the time of last observation."
+    },
+    {
+      "path": "patient.summary",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "patient.summary.narrativeincludeclinical",
+      "type": "string",
+      "description": "Populated with Case Event Date, when available; does `NOT` include Case Narrative."
+    },
+    {
+      "path": "primarysource",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "primarysource.literaturereference",
+      "type": "string",
+      "description": "Populated with the Literature Reference information, when available."
+    },
+    {
+      "path": "primarysource.qualification",
+      "type": "string",
+      "description": "Category of individual who submitted the report."
+    },
+    {
+      "path": "primarysource.reportercountry",
+      "type": "string",
+      "description": "Country from which the report was submitted."
+    },
+    {
+      "path": "primarysourcecountry",
+      "type": "string",
+      "description": "Country of the reporter of the event."
+    },
+    {
+      "path": "receiptdate",
+      "type": "string",
+      "description": "Date that the _most recent_ information in the report was received by FDA."
+    },
+    {
+      "path": "receiptdateformat",
+      "type": "string",
+      "description": "Encoding format of the `receiptdate` field. Always set to 102 (YYYYMMDD)."
+    },
+    {
+      "path": "receivedate",
+      "type": "string",
+      "description": "Date that the report was _first_ received by FDA. If this report has multiple versions, this will be the date the first version was received by FDA."
+    },
+    {
+      "path": "receivedateformat",
+      "type": "string",
+      "description": "Encoding format of the `receivedate` field. Always set to 102 (YYYYMMDD)."
+    },
+    {
+      "path": "receiver",
+      "type": "object",
+      "description": "Information on the organization receiving the report."
+    },
+    {
+      "path": "receiver.receiverorganization",
+      "type": "string",
+      "description": "Name of the organization receiving the report. Because FDA received the report, the value is always `FDA`."
+    },
+    {
+      "path": "receiver.receivertype",
+      "type": "string",
+      "description": "The type of organization receiving the report. The value,`6`, is only specified if it is `other`, otherwise it is left blank."
+    },
+    {
+      "path": "reportduplicate",
+      "type": "object",
+      "description": "If a report is a duplicate or more recent version than a previously submitted report, this field will provide additional details on source provider."
+    },
+    {
+      "path": "reportduplicate.duplicatenumb",
+      "type": "string",
+      "description": "The case identifier for the duplicate."
+    },
+    {
+      "path": "reportduplicate.duplicatesource",
+      "type": "string",
+      "description": "The name of the organization providing the duplicate."
+    },
+    {
+      "path": "reporttype",
+      "type": "string",
+      "description": "Code indicating the circumstances under which the report was generated."
+    },
+    {
+      "path": "safetyreportid",
+      "type": "string",
+      "description": "The 8-digit Safety Report ID number, also known as the case report number or case ID. The first 7 digits (before the hyphen) identify an individual report and the last digit (after the hyphen) is a checksum. This field can be used to identify or find a specific adverse event report."
+    },
+    {
+      "path": "safetyreportversion",
+      "type": "string",
+      "description": "The version number of the `safetyreportid`. Multiple versions of the same report may exist, it is generally best to only count the latest report and disregard others. openFDA will only return the latest version of a report."
+    },
+    {
+      "path": "sender",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "sender.senderorganization",
+      "type": "string",
+      "description": "Name of the organization sending the report. Because FDA is providing these reports to you, the value is always `FDA-Public Use.`"
+    },
+    {
+      "path": "sender.sendertype",
+      "type": "string",
+      "description": "The name of the organization sending the report. Because FDA is providing these reports to you, the value is always `2`."
+    },
+    {
+      "path": "serious",
+      "type": "string",
+      "description": "Seriousness of the adverse event."
+    },
+    {
+      "path": "seriousnesscongenitalanomali",
+      "type": "string",
+      "description": "This value is `1` if the adverse event resulted in a congenital anomaly, and absent otherwise."
+    },
+    {
+      "path": "seriousnessdeath",
+      "type": "string",
+      "description": "This value is `1` if the adverse event resulted in death, and absent otherwise."
+    },
+    {
+      "path": "seriousnessdisabling",
+      "type": "string",
+      "description": "This value is `1` if the adverse event resulted in disability, and absent otherwise."
+    },
+    {
+      "path": "seriousnesshospitalization",
+      "type": "string",
+      "description": "This value is `1` if the adverse event resulted in a hospitalization, and absent otherwise."
+    },
+    {
+      "path": "seriousnesslifethreatening",
+      "type": "string",
+      "description": "This value is `1` if the adverse event resulted in a life threatening condition, and absent otherwise."
+    },
+    {
+      "path": "seriousnessother",
+      "type": "string",
+      "description": "This value is `1` if the adverse event resulted in some other serious condition, and absent otherwise."
+    },
+    {
+      "path": "transmissiondate",
+      "type": "string",
+      "description": "Date that the record was created. This may be earlier than the date the record was received by the FDA."
+    },
+    {
+      "path": "transmissiondateformat",
+      "type": "string",
+      "description": "Encoding format of the `transmissiondate` field. Always set to 102 (YYYYMMDD)."
+    }
+  ]
+}

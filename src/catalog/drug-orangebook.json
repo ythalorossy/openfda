@@ -1,0 +1,162 @@
+{
+  "endpoint": "orangebook",
+  "source_url": "https://open.fda.gov/fields/drugorangebook.yaml",
+  "fetched_at": "2026-09-20T23:36:19.723Z",
+  "fields": [
+    {
+      "path": "approval_date",
+      "type": "string",
+      "description": "The date the product was approved as stated in the FDA approval letter to the applicant."
+    },
+    {
+      "path": "approved_prior_to_1982",
+      "type": "boolean",
+      "description": "Products approved prior to the January 1, 1982 contain the phrase: \"Approved prior to Jan 1, 1982\"."
+    },
+    {
+      "path": "exclusivity",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "exclusivity.exclusivity_code",
+      "type": "string",
+      "description": "Code to designate exclusivity granted by the FDA to a drug product."
+    },
+    {
+      "path": "exclusivity.exclusivity_code_definition",
+      "type": "string",
+      "description": "The definition of the exclusivity code."
+    },
+    {
+      "path": "exclusivity.exclusivity_expiration_date",
+      "type": "string",
+      "description": "The date the exclusivity expires."
+    },
+    {
+      "path": "patents",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patents.drug_product_flag",
+      "type": "boolean",
+      "description": "Patents submitted on FDA Form 3542 and listed after August 18, 2003 may have a drug product flag indicating the sponsor submitted the patent as claiming the drug product."
+    },
+    {
+      "path": "patents.drug_substance_flag",
+      "type": "boolean",
+      "description": "Patents submitted on FDA Form 3542 and listed after August 18, 2003 may have a drug substance flag indicating the sponsor submitted the patent as claiming the drug substance."
+    },
+    {
+      "path": "patents.expiration_date",
+      "type": "string",
+      "description": "The date the patent expires as submitted by the applicant holder including applicable extensions."
+    },
+    {
+      "path": "patents.patent_delist_flag",
+      "type": "boolean",
+      "description": "The flag is set to 'Y' when an applicant holder has requested a patent to be delisted but the patent cannot be delisted."
+    },
+    {
+      "path": "patents.patent_number",
+      "type": "string",
+      "description": "Patent numbers as submitted by the applicant holder for patents covered by the statutory provisions. May repeat for multiple applications and multiple products. Includes pediatric exclusivity granted by the agency."
+    },
+    {
+      "path": "patents.patent_submission_date",
+      "type": "string",
+      "description": "The date on which the FDA receives patent information from the applicant holder. Patent submission date data is included for patents submitted after 2013."
+    },
+    {
+      "path": "patents.patent_use_code",
+      "type": "string",
+      "description": "A code to designate a method of use that covers the approved indication or use of a drug product."
+    },
+    {
+      "path": "patents.patent_use_code_definition",
+      "type": "string",
+      "description": "The definition of the patent use code."
+    },
+    {
+      "path": "product_number",
+      "type": "string",
+      "description": "The FDA assigned number to identify the application products. Each strength is a separate product. May repeat for multiple part products."
+    },
+    {
+      "path": "products",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "products.active_ingredients",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "products.active_ingredients.name",
+      "type": "string",
+      "description": "The names of the active, medicinal ingredients in the drug product."
+    },
+    {
+      "path": "products.active_ingredients.strength",
+      "type": "string",
+      "description": "The strength of the active, medicinal ingredients in the drug product."
+    },
+    {
+      "path": "products.application_full_name",
+      "type": "string",
+      "description": "The full name of the firm holding legal responsibility for the new drug application."
+    },
+    {
+      "path": "products.application_name",
+      "type": "string",
+      "description": "Name of the Applicant for the drug product."
+    },
+    {
+      "path": "products.application_number",
+      "type": "string",
+      "description": "The FDA assigned number to the application."
+    },
+    {
+      "path": "products.application_type",
+      "type": "string",
+      "description": "The type of new drug application approval."
+    },
+    {
+      "path": "products.brand_name",
+      "type": "string",
+      "description": "Brand or trade name of the drug product."
+    },
+    {
+      "path": "products.dosage_form",
+      "type": "string",
+      "description": "The drug’s dosage form. There is no standard, but values may include terms like `tablet` or `solution for injection`."
+    },
+    {
+      "path": "products.product_type",
+      "type": "string",
+      "description": "The group or category of approved drugs."
+    },
+    {
+      "path": "products.reference_listed_drug",
+      "type": "boolean",
+      "description": "The RLD is a drug product approved under section 505(c) of the FD&C Act for which FDA has made a finding of safety and effectiveness. In the electronic Orange Book, an RLD is identified by “RLD” in the RLD column."
+    },
+    {
+      "path": "products.reference_standard",
+      "type": "boolean",
+      "description": "A highly purified compound that is well characterized."
+    },
+    {
+      "path": "products.route",
+      "type": "string",
+      "description": "The route of administration of the drug product."
+    },
+    {
+      "path": "products.therapeutic_equivalence_codes",
+      "type": "array",
+      "description": ""
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+{
+  "endpoint": "ndc",
+  "source_url": "https://open.fda.gov/fields/drugndc.yaml",
+  "fetched_at": "2026-09-20T23:36:19.465Z",
+  "fields": [
+    {
+      "path": "active_ingredients",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "active_ingredients.name",
+      "type": "string",
+      "description": "The names of the active, medicinal ingredients in the drug product."
+    },
+    {
+      "path": "active_ingredients.strength",
+      "type": "string",
+      "description": "The strength of the active, medicinal ingredients in the drug product."
+    },
+    {
+      "path": "application_number",
+      "type": "string",
+      "description": "This corresponds to the NDA, ANDA, or BLA number reported by the labeler for products which have the corresponding Marketing Category designated. If the designated Marketing Category is OTC Monograph Final or OTC Monograph Not Final, then the application number will be the CFR citation corresponding"
+    },
+    {
+      "path": "brand_name",
+      "type": "string",
+      "description": "Brand or trade name of the drug product."
+    },
+    {
+      "path": "brand_name_base",
+      "type": "string",
+      "description": "The base of the brand name excluding its suffix."
+    },
+    {
+      "path": "brand_name_suffix",
+      "type": "string",
+      "description": "A suffix to the proprietary name, a value here should be appended to the ProprietaryName field to obtain the complete name of the product. This suffix is often used to distinguish characteristics of a product such as extended release (“XR”) or sleep aid (“PM”)."
+    },
+    {
+      "path": "dea_schedule",
+      "type": "string",
+      "description": "This is the assigned DEA Schedule number as reported by the labeler. Values are CI, CII, CIII, CIV, and CV."
+    },
+    {
+      "path": "dosage_form",
+      "type": "string",
+      "description": "The drug’s dosage form. There is no standard, but values may include terms like `tablet` or `solution for injection`."
+    },
+    {
+      "path": "finished",
+      "type": "string",
+      "description": "Details whether the product is finished or not. FDA does not review and approve unfinished products. Therefore, all products in this file are considered unapproved."
+    },
+    {
+      "path": "generic_name",
+      "type": "string",
+      "description": "Generic name(s) of the drug product."
+    },
+    {
+      "path": "listing_expiration_date",
+      "type": "string",
+      "description": "This is the date when the listing record will expire if not updated or certified by the firm."
+    },
+    {
+      "path": "marketing_category",
+      "type": "string",
+      "description": "Product types are broken down into several potential Marketing Categories, such as NDA/ANDA/BLA, OTC Monograph, or Unapproved Drug."
+    },
+    {
+      "path": "marketing_end_date",
+      "type": "string",
+      "description": "This is the date the product will no longer be available on the market."
+    },
+    {
+      "path": "marketing_start_date",
+      "type": "type",
+      "description": "This is the date that the labeler indicates was the start of its marketing of the drug product."
+    },
+    {
+      "path": "openfda",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "openfda.is_original_packager",
+      "type": "string",
+      "description": "Whether or not the drug has been repackaged for distribution."
+    },
+    {
+      "path": "openfda.manufacturer_name",
+      "type": "string",
+      "description": "Name of manufacturer or company that makes this drug product, corresponding to the labeler code segment of the NDC."
+    },
+    {
+      "path": "openfda.nui",
+      "type": "string",
+      "description": "Unique identifier applied to a drug concept within the National Drug File Reference Terminology (NDF-RT)."
+    },
+    {
+      "path": "openfda.pharm_class_cs",
+      "type": "string",
+      "description": "Chemical structure classification of the drug product’s pharmacologic class. Takes the form of the classification, followed by `[Chemical/Ingredient]` (such as `Thiazides [Chemical/Ingredient]` or `Antibodies, Monoclonal [Chemical/Ingredient]."
+    },
+    {
+      "path": "openfda.pharm_class_epc",
+      "type": "string",
+      "description": "Established pharmacologic class associated with an approved indication of an active moiety (generic drug) that the FDA has determined to be scientifically valid and clinically meaningful. Takes the form of the pharmacologic class, followed by `[EPC]` (such as `Thiazide Diuretic [EPC]` or `Tumor Necr"
+    },
+    {
+      "path": "openfda.pharm_class_moa",
+      "type": "string",
+      "description": "Mechanism of action of the drug—molecular, subcellular, or cellular functional activity—of the drug’s established pharmacologic class. Takes the form of the mechanism of action, followed by `[MoA]` (such as `Calcium Channel Antagonists [MoA]` or `Tumor Necrosis Factor Receptor Blocking Activity [MoA"
+    },
+    {
+      "path": "openfda.pharm_class_pe",
+      "type": "string",
+      "description": "Physiologic effect or pharmacodynamic effect—tissue, organ, or organ system level functional activity—of the drug’s established pharmacologic class. Takes the form of the effect, followed by `[PE]` (such as `Increased Diuresis [PE]` or `Decreased Cytokine Activity [PE]`."
+    },
+    {
+      "path": "openfda.rxcui",
+      "type": "string",
+      "description": "The RxNorm Concept Unique Identifier. RxCUI is a unique number that describes a semantic concept about the drug product, including its ingredients, strength, and dose forms."
+    },
+    {
+      "path": "openfda.spl_set_id",
+      "type": "string",
+      "description": "Unique identifier for the Structured Product Label for a product, which is stable across versions of the label. Also referred to as the set ID."
+    },
+    {
+      "path": "openfda.unii",
+      "type": "string",
+      "description": "Unique Ingredient Identifier, which is a non-proprietary, free, unique, unambiguous, non-semantic, alphanumeric identifier based on a substance’s molecular structure and/or descriptive information."
+    },
+    {
+      "path": "openfda.upc",
+      "type": "string",
+      "description": "Universal Product Code"
+    },
+    {
+      "path": "packaging",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "packaging.description",
+      "type": "string",
+      "description": "A description of the size and type of packaging in sentence form. Multilevel packages will have the descriptions concatenated together."
+    },
+    {
+      "path": "packaging.marketing_end_date",
+      "type": "string",
+      "description": "This is the date the product will no longer be available on the market."
+    },
+    {
+      "path": "packaging.marketing_start_date",
+      "type": "string",
+      "description": "This is the date that the labeler indicates was the start of its marketing of the drug product."
+    },
+    {
+      "path": "packaging.package_ndc",
+      "type": "string",
+      "description": "This number, known as the NDC, identifies the labeler, product, and trade package size. The first segment, the labeler code, is assigned by the FDA. A labeler is any firm that manufactures (including repackers or relabelers), or distributes (under its own name) the drug."
+    },
+    {
+      "path": "packaging.sample",
+      "type": "string",
+      "description": "Indicates whether this is a sample packaging or not."
+    },
+    {
+      "path": "pharm_class",
+      "type": "string",
+      "description": "These are the reported pharmacological class categories corresponding to the SubstanceNames listed above."
+    },
+    {
+      "path": "product_id",
+      "type": "string",
+      "description": "ProductID is a concatenation of the NDC product code and SPL documentID."
+    },
+    {
+      "path": "product_ndc",
+      "type": "string",
+      "description": "The labeler manufacturer code and product code segments of the NDC number, separated by a hyphen."
+    },
+    {
+      "path": "product_type",
+      "type": "string",
+      "description": "Type of drug product"
+    },
+    {
+      "path": "route",
+      "type": "string",
+      "description": "The route of administation of the drug product."
+    },
+    {
+      "path": "spl_id",
+      "type": "string",
+      "description": "Unique identifier for a particular version of a Structured Product Label for a product. Also referred to as the document ID."
+    }
+  ]
+}

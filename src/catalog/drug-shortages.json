@@ -1,0 +1,212 @@
+{
+  "endpoint": "shortages",
+  "source_url": "https://open.fda.gov/fields/drugshortages.yaml",
+  "fetched_at": "2026-09-20T23:36:19.796Z",
+  "fields": [
+    {
+      "path": "availability",
+      "type": "string",
+      "description": "Availability Information"
+    },
+    {
+      "path": "change_date",
+      "type": "string",
+      "description": "Date of change for the presentation"
+    },
+    {
+      "path": "company_name",
+      "type": "string",
+      "description": "Company name that makes this drug product."
+    },
+    {
+      "path": "contact_info",
+      "type": "string",
+      "description": "Contact information"
+    },
+    {
+      "path": "discontinued_date",
+      "type": "string",
+      "description": "Date the presentation was discontinued"
+    },
+    {
+      "path": "dosage_form",
+      "type": "string",
+      "description": "The drug’s dosage form. There is no standard, but values may include terms like `tablet` or `solution for injection`."
+    },
+    {
+      "path": "generic_name",
+      "type": "string",
+      "description": "Generic name(s) of the drug product."
+    },
+    {
+      "path": "initial_posting_date",
+      "type": "string",
+      "description": "Date the presentation was added to the public website"
+    },
+    {
+      "path": "openfda",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "openfda.brand_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.dosage_form",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.is_original_packager",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.manufacturer_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.nui",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.original_packager_product_ndc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.package_ndc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_cs",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_epc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_moa",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_pe",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.product_ndc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.product_type",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.route",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.rxcui",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.spl_id",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.spl_set_id",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.substance_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.unii",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.upc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "package_ndc",
+      "type": "string",
+      "description": "This number, known as the NDC, identifies the labeler, product, and trade package size. The first segment, the labeler code, is assigned by the FDA. A labeler is any firm that manufactures (including repackers or relabelers), or distributes (under its own name) the drug."
+    },
+    {
+      "path": "presentation",
+      "type": "string",
+      "description": "Drug name, form, strength, and NDC number"
+    },
+    {
+      "path": "proprietary_name",
+      "type": "string",
+      "description": "Brand or trade name of the drug product."
+    },
+    {
+      "path": "related_info",
+      "type": "string",
+      "description": "Specific availability information for the presentation"
+    },
+    {
+      "path": "related_info_link",
+      "type": "string",
+      "description": "FDA resources and links"
+    },
+    {
+      "path": "resolved_note",
+      "type": "string",
+      "description": "Information related to the resolved status of the presentation"
+    },
+    {
+      "path": "shortage_reason",
+      "type": "string",
+      "description": "Reason for shortage of the presentation"
+    },
+    {
+      "path": "status",
+      "type": "string",
+      "description": "Presentation shortage status"
+    },
+    {
+      "path": "strength",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "therapeutic_category",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "update_date",
+      "type": "string",
+      "description": "Date of update for the presentation"
+    },
+    {
+      "path": "update_type",
+      "type": "string",
+      "description": "Type of update"
+    }
+  ]
+}
