@@ -1,7 +1,7 @@
 {
   "endpoint": "drugsfda",
   "source_url": "https://open.fda.gov/fields/drugsfda.yaml",
-  "fetched_at": "2026-09-20T23:36:19.640Z",
+  "fetched_at": "2026-09-20T23:46:59.619Z",
   "fields": [
     {
       "path": "application_number",
@@ -174,6 +174,31 @@
       "description": ""
     },
     {
+      "path": "submissions.application_docs.date",
+      "type": "string",
+      "description": "The date of publication of the applications document."
+    },
+    {
+      "path": "submissions.application_docs.id",
+      "type": "string",
+      "description": "The id of the applications document."
+    },
+    {
+      "path": "submissions.application_docs.title",
+      "type": "string",
+      "description": "The title of the applications document."
+    },
+    {
+      "path": "submissions.application_docs.type",
+      "type": "string",
+      "description": "The type of the applications document."
+    },
+    {
+      "path": "submissions.application_docs.url",
+      "type": "string",
+      "description": "The url to access the applications document."
+    },
+    {
       "path": "submissions.review_priority",
       "type": "string",
       "description": "Pending."
@@ -197,6 +222,11 @@
       "path": "submissions.submission_property_type",
       "type": "array",
       "description": ""
+    },
+    {
+      "path": "submissions.submission_property_type.code",
+      "type": "string",
+      "description": "The code indicating the submission property type."
     },
     {
       "path": "submissions.submission_public_notes",

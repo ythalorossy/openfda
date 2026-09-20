@@ -43,4 +43,28 @@ describe('field catalogs', () => {
       expect(paths).toContain(KNOWN_TRUE[endpoint]);
     });
   }
+
+  // drugsfda.yaml has a fifth field shape none of the other six endpoints
+  // use: an array whose `items` is itself a map of named child field
+  // definitions with no `properties` wrapper (`submissions.application_docs`,
+  // `submissions.submission_property_type`). A flattener that only walks
+  // `properties`/`items.properties` silently drops these — verified live on
+  // 2026-09-20, and four of the five `application_docs` fields are already
+  // load-bearing in `src/drug/drugsfda-sections.ts`.
+  const KNOWN_TRUE_DEEP_DRUGSFDA = [
+    'submissions.application_docs.id',
+    'submissions.application_docs.date',
+    'submissions.application_docs.title',
+    'submissions.application_docs.type',
+    'submissions.application_docs.url',
+    'submissions.submission_property_type.code',
+  ];
+
+  it('drugsfda: catalog lists its deeply-nested, wrapper-less field paths', () => {
+    const catalog = JSON.parse(readFileSync('src/catalog/drug-drugsfda.json', 'utf8'));
+    const paths = catalog.fields.map((f: { path: string }) => f.path);
+    for (const deepPath of KNOWN_TRUE_DEEP_DRUGSFDA) {
+      expect(paths).toContain(deepPath);
+    }
+  });
 });

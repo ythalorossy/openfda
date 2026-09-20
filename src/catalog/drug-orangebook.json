@@ -1,7 +1,7 @@
 {
   "endpoint": "orangebook",
   "source_url": "https://open.fda.gov/fields/drugorangebook.yaml",
-  "fetched_at": "2026-09-20T23:36:19.723Z",
+  "fetched_at": "2026-09-20T23:46:59.641Z",
   "fields": [
     {
       "path": "approval_date",

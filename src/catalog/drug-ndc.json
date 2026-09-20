@@ -1,7 +1,7 @@
 {
   "endpoint": "ndc",
   "source_url": "https://open.fda.gov/fields/drugndc.yaml",
-  "fetched_at": "2026-09-20T23:36:19.465Z",
+  "fetched_at": "2026-09-20T23:46:59.567Z",
   "fields": [
     {
       "path": "active_ingredients",

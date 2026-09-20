@@ -1,7 +1,7 @@
 {
   "endpoint": "event",
   "source_url": "https://open.fda.gov/fields/drugevent.yaml",
-  "fetched_at": "2026-09-20T23:36:19.371Z",
+  "fetched_at": "2026-09-20T23:46:59.542Z",
   "fields": [
     {
       "path": "authoritynumb",
