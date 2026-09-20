@@ -30,6 +30,7 @@ export interface SafetyFields {
   overdosage: string[];
   do_not_use: string[];
   ask_doctor: string[];
+  ask_doctor_or_pharmacist: string[];
   stop_use: string[];
   pregnancy_or_breast_feeding: string[];
 }
@@ -51,6 +52,7 @@ export function mapSafetyFields(drug: RawLabel): SafetyFields {
     overdosage: asArray(drug.overdosage),
     do_not_use: asArray(drug.do_not_use),
     ask_doctor: asArray(drug.ask_doctor),
+    ask_doctor_or_pharmacist: asArray(drug.ask_doctor_or_pharmacist),
     stop_use: asArray(drug.stop_use),
     pregnancy_or_breast_feeding: asArray(drug.pregnancy_or_breast_feeding),
   };

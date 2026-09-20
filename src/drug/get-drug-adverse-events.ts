@@ -5,7 +5,7 @@
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import { summarizeResults, withTotals } from '../utils/format.js';
-import { describeOutcome } from './faers.js';
+import { describeOutcome, SERIOUSNESS, PATIENT_SEX } from './faers.js';
 import { buildEventSearch, EVENT_MATCHED_VIA } from './event-search.js';
 import z from 'zod';
 
@@ -162,14 +162,11 @@ export const getDrugAdverseEvents = {
       const pairs = dedupeReactionPairs(event.patient?.reaction ?? []);
       return {
         report_id: event.safetyreportid,
-        serious: event.serious === '1' ? 'Yes' : 'No',
+        // Same map the counts tool uses, so the two tools cannot disagree.
+        serious: SERIOUSNESS[String(event.serious)] ?? 'Not reported',
         patient_age: event.patient?.patientonsetage || 'Unknown',
         patient_sex:
-          event.patient?.patientsex === '1'
-            ? 'Male'
-            : event.patient?.patientsex === '2'
-              ? 'Female'
-              : 'Unknown',
+          PATIENT_SEX[String(event.patient?.patientsex)] ?? 'Not reported',
         // Derived from the same deduped pairs so the two arrays stay the
         // same length and positionally aligned (see dedupeReactionPairs).
         reactions: pairs.map((p) => p.reaction),

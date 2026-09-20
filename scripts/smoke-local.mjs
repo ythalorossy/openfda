@@ -9,7 +9,7 @@
  * stdio exactly as an MCP client would, so it exercises the shipped artifact
  * rather than the TypeScript sources.
  *
- * Asserts behaviours introduced by the 1.1.0 and 1.2.0 fixes.
+ * Asserts behaviours introduced by the 1.1.0 through 1.3.0 fixes.
  *
  * This HITS THE LIVE openFDA API and is NOT part of the test suite — the
  * vitest suite is fully offline. Run it by hand before publishing.
@@ -239,6 +239,32 @@ const run = async () => {
     ['names the offending field', /bogus_field/.test(t)],
     ['lists at least two valid fields', /dosage_form/.test(t) && /marketing_status/.test(t)],
     ['does not look like a miss', !/No Drugs@FDA records/.test(t)],
+  ]);
+
+  t = await call('get-drug-adverse-event-counts', { drugName: 'prednisone', field: 'serious', limit: 2 });
+  show('R1  coded count terms are decoded', t, [
+    ['shows a readable label', /Serious|Not serious/.test(t)],
+    ['keeps the raw code', /"term_code"/.test(t)],
+    ['no bare integer term', !/"term":\s*\d+\s*,/.test(t)],
+  ]);
+
+  t = await call('get-drugsfda', { sectionName: 'openfda', fieldName: 'brand_name', searchValue: 'Neurontin' });
+  show('R2  Neurontin returns inline at default settings', t, [
+    ['under the budget that broke before', t.length < 20000],
+    ['reports a submission count', /"submission_count"/.test(t)],
+    ['no submissions array in summary', !/"submissions":/.test(t)],
+  ]);
+
+  t = await call('get-drug-by-name', { drugName: 'Advil', skip: 1 });
+  show('R3  skip reaches a different Advil label', t, [
+    ['not the dual-action combination', !/Dual Action/i.test(t)],
+    ['substance_name leads the record', /"substance_name"/.test(t)],
+  ]);
+
+  t = await call('get-drug-safety-info', { drugName: 'Rayos' });
+  show('R5  absent generic name is null, not "Unknown"', t, [
+    ['no literal Unknown', !/"generic_name":\s*"Unknown"/.test(t)],
+    ['null instead', /"generic_name":\s*null/.test(t)],
   ]);
 
   console.log('\nDone.\n');

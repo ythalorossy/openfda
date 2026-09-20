@@ -139,6 +139,47 @@ describe('declared fields are actually returned', () => {
     }
   });
 
+  it('get-drug-by-name emits every declared field when openfda is empty', async () => {
+    // Rayos and Cordarone reach the label with a fully empty openfda object
+    // (resolved via spl_product_data_elements). A fixture with populated
+    // openfda cannot catch a handler that silently drops fields via
+    // undefined passthrough, because JSON.stringify removes undefined keys.
+    respondWith({
+      meta: { results: { skip: 0, limit: 1, total: 1 } },
+      results: [{ openfda: {} }],
+    });
+
+    const result = await getDrugByName.handler({ drugName: 'Rayos' });
+    const text = result.content[0].text;
+    const payload = JSON.parse(text.slice(text.indexOf('{')));
+    const emitted = payload.results ? payload.results[0] : payload;
+
+    for (const field of (getDrugByName as any).returnsFields as string[]) {
+      expect(
+        Object.prototype.hasOwnProperty.call(emitted, field),
+        `declared "${field}" but did not emit it when openfda is empty`
+      ).toBe(true);
+    }
+  });
+
+  it('get-drug-safety-info emits every declared field when openfda is empty', async () => {
+    respondWith({
+      meta: { results: { skip: 0, limit: 1, total: 1 } },
+      results: [{ openfda: {} }],
+    });
+
+    const result = await getDrugSafetyInfo.handler({ drugName: 'Rayos' });
+    const text = result.content[0].text;
+    const payload = JSON.parse(text.slice(text.indexOf('{')));
+
+    for (const field of (getDrugSafetyInfo as any).returnsFields as string[]) {
+      expect(
+        Object.prototype.hasOwnProperty.call(payload, field),
+        `declared "${field}" but did not emit it when openfda is empty`
+      ).toBe(true);
+    }
+  });
+
   it('get-drug-adverse-events emits every field it declares', async () => {
     respondWith({
       meta: { results: { skip: 0, limit: 1, total: 1 } },

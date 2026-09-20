@@ -1,6 +1,6 @@
 {
   "name": "@ythalorossy/openfda",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "OpenFDA Model Context Protocol",
   "repository": {
     "type": "git",
@@ -31,7 +31,8 @@
     "typecheck": "tsc --noEmit",
     "prepare": "npm run build:cli",
     "smoke": "node scripts/smoke-local.mjs",
-    "probe:drugsfda": "node scripts/probe-drugsfda-paths.mjs"
+    "probe:drugsfda": "node scripts/probe-drugsfda-paths.mjs",
+    "probe:faers-codes": "node scripts/probe-faers-codes.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
