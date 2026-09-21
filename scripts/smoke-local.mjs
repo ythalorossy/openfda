@@ -9,7 +9,9 @@
  * stdio exactly as an MCP client would, so it exercises the shipped artifact
  * rather than the TypeScript sources.
  *
- * Asserts behaviours introduced by the 1.1.0 through 1.3.0 fixes.
+ * Asserts behaviours of the 2.0.0 drug endpoint group (drug-label,
+ * drug-event, drug-drugsfda), the descriptor-built replacement for the nine
+ * 1.x get-* tools.
  *
  * This HITS THE LIVE openFDA API and is NOT part of the test suite — the
  * vitest suite is fully offline. Run it by hand before publishing.
@@ -91,16 +93,32 @@ const notify = (method, params) =>
 
 const call = async (name, args) => {
   const res = await send('tools/call', { name, arguments: args });
-  return res?.result?.content?.[0]?.text ?? JSON.stringify(res?.error ?? res);
+  return {
+    text: res?.result?.content?.[0]?.text ?? JSON.stringify(res?.error ?? res),
+    isError: res?.result?.isError === true,
+  };
 };
 
+let failures = 0;
 const show = (label, text, checks) => {
   console.log(`\n${'='.repeat(72)}\n${label}\n${'='.repeat(72)}`);
   for (const [desc, ok] of checks) {
+    if (!ok) failures += 1;
     console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${desc}`);
   }
   console.log('  ---- first 320 chars of output ----');
   console.log('  ' + text.slice(0, 320).replace(/\n/g, '\n  '));
+};
+
+/** A response body parses as `${prose}\n\n${json}` — extract the JSON half. */
+const parsePayload = (text) => {
+  const start = text.indexOf('{');
+  if (start < 0) return undefined;
+  try {
+    return JSON.parse(text.slice(start));
+  } catch {
+    return undefined;
+  }
 };
 
 const run = async () => {
@@ -118,157 +136,58 @@ const run = async () => {
   );
 
   if (forceNoKey) {
-    const t = await call('get-drug-by-name', { drugName: 'Lipitor' });
-    show('P0-2  missing key -> actionable error, no network call', t, [
+    const { text: t } = await call('drug-label', { value: 'Lipitor' });
+    show('missing key -> actionable error, no network call', t, [
       ['says the key is not set', /OPENFDA_API_KEY is not set/.test(t)],
       ['explains .env is not read', /\.env file is not loaded/i.test(t)],
       ['mentions the opt-in', /OPENFDA_ALLOW_KEYLESS=1/.test(t)],
       ['does NOT say "Forbidden"', !/Forbidden/.test(t)],
     ]);
     child.kill();
-    return;
+    process.exit(failures > 0 ? 1 : 0);
   }
 
-  let t = await call('get-drug-safety-info', { drugName: 'Jantoven' });
-  show('P1-1  Jantoven -> populated boxed_warning', t, [
-    ['boxed_warning key present', /"boxed_warning"/.test(t)],
-    ['boxed_warning is NOT empty', !/"boxed_warning": \[\]/.test(t)],
-    ['no api_key leaked', !/api_key/.test(t)],
-  ]);
+  // The six calls Task 19 requires, one-for-one replacing the 1.x calls
+  // this script used to drive.
+  const calls = [
+    { tool: 'drug-label', args: { value: 'Advil' } },
+    { tool: 'drug-label', args: { value: 'Advil', detail: 'safety' } },
+    { tool: 'drug-label', args: { field: 'ndc', value: '0573-0164-40' } },
+    { tool: 'drug-event', args: { value: 'IBUPROFEN', limit: 2 } },
+    {
+      tool: 'drug-event',
+      args: { value: 'IBUPROFEN', count: 'patient.reaction.reactionmeddrapt.exact' },
+    },
+    { tool: 'drug-drugsfda', args: { field: 'sponsor_name', value: 'Pfizer' } },
+  ];
 
-  t = await call('get-drug-safety-info', { drugName: 'Lipitor' });
-  show('P1-1  Lipitor (control) -> boxed_warning present but EMPTY', t, [
-    ['boxed_warning key present', /"boxed_warning"/.test(t)],
-    ['boxed_warning is empty []', /"boxed_warning": \[\]/.test(t)],
-  ]);
+  for (const { tool, args } of calls) {
+    const { text, isError } = await call(tool, args);
+    const payload = parsePayload(text);
+    show(`${tool} ${JSON.stringify(args)}`, text, [
+      ['is not an error', !isError],
+      ['response parses as JSON', payload !== undefined],
+      ['matched_via is present', payload !== undefined && 'matched_via' in payload],
+      ['no api_key substring anywhere in output', !/api_key/.test(text)],
+      ['no bare api.fda.gov leak', !/api\.fda\.gov/.test(text)],
+    ]);
+  }
 
-  t = await call('get-drug-safety-info', { drugName: 'Zoloft' });
-  show('P1-2  Zoloft (PLR label) -> warnings non-empty', t, [
-    ['warnings_and_cautions present', /"warnings_and_cautions"/.test(t)],
-    ['warnings is NOT empty', !/"warnings": \[\]/.test(t)],
-  ]);
+  // The live proof of the 404 fix: a drug that does not exist must come back
+  // as a non-error, prose "no results" message — not isError: true. This is
+  // the exact regression the 1.x line's 404-classification bug produced.
+  {
+    const { text, isError } = await call('drug-label', { value: 'Zzzznotadrug' });
+    show('drug-label nonexistent drug -> non-error no-results message', text, [
+      ['is NOT an error', !isError],
+      ['reads as "no records found"', /No drug-label records found/i.test(text)],
+      ['no api_key substring anywhere in output', !/api_key/.test(text)],
+    ]);
+  }
 
-  t = await call('get-drug-by-name', { drugName: 'Cordarone' });
-  show('P2-3  Cordarone -> resolves via a fallback tier (Task 10)', t, [
-    ['matched_via reported', /"matched_via"/.test(t)],
-    ['not a not-found', !/No label found/.test(t)],
-  ]);
-
-  t = await call('get-drug-by-product-ndc', { productNDC: '58151-155' });
-  show('P2-1  5-3 product NDC reaches the API', t, [
-    ['not rejected as invalid', !/Invalid product NDC format/.test(t)],
-    ['normalized echo, not raw', !/"product_ndc": "58151155"/.test(t)],
-  ]);
-
-  t = await call('get-drug-by-product-ndc', { productNDC: '0456-4020' });
-  show('4-4 product NDC (Celexa) is accepted', t, [
-    ['not rejected as invalid', !/Invalid product NDC format/.test(t)],
-    ['echoes the dashed form', /"product_ndc": "0456-4020"/.test(t)],
-  ]);
-
-  t = await call('get-drug-by-product-ndc', { productNDC: '58151155' });
-  show('ambiguous undashed 8-digit NDC is refused, not guessed', t, [
-    ['rejected', /Invalid product NDC format/.test(t)],
-    ['explains the ambiguity', /ambiguous/.test(t)],
-  ]);
-
-  t = await call('get-drug-by-generic-name', { genericName: 'citalopram', limit: 3 });
-  show('P2-2  totals: "Showing 3 of N", not "Found 3"', t, [
-    ['uses Showing N of M', /Showing 3 of \d+/.test(t)],
-    ['no "Found 3 drug(s)"', !/Found 3 drug\(s\)/.test(t)],
-    ['total in payload', /"total":\s*\d+/.test(t)],
-  ]);
-
-  t = await call('get-drug-adverse-events', { drugName: 'metformin', limit: 2 });
-  show('P3-4/5  FAERS codes decoded, reactions deduped', t, [
-    ['decoded label present', /Recovered|Fatal|Not recovered|Unknown|Not reported/.test(t)],
-    ['no bare numeric outcome', !/"outcomes": \[\s*"[1-6]"/.test(t)],
-  ]);
-
-  t = await call('get-drug-adverse-event-counts', { drugName: 'citalopram', limit: 3 });
-  show('L1  adverse-event counts rank terms by frequency', t, [
-    ['returns ranked terms', /"term":/.test(t) && /"count":/.test(t)],
-    ['states it has no total', /no result total/i.test(t)],
-  ]);
-
-  t = await call('get-drugsfda', {
-    sectionName: 'products',
-    fieldName: 'marketing_status',
-    searchValue: 'Discontinued',
-    limit: 3,
-  });
-  show('N1  get-drugsfda reports a real total', t, [
-    ['shows N of M', /Showing 3 of \d{3,}/.test(t)],
-  ]);
-
-  t = await call('get-drugsfda', {
-    sectionName: 'application',
-    fieldName: 'sponsor_name',
-    searchValue: 'Upjohn',
-  });
-  show('sponsor_name is normalised to uppercase', t, [
-    ['found despite mixed-case input', !/No Drugs@FDA records/.test(t)],
-  ]);
-
-  // sectionName is a Zod enum, so an invalid value is rejected by MCP's
-  // input validation before the handler runs — the handler's own "Unknown
-  // section" wording is unreachable over the real protocol. That is a
-  // deliberate schema-level choice (it also tells a model every valid
-  // option up front), not a bug, so assert what the protocol actually
-  // returns rather than the handler's prose.
-  t = await call('get-drugsfda', {
-    sectionName: 'bogus',
-    fieldName: 'x',
-    searchValue: 'y',
-  });
-  show('N2  invalid section is rejected with the valid options, not a silent miss', t, [
-    ['is a validation error, not success', /Input validation error/i.test(t)],
-    ['names at least two valid sections', /products/.test(t) && /submissions/.test(t)],
-    ['does not look like a miss', !/No Drugs@FDA records/.test(t)],
-  ]);
-
-  // fieldName is a plain z.string(), so this path IS still handled by
-  // resolveField() and its "Unknown field" wording IS reachable over the
-  // real protocol — the branch N2 no longer exercises.
-  t = await call('get-drugsfda', {
-    sectionName: 'products',
-    fieldName: 'bogus_field',
-    searchValue: 'y',
-  });
-  show('N3  invalid field is rejected with the valid options, not a silent miss', t, [
-    ['names the offending field', /bogus_field/.test(t)],
-    ['lists at least two valid fields', /dosage_form/.test(t) && /marketing_status/.test(t)],
-    ['does not look like a miss', !/No Drugs@FDA records/.test(t)],
-  ]);
-
-  t = await call('get-drug-adverse-event-counts', { drugName: 'prednisone', field: 'serious', limit: 2 });
-  show('R1  coded count terms are decoded', t, [
-    ['shows a readable label', /Serious|Not serious/.test(t)],
-    ['keeps the raw code', /"term_code"/.test(t)],
-    ['no bare integer term', !/"term":\s*\d+\s*,/.test(t)],
-  ]);
-
-  t = await call('get-drugsfda', { sectionName: 'openfda', fieldName: 'brand_name', searchValue: 'Neurontin' });
-  show('R2  Neurontin returns inline at default settings', t, [
-    ['under the budget that broke before', t.length < 20000],
-    ['reports a submission count', /"submission_count"/.test(t)],
-    ['no submissions array in summary', !/"submissions":/.test(t)],
-  ]);
-
-  t = await call('get-drug-by-name', { drugName: 'Advil', skip: 1 });
-  show('R3  skip reaches a different Advil label', t, [
-    ['not the dual-action combination', !/Dual Action/i.test(t)],
-    ['substance_name leads the record', /"substance_name"/.test(t)],
-  ]);
-
-  t = await call('get-drug-safety-info', { drugName: 'Rayos' });
-  show('R5  absent generic name is null, not "Unknown"', t, [
-    ['no literal Unknown', !/"generic_name":\s*"Unknown"/.test(t)],
-    ['null instead', /"generic_name":\s*null/.test(t)],
-  ]);
-
-  console.log('\nDone.\n');
+  console.log(`\nDone. ${failures} check(s) failed.\n`);
   child.kill();
+  process.exit(failures > 0 ? 1 : 0);
 };
 
 run().catch((e) => {

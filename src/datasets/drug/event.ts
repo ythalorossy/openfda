@@ -5,7 +5,6 @@
 import { z } from 'zod';
 import type { EndpointDescriptor } from '../../core/descriptor.js';
 import type { Clause } from '../../core/search/strategy.js';
-import { EVENT_SEARCH_FIELDS } from '../../drug/event-search.js';
 import {
   describeOutcome,
   SERIOUSNESS,
@@ -67,7 +66,14 @@ export const drugEvent: EndpointDescriptor = {
       // openfda.*: verified live, openfda.substance_name is NOT_FOUND on
       // this index while patient.drug.openfda.substance_name returns
       // 508,117 records for IBUPROFEN.
-      strategy: { kind: 'anyOf', paths: [...EVENT_SEARCH_FIELDS] },
+      strategy: {
+        kind: 'anyOf',
+        paths: [
+          'patient.drug.openfda.generic_name',
+          'patient.drug.openfda.substance_name',
+          'patient.drug.medicinalproduct',
+        ],
+      },
     },
     {
       name: 'brand_name',

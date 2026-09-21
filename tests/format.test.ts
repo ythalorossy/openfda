@@ -1,7 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { summarizeResults, withTotals } from '../src/utils/format';
-import { getDrugByGenericName } from '../src/drug/get-drug-by-generic-name';
-import { stubFetch } from './helpers/stubFetch';
 
 describe('summarizeResults', () => {
   it('reports the total alongside the returned count', () => {
@@ -35,41 +33,5 @@ describe('withTotals', () => {
 
   it('uses null rather than inventing a total when it is unknown', () => {
     expect(withTotals(['a'], undefined, 10).total).toBeNull();
-  });
-});
-
-describe('list tools report the upstream total', () => {
-  const originalEnv = process.env;
-  let fetchStub: ReturnType<typeof stubFetch>;
-
-  beforeEach(() => {
-    process.env = { ...originalEnv, OPENFDA_API_KEY: 'TEST_API_KEY' };
-    fetchStub = stubFetch([
-      {
-        meta: { results: { skip: 0, limit: 3, total: 91 } },
-        results: [
-          { openfda: { brand_name: ['A'] } },
-          { openfda: { brand_name: ['B'] } },
-          { openfda: { brand_name: ['C'] } },
-        ],
-      },
-    ]);
-  });
-
-  afterEach(() => {
-    process.env = originalEnv;
-    fetchStub.restore();
-  });
-
-  it('distinguishes the requested limit from the matching total', async () => {
-    const result = await getDrugByGenericName.handler({
-      genericName: 'citalopram',
-      limit: 3,
-    });
-
-    const text = result.content[0].text;
-    expect(text).toContain('Showing 3 of 91');
-    expect(text).not.toContain('Found 3 drug(s)');
-    expect(JSON.parse(text.slice(text.indexOf('{'))).total).toBe(91);
   });
 });

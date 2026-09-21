@@ -6,17 +6,6 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { ToolManager } from './ToolManager.js';
 import { warnIfKeyless } from './utils/env.js';
-import {
-  getDrugByName,
-  getDrugByGenericName,
-  getDrugAdverseEvents,
-  getDrugsByManufacturer,
-  getDrugSafetyInfo,
-  getDrugByNdc,
-  getDrugByProductNdc,
-  getDrugsfda,
-  getDrugAdverseEventCounts,
-} from './drug/index.js';
 import { registerDataset } from './core/registry.js';
 import { DRUG_ENDPOINTS } from './datasets/drug/index.js';
 
@@ -41,16 +30,6 @@ const server = new McpServer(
 );
 
 const toolManager = new ToolManager(server);
-
-toolManager.registerTool(getDrugByName);
-toolManager.registerTool(getDrugByGenericName);
-toolManager.registerTool(getDrugAdverseEvents);
-toolManager.registerTool(getDrugsByManufacturer);
-toolManager.registerTool(getDrugSafetyInfo);
-toolManager.registerTool(getDrugByNdc);
-toolManager.registerTool(getDrugByProductNdc);
-toolManager.registerTool(getDrugsfda);
-toolManager.registerTool(getDrugAdverseEventCounts);
 
 registerDataset(toolManager, DRUG_ENDPOINTS);
 

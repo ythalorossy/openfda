@@ -34,10 +34,6 @@ type EndpointType = string;
  *
  * The build() method will throw an error if any required parameter is missing.
  * The API key is read from the OPENFDA_API_KEY environment variable.
- *
- * `.context()` is a deprecated alias for `.endpoint()`, kept only so the 1.x
- * tools keep compiling until they are removed. New code should use
- * `.endpoint()`.
  */
 export class OpenFDABuilder {
   private readonly urlBase = 'https://api.fda.gov';
@@ -51,11 +47,6 @@ export class OpenFDABuilder {
   endpoint(endpoint: EndpointType): this {
     this.params.set('endpoint', endpoint);
     return this;
-  }
-
-  /** @deprecated Alias kept until the 1.x tools are removed. Use endpoint(). */
-  context(context: EndpointType): this {
-    return this.endpoint(context);
   }
 
   search(query: string): this {

@@ -7,14 +7,16 @@ import { capArray } from '../../core/shape/project.js';
 
 /**
  * The 20 paths selected in docs/superpowers/notes/2026-09-20-field-selection.md
- * (`## drugsfda`), not the full 25-path 1.x table in
- * `src/drug/drugsfda-sections.ts`. That table seeded this selection — every
- * path here was live-probed with an `_exists_` check in 1.2.0 — but seven of
- * the 25 were deliberately dropped (duplicates, per-application ordinals, or
- * opaque per-document values), and two better-populated `products.*` paths
- * were added in their place. `tests/parity/drugsfda-parity.test.ts` checks
- * every 1.x path is either exposed here or named as deliberately dropped in
- * that note, so the two lists cannot silently diverge.
+ * (`## drugsfda`), not the full 25-path 1.x table that used to live in
+ * `src/drug/drugsfda-sections.ts` (removed once the 1.x tools were cut over).
+ * That table seeded this selection — every path here was live-probed with an
+ * `_exists_` check in 1.2.0 — but seven of the 25 were deliberately dropped
+ * (duplicates, per-application ordinals, or opaque per-document values), and
+ * two better-populated `products.*` paths were added in their place.
+ * `tests/parity/drugsfda-parity.test.ts` checked every 1.x path was either
+ * exposed here or named as deliberately dropped in that note before the 1.x
+ * tools and the parity suite were both removed; the note remains the record
+ * of that decision.
  */
 const PATHS: Array<[name: string, description: string, uppercase?: boolean]> = [
   ['application_number', 'FDA application number, e.g. NDA020235'],
