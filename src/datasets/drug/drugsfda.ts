@@ -143,9 +143,9 @@ export const drugDrugsfda: EndpointDescriptor = {
   ],
   sortFields: [],
   countFields: [
-    'sponsor_name.exact',
+    'sponsor_name',
     'products.marketing_status',
-    'products.dosage_form',
+    'products.dosage_form.exact',
   ],
   codeMaps: {},
   limits: { default: 5, max: 100 },

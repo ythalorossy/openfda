@@ -224,8 +224,8 @@ export const drugLabel: EndpointDescriptor = {
   ],
   sortFields: ['effective_time:desc', 'effective_time:asc'],
   countFields: [
-    'openfda.route',
-    'openfda.product_type',
+    'openfda.route.exact',
+    'openfda.product_type.exact',
     'openfda.manufacturer_name.exact',
   ],
   codeMaps: {},

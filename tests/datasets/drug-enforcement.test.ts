@@ -79,9 +79,9 @@ describe('drug-enforcement descriptor', () => {
     ]);
     restore = stub.restore;
     const text = textOf(
-      await execute(drugEnforcement, { value: 'ibuprofen', count: 'classification' })
+      await execute(drugEnforcement, { value: 'ibuprofen', count: 'classification.exact' })
     );
     expect(text).toContain('"term": "Class II"');
-    expect(text).toContain('"counted_by": "classification"');
+    expect(text).toContain('"counted_by": "classification.exact"');
   });
 });

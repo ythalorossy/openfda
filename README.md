@@ -23,8 +23,8 @@ adding a row here, not rewriting the pattern.
   present, empty if absent), `safety` (warnings, contraindications,
   interactions and overdosage — see the migration table below for the 1.x
   tool this replaces), `full` (the raw upstream record). `count`:
-  `openfda.route`,
-  `openfda.product_type`, `openfda.manufacturer_name.exact`. `sort`:
+  `openfda.route.exact`,
+  `openfda.product_type.exact`, `openfda.manufacturer_name.exact`. `sort`:
   `effective_time:desc`/`effective_time:asc`. `limit` default
   1, max 25.
 - **`drug-event`** — Search FAERS adverse event reports (voluntarily
@@ -67,7 +67,7 @@ adding a row here, not rewriting the pattern.
   `te_code`, `null` when absent — plus a `submission_count`, with no
   `submissions` array), `full` (adds `submissions`, capped at 10 per record,
   plus `submissions_truncated` when more were omitted). `count`:
-  `sponsor_name.exact`, `products.marketing_status`, `products.dosage_form`.
+  `sponsor_name`, `products.marketing_status`, `products.dosage_form.exact`.
   `limit` default 5, max 100. Seven search paths openFDA publishes on this
   endpoint are deliberately not exposed here — see
   [Migrating from 1.x](#migrating-from-1x) below.
@@ -83,7 +83,7 @@ adding a row here, not rewriting the pattern.
   `product_type`, `pharm_class`, `marketing_start_date`, `openfda.unii`,
   `openfda.rxcui`, `openfda.spl_set_id`. `detail`: `summary` (default;
   identity, packaging and marketing status), `full` (raw upstream record).
-  `count`: `dosage_form`, `route`, `product_type`, `marketing_category`,
+  `count`: `dosage_form.exact`, `route.exact`, `product_type.exact`, `marketing_category`,
   `openfda.manufacturer_name.exact`. `limit` default 5, max 50.
 - **`drug-enforcement`** — Search FDA drug recall and enforcement reports.
   `classification` is the hazard level (Class I: reasonable probability of
@@ -99,8 +99,8 @@ adding a row here, not rewriting the pattern.
   ~18% of recalls — the precise alternative to `product_description`, not
   the default). `detail`: `summary` (default; every field above except the
   three `openfda.*` names, which are bundled as one `openfda` object),
-  `full` (raw upstream record). `count`: `classification`, `status`,
-  `state`, `voluntary_mandated`, `recalling_firm.exact`. `sort`:
+  `full` (raw upstream record). `count`: `classification.exact`, `status.exact`,
+  `state.exact`, `voluntary_mandated.exact`, `recalling_firm.exact`. `sort`:
   `report_date:desc`/`report_date:asc`/`recall_initiation_date:desc`.
   `limit` default 5, max 50.
 - **`drug-orangebook`** — Search the Orange Book: FDA-approved drug products
@@ -116,7 +116,7 @@ adding a row here, not rewriting the pattern.
   `reference_listed_drug` and `reference_standard` are booleans always
   returned, `false` a fact rather than a missing value), `full` (raw
   upstream record). `count`: `products.application_type`,
-  `products.dosage_form`, `products.route`,
+  `products.dosage_form.exact`, `products.route.exact`,
   `products.therapeutic_equivalence_codes`. `sort`:
   `approval_date:desc`/`approval_date:asc`. `limit` default 5, max 50.
 - **`drug-shortages`** — Search FDA drug shortage reports. `status`
@@ -129,7 +129,7 @@ adding a row here, not rewriting the pattern.
   `therapeutic_category`, `dosage_form`, `update_type`,
   `initial_posting_date`, `update_date`. `detail`: `summary` (default;
   the `openfda.*` names are bundled as one `openfda` object), `full` (raw
-  upstream record). `count`: `status`, `dosage_form`,
+  upstream record). `count`: `status`, `dosage_form.exact`,
   `therapeutic_category`, `company_name.exact`. `sort`:
   `update_date:desc`/`update_date:asc`/`initial_posting_date:desc`. `limit`
   default 10, max 50. Smallest drug dataset (~1,600 records); a coverage

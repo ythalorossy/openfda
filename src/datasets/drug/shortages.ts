@@ -112,7 +112,7 @@ export const drugShortages: EndpointDescriptor = {
   ],
   countFields: [
     'status',
-    'dosage_form',
+    'dosage_form.exact',
     'therapeutic_category',
     'company_name.exact',
   ],
