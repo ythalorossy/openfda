@@ -31,7 +31,6 @@
     "typecheck": "tsc --noEmit",
     "prepare": "npm run build:cli",
     "smoke": "node scripts/smoke-local.mjs",
-    "probe:drugsfda": "node scripts/probe-drugsfda-paths.mjs",
     "probe:faers-codes": "node scripts/probe-faers-codes.mjs",
     "fields:sync": "node scripts/fields-sync.mjs",
     "fields:coverage": "node scripts/fields-coverage.mjs"
