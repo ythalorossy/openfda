@@ -49,24 +49,31 @@ export function buildDescription(descriptor: EndpointDescriptor): string {
     )
     .join(' ');
 
+  // Trimmed 2026-09-20: this fixed prose repeated, byte-for-byte, on every
+  // registered tool — ~540-560 characters of always-loaded schema cost per
+  // tool that said nothing descriptor-specific. The two facts a model
+  // actually needs (the envelope keys are always present, and `total` is
+  // the upstream match count rather than the returned count — a real 1.x
+  // defect) are kept; the restated "where matched_via is the real path
+  // that matched" and "see the field parameter for the searchable fields"
+  // clauses were dropped because the field parameter is self-describing
+  // and matched_via's meaning is already implied by its name.
   const counting =
     descriptor.countFields.length > 0
-      ? ` Set count to rank values by frequency instead of returning records; it returns {term, term_code, count} and no total, because openFDA omits one on aggregated responses. Countable fields: ${descriptor.countFields.join(', ')}.`
+      ? ` Set count to rank by frequency instead of records ({term, term_code, count}, no total). Countable: ${descriptor.countFields.join(', ')}.`
       : '';
 
   const sorting =
     descriptor.sortFields.length > 0
-      ? ` Order with sort (${descriptor.sortFields.join(', ')}); without it, results are a deterministic slice, so a small sample is not representative.`
+      ? ` Order with sort (${descriptor.sortFields.join(', ')}); default order is a deterministic slice.`
       : '';
 
   return (
-    `${descriptor.summary} Search one field at a time: field + value; see the field ` +
-    `parameter for the searchable fields. ` +
-    `Always returns ${ENVELOPE_FIELDS.join(', ')}, where matched_via is the real path that matched ` +
-    `and total is the upstream match count, not the number returned. ` +
+    `${descriptor.summary} Search one field at a time: field + value. ` +
+    `Always returns ${ENVELOPE_FIELDS.join(', ')}; total is the upstream match count, not the number returned. ` +
     `detail selects the record shape: ${details}` +
     `${counting}${sorting} ` +
-    `Page with limit (max ${descriptor.limits.max}, default ${descriptor.limits.default}) and skip (max ${SKIP_MAX}).`
+    `Limit max ${descriptor.limits.max} (default ${descriptor.limits.default}); skip max ${SKIP_MAX}.`
   );
 }
 
@@ -90,8 +97,8 @@ export function buildInputSchema(
       .enum(asEnum(fieldNames))
       .optional()
       .default(descriptor.defaultField ?? fieldNames[0]!)
-      .describe(`Field to search: ${fieldList}`),
-    value: z.string().min(1).describe('Value to search for.'),
+      .describe(`Field: ${fieldList}`),
+    value: z.string().min(1).describe('Search value.'),
     limit: z
       .number()
       .int()
@@ -99,32 +106,32 @@ export function buildInputSchema(
       .max(descriptor.limits.max)
       .optional()
       .default(descriptor.limits.default)
-      .describe('Maximum number of records to return.'),
+      .describe('Max records to return.'),
     skip: z
       .number()
       .int()
       .min(0)
       .max(SKIP_MAX)
       .optional()
-      .describe(`Offset into the result set. Maximum ${SKIP_MAX}.`),
+      .describe(`Offset for paging. Max ${SKIP_MAX}.`),
     detail: z
       .enum(asEnum(detailNames))
       .optional()
       .default(detailNames[0]!)
-      .describe(`Record shape. One of: ${detailNames.join(', ')}`),
+      .describe(`Shape: ${detailNames.join(', ')}`),
   };
 
   if (descriptor.sortFields.length > 0) {
     shape.sort = z
       .enum(asEnum(descriptor.sortFields))
       .optional()
-      .describe('Result ordering.');
+      .describe('Sort order.');
   }
   if (descriptor.countFields.length > 0) {
     shape.count = z
       .enum(asEnum(descriptor.countFields))
       .optional()
-      .describe('Aggregate by this field instead of returning records.');
+      .describe('Aggregate by this field instead of records.');
   }
   // The keys already on `shape` at this point ARE the built-ins this
   // function sets (field/value/limit/skip/detail, plus sort/count when
