@@ -9,6 +9,7 @@ import { drugDrugsfda } from './drugsfda.js';
 import { drugNdc } from './ndc.js';
 import { drugEnforcement } from './enforcement.js';
 import { drugOrangebook } from './orangebook.js';
+import { drugShortages } from './shortages.js';
 
 /**
  * The drug API group. Every entry is checked by tests/catalog-conformance
@@ -22,4 +23,5 @@ export const DRUG_ENDPOINTS: EndpointDescriptor[] = [
   drugNdc,
   drugEnforcement,
   drugOrangebook,
+  drugShortages,
 ];

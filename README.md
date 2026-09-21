@@ -115,6 +115,22 @@ adding a row here, not rewriting the pattern.
   `products.dosage_form`, `products.route`,
   `products.therapeutic_equivalence_codes`. `sort`:
   `approval_date:desc`/`approval_date:asc`. `limit` default 5, max 50.
+- **`drug-shortages`** — Search FDA drug shortage reports. `status`
+  distinguishes a current shortage from a resolved one, so a product
+  appearing here is not necessarily short now. openFDA sends an empty
+  string, not `null`, for an absent date on this endpoint; this tool
+  normalises those to `null`. `field`: `generic_name` (default),
+  `company_name`, `openfda.manufacturer_name`, `openfda.brand_name`,
+  `openfda.substance_name`, `package_ndc`, `openfda.product_ndc`, `status`,
+  `therapeutic_category`, `dosage_form`, `update_type`,
+  `initial_posting_date`, `update_date`. `detail`: `summary` (default;
+  the `openfda.*` names are bundled as one `openfda` object), `full` (raw
+  upstream record). `count`: `status`, `dosage_form`,
+  `therapeutic_category`, `company_name.exact`. `sort`:
+  `update_date:desc`/`update_date:asc`/`initial_posting_date:desc`. `limit`
+  default 10, max 50. Smallest drug dataset (~1,600 records); a coverage
+  percentage here represents far fewer records than the same percentage
+  elsewhere.
 
 Every tool reports `matched_via` (which field path actually matched) and a
 `total` that is the upstream match count, not the number of records
@@ -169,7 +185,8 @@ many.
                   "drug-drugsfda",
                   "drug-ndc",
                   "drug-enforcement",
-                  "drug-orangebook"
+                  "drug-orangebook",
+                  "drug-shortages"
               ]
           }
       }
