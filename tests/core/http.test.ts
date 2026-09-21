@@ -47,6 +47,27 @@ describe('fetchPage', () => {
     if (outcome.kind === 'error') expect(outcome.error.status).toBe(500);
   }, 20000);
 
+  it('treats a 404 with a non-JSON body as an error, not a miss', async () => {
+    // openFDA answers a bogus dataset or endpoint path this way — verified
+    // live 2026-09-20. A descriptor typo must fail loudly, not report
+    // "no records found" forever.
+    const stub = stubFetchResponses([
+      { status: 404, text: '<html><body>Not Found</body></html>' },
+    ]);
+    restore = stub.restore;
+    const outcome = await fetchPage(request);
+    expect(outcome.kind).toBe('error');
+    if (outcome.kind === 'error') expect(outcome.error.status).toBe(404);
+  });
+
+  it('treats a 404 with valid JSON but a different error.code as an error', async () => {
+    const stub = stubFetchResponses([
+      { status: 404, body: { error: { code: 'SOME_OTHER_CODE', message: 'x' } } },
+    ]);
+    restore = stub.restore;
+    expect((await fetchPage(request)).kind).toBe('error');
+  });
+
   it('passes skip, sort and count through to the URL', async () => {
     const stub = stubFetchResponses([{ body: { results: [{ term: 'NAUSEA', count: 3 }] } }]);
     restore = stub.restore;
