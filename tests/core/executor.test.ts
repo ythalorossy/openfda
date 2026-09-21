@@ -236,10 +236,15 @@ describe('execute: search behaviour', () => {
     expect(text).not.toContain('experiencing issues');
   }, 20000);
 
-  it('does not walk the remaining tiers after a bad request', async () => {
-    // A bad argument fails identically on every tier, so walking them only
-    // multiplies latency and then reports the wrong outcome. drug_name is
-    // tiered over two paths; exactly one request must be made.
+  it('returns on a bad request without issuing a second tier fetch, even though drug_name has two tiers', async () => {
+    // Guards against a future regression where `bad_request` falls through
+    // to `continue` instead of returning: today, a `bad_request` outcome
+    // matches neither the old `miss` nor `error` branch, so pre-fix it fell
+    // through to the unconditional `hit = ...; break`, which also issued
+    // only one fetch (it then crashed reading `hit.data.results`, which is
+    // what the pre-fix RED run demonstrated — not a second HTTP call). This
+    // test asserts on the call count directly so a later change that turns
+    // `bad_request` into `continue` would be caught here.
     const stub = stubFetchResponses([
       { status: 404, body: { error: { code: 'NOT_FOUND', message: 'Nothing to count' } } },
     ]);
@@ -260,6 +265,56 @@ describe('execute: search behaviour', () => {
     const text = result.content[0]!.text;
     expect(text).toContain('openfda.route.exact');
     expect(text).toContain('fields:countable');
+  });
+
+  it('reports a rejected argument generically when neither count nor sort was sent', async () => {
+    // badArgumentText's generic branch (no count, no sort) is otherwise
+    // never exercised by this file's other bad_request tests, all of which
+    // supply a count.
+    const details =
+      '[illegal_argument_exception] Text fields are not optimised for operations that ' +
+      'require per-document field data like aggregations and sorting. Please use a ' +
+      'keyword field instead.';
+    const stub = stubFetchResponses([
+      { status: 500, body: { error: { code: 'SERVER_ERROR', message: 'Check your request and try again', details } } },
+    ]);
+    restore = stub.restore;
+    const result = await execute(descriptor(), { value: 'Advil' });
+    const text = result.content[0]!.text;
+
+    expect(result.isError).toBe(true);
+    expect(text).toContain('malformed');
+    expect(text).toContain('keyword field');
+    expect(text).not.toContain('Cannot aggregate');
+  });
+
+  it('names both count and sort as candidates, without blaming count alone, when both were sent', async () => {
+    // openFDA's illegal_argument_exception covers both aggregation (count)
+    // and sorting (sort), and its message does not say which parameter it
+    // refused. A stale sortField would otherwise be misattributed to count
+    // and pointed at the wrong diagnostic script.
+    const details =
+      '[illegal_argument_exception] Text fields are not optimised for operations that ' +
+      'require per-document field data like aggregations and sorting. Please use a ' +
+      'keyword field instead.';
+    const stub = stubFetchResponses([
+      { status: 500, body: { error: { code: 'SERVER_ERROR', message: 'Check your request and try again', details } } },
+    ]);
+    restore = stub.restore;
+    const result = await execute(descriptor(), {
+      value: 'Advil',
+      count: 'openfda.route',
+      sort: 'receivedate:desc',
+    });
+    const text = result.content[0]!.text;
+
+    expect(result.isError).toBe(true);
+    expect(text).toContain('count "openfda.route"');
+    expect(text).toContain('sort "receivedate:desc"');
+    expect(text).toContain('does not say which one');
+    // Must not confidently assert count is the culprit the way the
+    // count-only message does.
+    expect(text).not.toContain('Cannot aggregate');
   });
 });
 

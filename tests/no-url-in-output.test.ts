@@ -86,4 +86,46 @@ describe('tool error output', () => {
     expect(text).not.toContain('api_key');
     expect(text).not.toContain('api.fda.gov');
   }, 15000);
+
+  it('never contains the api key on the rejected-argument (bad_request) path', async () => {
+    // The beforeEach's empty-body 500 above never reaches badArgumentText:
+    // JSON.parse('') throws inside badArgumentDetail, so that outcome
+    // classifies as a generic `error`, not `bad_request`. This test supplies
+    // a real illegal_argument_exception body so the bad_request branch (and
+    // its own executor.ts message builder, badArgumentText) actually runs,
+    // proving the key still cannot leak through that specific code path.
+    const details =
+      '[illegal_argument_exception] Text fields are not optimised for operations that ' +
+      'require per-document field data like aggregations and sorting. Please use a ' +
+      'keyword field instead.';
+    globalThis.fetch = (async () => ({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+      text: async () =>
+        JSON.stringify({
+          error: {
+            code: 'SERVER_ERROR',
+            message: 'Check your request and try again',
+            details,
+          },
+        }),
+      json: async () => ({}),
+    })) as any;
+
+    const result = await execute(drugLabel, {
+      field: 'ndc',
+      value: '12345-1234',
+      count: 'openfda.route.exact',
+    });
+    const text = result.content[0]!.text;
+
+    // Confirms the bad_request path (not the generic error path) actually
+    // rendered this output.
+    expect(text).toContain('keyword field');
+    expect(result.isError).toBe(true);
+    expect(text).not.toContain('SUPERSECRETKEY');
+    expect(text).not.toContain('api_key');
+    expect(text).not.toContain('api.fda.gov');
+  }, 15000);
 });

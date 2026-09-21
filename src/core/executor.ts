@@ -93,6 +93,23 @@ function badArgumentText(
   const flipped = input.count.endsWith('.exact')
     ? input.count.slice(0, -'.exact'.length)
     : `${input.count}.exact`;
+
+  // openFDA's illegal_argument_exception pattern covers both aggregations
+  // (count) and sorting (sort) — see http.ts's badArgumentDetail doc
+  // comment — and the rejection does not say which parameter it refused.
+  // With both present on the same request, blaming count alone would send a
+  // maintainer to the wrong diagnostic when sort was the actual cause.
+  if (input.sort !== undefined) {
+    return (
+      `Cannot process this ${descriptor.toolName} request: ${detail}\n\n` +
+      `Both count "${input.count}" and sort "${input.sort}" were sent, and openFDA's ` +
+      `rejection does not say which one it refused. "${input.count}" is declared countable ` +
+      `by this tool ("${flipped}" is the usual working form; npm run fields:countable checks ` +
+      `it), and "${input.sort}" is declared sortable, for which no equivalent probe exists ` +
+      `yet. Check both against openFDA's current index before assuming which one drifted.`
+    );
+  }
+
   return (
     `Cannot aggregate ${descriptor.toolName} by "${input.count}": ${detail}\n\n` +
     `"${input.count}" is declared countable by this tool, so openFDA's index no longer ` +
