@@ -33,7 +33,7 @@ after changing any descriptor's field list.
 ## Key Files
 
 - **`vite.config.ts`**: Vite build configuration; externalizes the SDK for StdioServerTransport compatibility, and injects `__APP_VERSION__` from `package.json` at build time so the version reported in `serverInfo` cannot drift from the published version
-- **`tests/`**: Vitest test suite (460 tests across 42 files: ApiHandler, bundle-size, catalog-conformance, catalog-coverage, catalog-shape, core/budget, core/codes, core/descriptor, core/envelope, core/escape, core/executor, core/http, core/project, core/query, core/registry, core/resources, core/strategy, datasets/drug-drugsfda, datasets/drug-enforcement, datasets/drug-event, datasets/drug-label, datasets/drug-ndc, datasets/drug-orangebook, datasets/drug-shortages, datasets/faers, docs-currency, drift-guard, env, faers-codes, format, label-fields, ndc, ndc-formats, no-raw-query, no-url-in-output, OpenFDABuilder, redact, registration, schema-budget, ToolManager, ToolManager.keyguard, version)
+- **`tests/`**: Vitest test suite (462 tests across 42 files: ApiHandler, bundle-size, catalog-conformance, catalog-coverage, catalog-shape, core/budget, core/codes, core/descriptor, core/envelope, core/escape, core/executor, core/http, core/project, core/query, core/registry, core/resources, core/strategy, datasets/drug-drugsfda, datasets/drug-enforcement, datasets/drug-event, datasets/drug-label, datasets/drug-ndc, datasets/drug-orangebook, datasets/drug-shortages, datasets/faers, docs-currency, drift-guard, env, faers-codes, format, label-fields, ndc, ndc-formats, no-raw-query, no-url-in-output, OpenFDABuilder, redact, registration, schema-budget, ToolManager, ToolManager.keyguard, version)
 - **`docs/superpowers/notes/2026-09-20-field-selection.md`**: The authoritative record of which fields each `drug-*` descriptor exposes in its `field` enum, and why — including every field that was seeded but deliberately dropped. No code reads this file; it is the rationale behind `src/datasets/drug/*.ts`.
 - **`scripts/capture-fixtures.mjs`**: Manual, live-API script that captures trimmed label fixtures into `tests/fixtures/` (not run in CI)
 - **`scripts/smoke-local.mjs`** (`npm run smoke`): Manual end-to-end check that drives the built `dist/index.js` over stdio as a real MCP client would, asserting the behaviours the 1.1.0 through 2.0.0 fixes introduced. Hits the live API, so it is deliberately NOT part of `npm test`; run it after `npm run build:cli` and before publishing. `npm run smoke -- --no-key` exercises the missing-key path instead.
@@ -112,3 +112,71 @@ Every tool takes `field` + `value`, `limit`/`skip`, and `detail`; `sort` and `co
 ## Environment
 
 Requires `OPENFDA_API_KEY` from your MCP client's `env` block; the server reads it directly from `process.env` at runtime and **does not load a `.env` file** (no `dotenv` dependency is declared). Set `OPENFDA_ALLOW_KEYLESS=1` to opt in to openFDA's unauthenticated tier (40 requests/minute, 1,000/day per IP, no rate-limit headers) instead of supplying a key.
+
+## Adding a new API group
+
+`src/core/` contains no dataset knowledge. Adding a group (e.g. Food,
+Transparency) is data, not a change to the executor:
+
+1. Add the endpoint's slug to `scripts/fields-sync.mjs`'s `ENDPOINTS` map and
+   run `npm run fields:sync` and `npm run fields:coverage`. These write the
+   committed `src/catalog/drug-<endpoint>.json` / `.coverage.json` files —
+   nothing downstream can check a path until they exist. Both scripts
+   currently hardcode the `drug-` prefix on every path they read and write
+   (`src/catalog/drug-${endpoint}.json` in `fields-sync.mjs`,
+   `fields-coverage.mjs` reading it back the same way), so a non-drug group
+   needs that prefix parameterized on its own filenames too, not just its
+   slug added to `ENDPOINTS`.
+2. Pick the exposed fields from the coverage data (criteria: published,
+   searchable scalar, at least 5% coverage, real query utility; 10–20
+   fields). Record the choice and its justification in
+   `docs/superpowers/notes/`, the way `2026-09-20-field-selection.md` does
+   for the drug group — including every field that was seeded but
+   deliberately dropped.
+3. Write `src/datasets/<group>/<endpoint>.ts` as an `EndpointDescriptor` and
+   add it to that group's exported array (e.g. a new `FOOD_ENDPOINTS` in
+   `src/datasets/food/index.ts`).
+4. Register the group in `src/index.ts` with `registerDataset(toolManager,
+   <GROUP>_ENDPOINTS)`, and its catalogs with
+   `registerCatalogResources(server, <GROUP>_ENDPOINTS, ...)`.
+5. Run `npm run test:ci` — `catalog-conformance`, `schema-budget`,
+   `drift-guard` and `docs-currency` all apply automatically to the new
+   descriptors, nothing bespoke to wire up. Then run the live-API probe:
+   `scripts/probe-fields.ts` currently imports `DRUG_ENDPOINTS` by name, so
+   it also needs the new group's array added (or the import generalized)
+   before `npm run probe:fields` actually covers it.
+6. Document the new tools in README.md, CLAUDE.md and AGENTS.md.
+
+Two things the next group will hit immediately:
+
+- **The schema budget is measured over `DRUG_ENDPOINTS` alone.**
+  `tests/schema-budget.test.ts` caps the total tool-schema cost at 20,000
+  characters, and the seven drug tools already measure ~17,972 of it. A
+  second group roughly doubles the always-loaded tool surface (every tool's
+  schema loads into an agent's context on connect, called or not), so this
+  ceiling must be raised deliberately, or the guard changed to sum every
+  registered group instead of importing `DRUG_ENDPOINTS` by name — decide
+  which before adding the group, not after the test fails.
+- **`scripts/fields-sync.mjs` has a hardcoded endpoint map (and a hardcoded
+  `drug-` filename prefix, see Step 1 above).** A new group's slugs — and,
+  today, its own copy of the file-naming logic — are needed before
+  `fields:sync`, `fields:coverage`, or any offline guard built on their
+  output can see the new endpoints at all.
+
+**If a new group forces a change under `src/core/`, the descriptor contract
+is wrong.** Fix the contract; do not special-case the group.
+
+## Release checklist
+
+1. `npm run fields:sync && npm run fields:coverage` — refresh the catalogs
+2. `npm run test:ci && npm run typecheck && npm run lint`
+3. `npm run build:cli`
+4. `npm run probe:fields` — every exposed path still returns data
+5. `npm run probe:faers-codes` — FAERS code maps still match the reference
+6. `npm run smoke` — end-to-end over stdio against the live API
+7. `npm run smoke -- --no-key` — the missing-key path still fails cleanly
+8. Bump the version, update `CHANGELOG.md`, commit, tag, publish
+
+Steps 4–7 hit the live API and are not part of `npm test`; a green unit suite
+over stubs does not prove the live surface still works. Stop and fix (or
+escalate) on the first failure rather than tagging past it.

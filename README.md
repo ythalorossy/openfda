@@ -233,7 +233,7 @@ Pin `1.3.0` if you are not ready to migrate.
 | `get-drugs-by-manufacturer` | `drug-label` `{ field: "manufacturer_name", value }` |
 | `get-drug-safety-info` | `drug-label` `{ field: "drug_name", value, detail: "safety" }` |
 | `get-drug-by-ndc` | `drug-label` `{ field: "ndc", value }` |
-| `get-drug-by-product-ndc` | `drug-label` `{ field: "product_ndc", value }` |
+| `get-drug-by-product-ndc` | `drug-label` `{ field: "ndc", value }` |
 | `get-drug-adverse-events` | `drug-event` `{ field: "drug_name", value }` |
 | `get-drug-adverse-event-counts` | `drug-event` `{ value, count: "patient.reaction.reactionmeddrapt.exact" }` |
 | `get-drugsfda` | `drug-drugsfda` `{ field: "application_number", value }` or `{ field: "products.brand_name", value }` |
