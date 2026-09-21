@@ -8,6 +8,14 @@ import { vi } from 'vitest';
  * `JSON.stringify(body)` — openFDA answers a bogus dataset or endpoint path
  * with a bare, non-JSON 404 body, and a test needs to be able to stub that
  * shape too, distinct from its JSON `NOT_FOUND` envelope.
+ *
+ * `json()` and `text()` are not two independent fields to keep in sync: the
+ * raw text is the single source of truth, and `json()` is derived from it by
+ * `JSON.parse`, exactly as a real `Response.json()` is (`JSON.parse(await
+ * text())`). A stub given non-JSON `text` therefore has its `json()` reject
+ * with the same `SyntaxError` a real fetch would throw, instead of silently
+ * resolving `undefined` — a stub that cannot model a Response `fetch` would
+ * never actually produce.
  */
 export function stubFetchResponses(
   responses: Array<{ status?: number; body?: unknown; text?: string }>
@@ -26,7 +34,7 @@ export function stubFetchResponses(
       ok: status >= 200 && status < 300,
       status,
       statusText: String(status),
-      json: async () => response.body,
+      json: async () => JSON.parse(rawText),
       text: async () => rawText,
     } as any;
   }) as any;

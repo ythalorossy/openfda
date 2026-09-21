@@ -17,8 +17,9 @@ type EndpointType = string;
  * The OpenFDABuilder class helps construct URLs for the OpenFDA API.
  *
  * Usage:
- *   - Set the dataset (such as 'drugs') using the dataset() method.
- *   - Set the context (such as 'label', 'ndc', or 'event') using the context() method.
+ *   - Set the dataset (such as 'drug' or 'food') using the dataset() method.
+ *   - Set the endpoint (such as 'label', 'ndc', 'event' or 'enforcement') using
+ *     the endpoint() method.
  *   - Set the search query using the search() method.
  *   - Optionally set the result limit using the limit() method (default is 1).
  *   - Call build() to assemble and return the final API URL.
@@ -26,13 +27,17 @@ type EndpointType = string;
  * Example:
  *   const url = new OpenFDABuilder()
  *     .dataset('drug')
- *     .context('label')
+ *     .endpoint('label')
  *     .search('openfda.brand_name:"Advil"')
  *     .limit(1)
  *     .build();
  *
  * The build() method will throw an error if any required parameter is missing.
  * The API key is read from the OPENFDA_API_KEY environment variable.
+ *
+ * `.context()` is a deprecated alias for `.endpoint()`, kept only so the 1.x
+ * tools keep compiling until they are removed. New code should use
+ * `.endpoint()`.
  */
 export class OpenFDABuilder {
   private readonly urlBase = 'https://api.fda.gov';
