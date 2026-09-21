@@ -32,9 +32,18 @@ describe('every descriptor path exists in FDA\'s published catalog', () => {
   }
 
   it('is actually checking something once descriptors exist', () => {
-    // Guards the guard: an empty list passes vacuously, which is correct in
-    // Phase 1 and a bug from Phase 2 onward.
-    expect(Array.isArray(DRUG_ENDPOINTS)).toBe(true);
+    // Self-deleting by construction: this passes only while DRUG_ENDPOINTS is
+    // still empty. The moment the first real descriptor lands, this fails —
+    // forcing whoever added it to replace this assertion with one that
+    // verifies the per-path checks above are genuinely running (e.g. that a
+    // fabricated path would be caught), rather than leaving behind a check
+    // that is trivially true for any array forever.
+    expect(
+      DRUG_ENDPOINTS.length,
+      'DRUG_ENDPOINTS is no longer empty — replace this assertion with one that verifies the ' +
+        'per-path checks above are actually exercised against a real descriptor, not just that ' +
+        'the array exists.'
+    ).toBe(0);
   });
 });
 
