@@ -9,9 +9,10 @@
  * stdio exactly as an MCP client would, so it exercises the shipped artifact
  * rather than the TypeScript sources.
  *
- * Asserts behaviours of the 2.0.0 drug endpoint group (drug-label,
- * drug-event, drug-drugsfda), the descriptor-built replacement for the nine
- * 1.x get-* tools.
+ * Asserts behaviours of all seven tools in the 2.0.0 drug endpoint group
+ * (drug-label, drug-event, drug-drugsfda, drug-ndc, drug-enforcement,
+ * drug-orangebook, drug-shortages), the descriptor-built replacement for the
+ * nine 1.x get-* tools.
  *
  * This HITS THE LIVE openFDA API and is NOT part of the test suite — the
  * vitest suite is fully offline. Run it by hand before publishing.
@@ -148,7 +149,14 @@ const run = async () => {
   }
 
   // The six calls Task 19 requires, one-for-one replacing the 1.x calls
-  // this script used to drive.
+  // this script used to drive, plus one live call per net-new endpoint
+  // (drug-ndc, drug-enforcement, drug-orangebook, drug-shortages) so the
+  // pre-publish gate actually exercises all seven tools, not three. Search
+  // values below were checked live against api.fda.gov before being picked;
+  // each returns a non-trivial number of records (see
+  // .superpowers/sdd/2026-09-20-openfda-api-groups/final-fix-report.md for
+  // the counts), so a PASS here is evidence the tool works, not a
+  // false-positive on zero rows.
   const calls = [
     { tool: 'drug-label', args: { value: 'Advil' } },
     { tool: 'drug-label', args: { value: 'Advil', detail: 'safety' } },
@@ -159,6 +167,17 @@ const run = async () => {
       args: { value: 'IBUPROFEN', count: 'patient.reaction.reactionmeddrapt.exact' },
     },
     { tool: 'drug-drugsfda', args: { field: 'sponsor_name', value: 'Pfizer' } },
+    // Default field (products.brand_name, 98.79% populated) — the exact
+    // path this fix wave repointed away from the sparse openfda.brand_name.
+    { tool: 'drug-drugsfda', args: { value: 'Lipitor' } },
+    // drug-ndc: 1,484 NDC Directory listings for Ibuprofen.
+    { tool: 'drug-ndc', args: { value: 'Ibuprofen' } },
+    // drug-enforcement: 68 recall/enforcement reports for Ibuprofen.
+    { tool: 'drug-enforcement', args: { value: 'Ibuprofen' } },
+    // drug-orangebook: 4 Orange Book product entries for Lipitor.
+    { tool: 'drug-orangebook', args: { value: 'Lipitor' } },
+    // drug-shortages: 89 shortage reports for Lidocaine.
+    { tool: 'drug-shortages', args: { value: 'Lidocaine' } },
   ];
 
   for (const { tool, args } of calls) {

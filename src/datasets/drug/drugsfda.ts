@@ -24,14 +24,17 @@ const PATHS: Array<[name: string, description: string, uppercase?: boolean]> = [
   // NOT_FOUND. Normalised so a caller typing "Pfizer" does not get a silent
   // miss that looks like absent data — a defect fixed in 1.2.0.
   ['sponsor_name', 'application sponsor; stored uppercase', true],
-  ['products.brand_name', 'proprietary brand name'],
+  ['products.brand_name', 'proprietary brand name (default); 98.79% populated'],
   ['products.active_ingredients.name', 'active ingredient name'],
   ['products.dosage_form', 'dosage form, e.g. TABLET'],
   ['products.route', 'Drugs@FDA product route'],
   ['products.marketing_status', 'e.g. Prescription, Discontinued'],
   ['products.reference_drug', 'whether product is a reference drug'],
   ['products.te_code', 'therapeutic equivalence code'],
-  ['openfda.brand_name', 'normalised brand name'],
+  [
+    'openfda.brand_name',
+    'openFDA-harmonised brand name; sparse, only 42.31% populated',
+  ],
   ['openfda.generic_name', 'normalised generic name'],
   ['openfda.substance_name', 'normalised substance name'],
   ['openfda.manufacturer_name', 'marketed-product manufacturer'],
@@ -90,7 +93,15 @@ export const drugDrugsfda: EndpointDescriptor = {
     'products[].route is the Drugs@FDA product route and uses a different controlled vocabulary ' +
     'from drug-label openfda.route, so joining on route across tools will silently miss.',
   fields,
-  defaultField: 'openfda.brand_name',
+  // NOT openfda.brand_name: that block is present on only 42.31% of
+  // applications (measured in the field-selection note), so defaulting to
+  // it would make most genuine brand-name searches come back empty, which
+  // looks indistinguishable from "this drug does not exist" — exactly the
+  // failure mode this release exists to close. products.brand_name is the
+  // best-covered name-like field on this descriptor (98.79%), matching the
+  // convention every other endpoint follows: default to the most name-like
+  // field with (near-)full coverage.
+  defaultField: 'products.brand_name',
   projections: [
     {
       name: 'summary',

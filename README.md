@@ -49,14 +49,17 @@ adding a row here, not rewriting the pattern.
   different, near-duplicate FAERS date fields. Filtering by one and reading
   the other back will not, in general, show the same date.
 - **`drug-drugsfda`** — Search Drugs@FDA application data: approvals,
-  sponsors, products and submissions. `field`: `application_number`,
+  sponsors, products and submissions. `field`: `products.brand_name`
+  (default drug-name search, 98.79% populated), `application_number`,
   `sponsor_name` (stored uppercase upstream; normalised automatically),
-  `products.brand_name`, `products.active_ingredients.name`,
-  `products.dosage_form`, `products.route`, `products.marketing_status`,
-  `products.reference_drug`, `products.te_code`, `openfda.brand_name`,
-  `openfda.generic_name`, `openfda.substance_name`,
-  `openfda.manufacturer_name`, `openfda.route`, `openfda.product_ndc`,
-  `submissions.submission_type`, `submissions.submission_status`,
+  `products.active_ingredients.name`, `products.dosage_form`,
+  `products.route`, `products.marketing_status`, `products.reference_drug`,
+  `products.te_code`, `openfda.brand_name`, `openfda.generic_name`,
+  `openfda.substance_name`, `openfda.manufacturer_name`, `openfda.route`,
+  `openfda.product_ndc` (the `openfda.*` names are the openFDA-harmonised
+  spelling of the same identifiers, but populated on only ~42% of
+  applications — the precise alternative to `products.brand_name`, not the
+  default), `submissions.submission_type`, `submissions.submission_status`,
   `submissions.submission_status_date`, `submissions.submission_class_code`,
   `submissions.review_priority`. `detail`: `summary` (default; application
   number, sponsor, `openfda` block and `products` — each product carries

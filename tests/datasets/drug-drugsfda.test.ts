@@ -38,6 +38,13 @@ describe('drug-drugsfda descriptor', () => {
   it('exposes exactly the 20 fields selected in the field-selection note', () => {
     expect(drugDrugsfda.fields).toHaveLength(20);
   });
+
+  it('defaults to products.brand_name, not the sparse openfda.brand_name (42.31% coverage)', () => {
+    // Regression guard: an earlier default of openfda.brand_name made a
+    // brand-name search silently miss on most applications, which looks
+    // indistinguishable from the drug not existing.
+    expect(drugDrugsfda.defaultField).toBe('products.brand_name');
+  });
 });
 
 describe('drug-drugsfda projections', () => {
