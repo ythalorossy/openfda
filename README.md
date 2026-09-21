@@ -24,7 +24,8 @@ adding a row here, not rewriting the pattern.
   interactions and overdosage — see the migration table below for the 1.x
   tool this replaces), `full` (the raw upstream record). `count`:
   `openfda.route`,
-  `openfda.product_type`, `openfda.manufacturer_name.exact`. `limit` default
+  `openfda.product_type`, `openfda.manufacturer_name.exact`. `sort`:
+  `effective_time:desc`/`effective_time:asc`. `limit` default
   1, max 25.
 - **`drug-event`** — Search FAERS adverse event reports (voluntarily
   submitted side-effect reports; not evidence of causation). `field`:
