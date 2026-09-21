@@ -7,7 +7,9 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { ToolManager } from './ToolManager.js';
 import { warnIfKeyless } from './utils/env.js';
 import { registerDataset } from './core/registry.js';
+import { registerCatalogResources } from './core/resources.js';
 import { DRUG_ENDPOINTS } from './datasets/drug/index.js';
+import { DRUG_CATALOGS } from './datasets/drug/catalogs.js';
 
 // Replaced at build time by vite (see vite.config.ts) with the version from
 // package.json. The fallback only applies when running unbundled, e.g. vitest.
@@ -32,6 +34,11 @@ const server = new McpServer(
 const toolManager = new ToolManager(server);
 
 registerDataset(toolManager, DRUG_ENDPOINTS);
+registerCatalogResources(
+  server,
+  DRUG_ENDPOINTS,
+  (descriptor) => DRUG_CATALOGS[descriptor.toolName]
+);
 
 async function main() {
   warnIfKeyless();
