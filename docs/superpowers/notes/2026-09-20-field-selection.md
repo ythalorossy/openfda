@@ -80,12 +80,12 @@ than being treated as an implementation detail of the resolver.
 
 **Deliberately not exposed** (cleared 5%, rejected anyway):
 
-- **The 105 narrative section fields** — `indications_and_usage` (96.46), `dosage_and_administration` (96.25), `warnings` (79.53), `inactive_ingredient` (63.59), `purpose` (62.58), `keep_out_of_reach_of_children` (62.32), `active_ingredient` (61.49), `spl_unclassified_section` (40.69), `stop_use` (36.82), `description` (36.24), `adverse_reactions` (34.95), `how_supplied` (34.63), `contraindications` (34.14), `clinical_pharmacology` (33.65), `overdosage` (32.08), `when_using` (31.13), and so on. These are free prose, not identifiers, names, classifications, statuses or dates, so criterion 4 rejects them. Exposing them would also be the single largest drain on the schema budget on any endpoint. They remain fully searchable through the field resource, and they are still *returned* in results — this is a decision about what the enum advertises as a search key, not about what the tool shows.
+- **The 49 narrative section fields that clear the floor** — `indications_and_usage` (96.46), `dosage_and_administration` (96.25), `warnings` (79.53), `inactive_ingredient` (63.59), `purpose` (62.58), `keep_out_of_reach_of_children` (62.32), `active_ingredient` (61.49), `spl_unclassified_section` (40.69), `stop_use` (36.82), `description` (36.24), `adverse_reactions` (34.95), `how_supplied` (34.63), `contraindications` (34.14), `clinical_pharmacology` (33.65), `overdosage` (32.08), `when_using` (31.13), and so on. These are free prose, not identifiers, names, classifications, statuses or dates, so criterion 4 rejects them. (The endpoint carries 85 narrative sections plus 86 `_table` variants of them; every `_table` variant measures 0%, 78 of the 85 are non-zero, and 49 clear 5% — those 49 are the ones this bullet rejects, since the rest never reached this list.) Exposing them would be the single largest drain on the schema budget on any endpoint. They remain fully searchable through the field resource, and they are still *returned* in results — this is a decision about what the enum advertises as a search key, not about what the tool shows.
 - `version` (100) — a small integer with no meaning outside its own `set_id`; searching for "version 3" globally is meaningless.
 - `openfda.spl_id` (33.09) and `openfda.spl_set_id` (33.09) — exact duplicates of `id` and `set_id`, which are the same values at 100% coverage. Exposing the 33% copies of a 100% field is strictly worse.
 - `openfda.pharm_class_epc` (9.48), `openfda.nui` (10.06), `openfda.upc` (10.55), `openfda.pharm_class_cs` (5.45) — all clear the floor but only just. Pharmacologic-class search is genuinely useful, but at 9.48% it would miss more than nine labels in ten; that is the "looks valid, finds nothing" failure this curation exists to prevent. Class search belongs to `drug-ndc` (`pharm_class`, 53.81) and `drug-event` (`patient.drug.openfda.pharm_class_epc`, 67.03), where the data supports it.
 - `openfda.is_original_packager` (24.85), `openfda.original_packager_product_ndc` (8.24) — repackager plumbing, not a query anyone starts from.
-- `meta`, `meta.disclaimer`, `meta.last_updated`, `meta.license`, `meta.results`, `meta.results.limit`, `meta.results.skip`, `meta.results.total`, `meta.type` — **not record fields at all.** FDA's reference documents the response envelope alongside the record, so these 8 entries sit in the catalog and all measure 0%. They describe the wrapper openFDA puts *around* results and can never be searched. They are excluded by criteria 1–3 several times over; they are called out here so a future reader does not mistake them for a coverage bug.
+- `meta`, `meta.disclaimer`, `meta.last_updated`, `meta.license`, `meta.results`, `meta.results.limit`, `meta.results.skip`, `meta.results.total`, `meta.type` — **not record fields at all.** FDA's reference documents the response envelope alongside the record, so these 9 entries sit in the catalog and all measure 0%. They describe the wrapper openFDA puts *around* results and can never be searched. They are excluded by criteria 1–3 several times over; they are called out here so a future reader does not mistake them for a coverage bug.
 - 102 of the 207 catalog fields measure 0% coverage, mostly `*_table` variants of the narrative sections (`warnings_table`, `dosage_and_administration_table`, …). They are real, published fields that are simply never populated in this corpus.
 
 **Deviations from the plan's seeded list:** all 9 seeded fields kept. Added 6:
@@ -195,10 +195,11 @@ this tool be reached from, and chained into, the others.
 
 ---
 
-## enforcement — `drug-enforcement` · 56 catalog fields · 14 exposed
+## enforcement — `drug-enforcement` · 56 catalog fields · 17 exposed
 
 Recall records. Almost every record-level field is 100% populated, so this endpoint is the
-cleanest of the seven — with one sharp exception noted below.
+cleanest of the seven — with one sharp exception: the `openfda` enrichment block reaches only
+**18.25%** of recalls, which shapes the drug-name guidance below.
 
 | path | coverage_pct | why exposed |
 | --- | --- | --- |
@@ -216,30 +217,49 @@ cleanest of the seven — with one sharp exception noted below.
 | `recall_initiation_date` | 100 | when the firm began the recall — the date that reflects when the risk started |
 | `report_date` | 100 | when FDA published it — the date that reflects when the public learned |
 | `termination_date` | 82.42 | when the recall closed. Absent on recalls still open, so its absence is itself informative, and it is the only way to bound "recalls closed in period X" |
+| `openfda.generic_name` | 18.25 | the normalised non-proprietary name. Thin, and **not the default** — see the guidance below — but it is exact where `product_description` is tokenized prose, so it is the option a caller takes when precision matters more than recall |
+| `openfda.brand_name` | 18.25 | the normalised proprietary name, on the same terms |
+| `openfda.product_ndc` | 18.25 | the product NDC. Thin, but it is the **only** NDC on this endpoint, and without it `drug-enforcement` is the one tool of the seven that no other tool can hand a product key to. Every other endpoint exposes `product_ndc` or its `openfda` equivalent; omitting it here would break the chain in one direction only |
+
+**Guidance on drug-name search here — `product_description` is the default, the `openfda` names are the precise option.**
+Only **18.25%** of recalls carry an `openfda` block at all, while `product_description` is at **100%** and
+contains the same drug name as tokenized text. A caller who reaches for `openfda.generic_name` first will
+look authoritative and silently miss four recalls in five, and unlike `label` there is no fallback resolver
+here to catch the miss — so the descriptor must steer the default to `product_description`. The two are
+complementary rather than substitutes, which is the same reasoning that exposes both
+`shortages.company_name` (100) and `shortages.openfda.manufacturer_name` (89.58) on that endpoint
+(cross-endpoint citation — those two coverage figures are from `drug-shortages`, not this one): the loose field has the recall, the structured field
+has the precision and matches only where the drug *is* the recalled product rather than merely mentioned.
+And `openfda.product_ndc` carries a second justification that outweighs its coverage on its own —
+cross-tool joinability, which every other endpoint in this note treats as first-class.
 
 **Deliberately not exposed** (cleared 5%, rejected anyway):
 
 - **`product_type` (100) — seeded by the plan, but rejected.** FDA's own field description says it plainly: "For drug queries, this will always be `Drugs`." Every record on this endpoint carries the identical value, so the field can never narrow a result set. Exposing it costs an enum slot and invites an agent to spend a turn on a no-op filter.
-- **The whole `openfda.*` block (18.25)** — `openfda.brand_name`, `openfda.generic_name`, `openfda.manufacturer_name`, `openfda.substance_name` (17.84), `openfda.product_ndc`, `openfda.package_ndc`, `openfda.route` (17.95), `openfda.application_number` (17.90), `openfda.unii` (17.86), `openfda.rxcui` (17.50), `openfda.product_type`, `openfda.spl_id`, `openfda.spl_set_id`, `openfda.is_original_packager` (17.20), `openfda.upc` (8.74), `openfda.nui` (6.43). Structured drug names would be the obvious thing to expose, and this is the most debatable call in the note. They are rejected because fewer than one recall in five carries an `openfda` block at all, while `product_description` is at 100% and contains the same drug name as text. A `openfda.generic_name` search would look authoritative and silently miss four fifths of the recalls for that drug — the exact failure mode this curation exists to prevent — and unlike the label endpoint there is no fallback resolver here to catch the miss. Callers are pointed at `product_description` instead, which has strictly better recall. All of these remain available through the field resource for anyone who wants precision over recall and knows they are trading one for the other.
+- **The rest of the `openfda.*` block** — `openfda.manufacturer_name` (18.25), `openfda.substance_name` (17.84), `openfda.package_ndc` (18.25), `openfda.route` (17.95), `openfda.application_number` (17.90), `openfda.unii` (17.86), `openfda.rxcui` (17.50), `openfda.product_type` (18.25), `openfda.spl_id` (18.25), `openfda.spl_set_id` (18.25), `openfda.is_original_packager` (17.20), `openfda.upc` (8.74), `openfda.nui` (6.43). Three members of this block are exposed (`generic_name`, `brand_name`, `product_ndc`); these are the rest, and they are redundant against fields already exposed at 100% — `recalling_firm` covers the company question that `openfda.manufacturer_name` would answer, and the remaining identifiers are reachable once a hit's `product_ndc` is in hand.
 - `center_classification_date` (99.99) — a third near-identical date alongside `recall_initiation_date` and `report_date`.
 - `city` (100), `address_1` (100), `address_2` (100) — firm address. `state` and `country` already give the geographic cut at a useful granularity; street addresses are high-cardinality and not something anyone searches by.
 - `distribution_pattern` (100) — free text describing where the product went ("nationwide", "AL, FL and GA"), too unstructured to search reliably.
 - `initial_firm_notification` (100) — how the firm notified customers (letter, press release, e-mail). A real classification, but no one filters recalls by notification medium.
 - `product_quantity` (100), `more_code_info` (46.51) — a free-text quantity string and an overflow field for `code_info`.
-- `meta`, `meta.disclaimer`, `meta.last_updated`, `meta.license`, `meta.results`, `meta.results.limit`, `meta.results.skip`, `meta.results.total`, `meta.type` — **not record fields.** As on `label`, FDA's reference documents the response envelope alongside the record, so these 8 entries are in the catalog at 0% coverage. They describe the wrapper around results and can never be searched. Noted here so the 0%s are not mistaken for a measurement failure.
+- `meta`, `meta.disclaimer`, `meta.last_updated`, `meta.license`, `meta.results`, `meta.results.limit`, `meta.results.skip`, `meta.results.total`, `meta.type` — **not record fields.** As on `label`, FDA's reference documents the response envelope alongside the record, so these 9 entries are in the catalog at 0% coverage. They describe the wrapper around results and can never be searched. Noted here so the 0%s are not mistaken for a measurement failure.
 
 **Deviations from the plan's seeded list:** 11 of the 12 seeded fields kept; `product_type`
-**dropped** as a constant (see above). Added 3: `event_id`, `code_info`, `termination_date`
-— recall-sibling lookup, lot-number lookup, and a closing date.
+**dropped** as a constant (see above). Added 6: `event_id`, `code_info`, `termination_date`
+— recall-sibling lookup, lot-number lookup and a closing date — plus `openfda.generic_name`,
+`openfda.brand_name` and `openfda.product_ndc` as the precise, non-default complement to
+`product_description`, and because `openfda.product_ndc` is the only NDC this endpoint has to
+receive a cross-tool join on.
 
 ---
 
 ## drugsfda — `drug-drugsfda` · 49 catalog fields · 20 exposed
 
 The plan seeds this endpoint with all 25 paths from `src/drug/drugsfda-sections.ts`, every
-one live-probed in 1.2.0. Live-probed means *exists*, not *worth advertising*: five of the
-25 are ordinals or opaque per-document values that nobody searches a 29,335-record corpus
-by. Those are dropped and two much better-populated product fields added, landing at 20.
+one live-probed in 1.2.0. Live-probed means *exists*, not *worth advertising*: seven of the
+25 are duplicates, ordinals or opaque per-document values that nobody searches a
+29,335-record corpus by. Those 7 are dropped and 2 much better-populated product fields
+added, landing at 20 exposed (25 seeded − 7 dropped = 18 kept, + 2 added = 20).
 
 | path | coverage_pct | why exposed |
 | --- | --- | --- |
@@ -275,7 +295,7 @@ by. Those are dropped and two much better-populated product fields added, landin
 - `products.active_ingredients.strength` (98.76) — strength strings ("10MG", "5MG/ML") are meaningless as a standalone search; they only narrow a query that already names an ingredient, which a single `field`+`value` pair cannot express.
 - `openfda.spl_id` / `openfda.spl_set_id` (42.31), `openfda.unii` (41.14), `openfda.rxcui` (41.30), `openfda.package_ndc` (42.31) — join keys already covered by `application_number` (100) and `openfda.product_ndc`.
 
-**Deviations from the plan's seeded list:** 20 of the 25 seeded paths kept. Dropped 7
+**Deviations from the plan's seeded list:** 18 of the 25 seeded paths kept. Dropped 7
 (`openfda.application_number`, `products.product_number`, `submissions.submission_number`,
 and all four `submissions.application_docs.*`) for the reasons above. Added 2
 (`products.brand_name`, `products.active_ingredients.name`) because the seeded list routed
@@ -386,7 +406,7 @@ Recorded here, not fixed — Task 3 does not touch catalog files.
    source or in the Task 1 downloader. The field itself is a date at 100% coverage and is
    exposed; only the recorded type is suspect. A descriptor task that keys off `type`
    should be aware of it.
-3. **`meta.*` is in the `label` and `enforcement` catalogs (8 entries each, 16 total).**
+3. **`meta.*` is in the `label` and `enforcement` catalogs (9 entries each, 18 total).**
    These are openFDA's response-envelope fields, not record fields. FDA's reference
    documents them alongside the record, so the downloader picked them up correctly; they
    measure 0% because no record contains them. They must never be exposed. This is expected
@@ -403,9 +423,10 @@ Recorded here, not fixed — Task 3 does not touch catalog files.
 | label | 207 | 15 | 9 | 9 | 0 | 6 |
 | event | 99 | 18 | 9 | 9 | 0 | 9 |
 | ndc | 39 | 16 | 10 | 9 | 1 | 7 |
-| enforcement | 56 | 14 | 12 | 11 | 1 | 3 |
-| drugsfda | 49 | 20 | 25 | 20 | 7 | 2 |
+| enforcement | 56 | 17 | 12 | 11 | 1 | 6 |
+| drugsfda | 49 | 20 | 25 | 18 | 7 | 2 |
 | orangebook | 31 | 12 | 9 | 8 | 1 | 4 |
 | shortages | 41 | 13 | 11 | 10 | 1 | 3 |
 
-108 fields across seven tools, every one within the 10–20 target.
+111 fields across seven tools, every one within the 10–20 target.
+Every row satisfies kept + dropped = seeded and kept + added = exposed.
