@@ -81,6 +81,24 @@ adding a row here, not rewriting the pattern.
   identity, packaging and marketing status), `full` (raw upstream record).
   `count`: `dosage_form`, `route`, `product_type`, `marketing_category`,
   `openfda.manufacturer_name.exact`. `limit` default 5, max 50.
+- **`drug-enforcement`** — Search FDA drug recall and enforcement reports.
+  `classification` is the hazard level (Class I: reasonable probability of
+  serious harm or death; II: temporary or reversible harm; III: unlikely
+  harm) and `status` says whether a recall is Ongoing, Completed or
+  Terminated — a recall appearing in results does not mean it is still in
+  effect. `field`: `product_description` (default drug-name search, 100%
+  populated), `recall_number`, `event_id`, `code_info`, `recalling_firm`,
+  `reason_for_recall`, `classification`, `status`, `voluntary_mandated`,
+  `state`, `country`, `recall_initiation_date`, `report_date`,
+  `termination_date`, `openfda.generic_name`, `openfda.brand_name`,
+  `openfda.product_ndc` (the last three are exact but populated on only
+  ~18% of recalls — the precise alternative to `product_description`, not
+  the default). `detail`: `summary` (default; every field above except the
+  three `openfda.*` names, which are bundled as one `openfda` object),
+  `full` (raw upstream record). `count`: `classification`, `status`,
+  `state`, `voluntary_mandated`, `recalling_firm.exact`. `sort`:
+  `report_date:desc`/`report_date:asc`/`recall_initiation_date:desc`.
+  `limit` default 5, max 50.
 
 Every tool reports `matched_via` (which field path actually matched) and a
 `total` that is the upstream match count, not the number of records
@@ -133,7 +151,8 @@ many.
                   "drug-label",
                   "drug-event",
                   "drug-drugsfda",
-                  "drug-ndc"
+                  "drug-ndc",
+                  "drug-enforcement"
               ]
           }
       }

@@ -7,6 +7,7 @@ import { drugLabel } from './label.js';
 import { drugEvent } from './event.js';
 import { drugDrugsfda } from './drugsfda.js';
 import { drugNdc } from './ndc.js';
+import { drugEnforcement } from './enforcement.js';
 
 /**
  * The drug API group. Every entry is checked by tests/catalog-conformance
@@ -18,4 +19,5 @@ export const DRUG_ENDPOINTS: EndpointDescriptor[] = [
   drugEvent,
   drugDrugsfda,
   drugNdc,
+  drugEnforcement,
 ];
