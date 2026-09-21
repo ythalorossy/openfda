@@ -25,10 +25,15 @@ npm run probe:fields     # Manual, live-API script that checks every path every 
 
 For single test file: `npx vitest run tests/ApiHandler.test.ts`
 
+`.github/workflows/fields-drift.yml` re-downloads FDA's field references every
+Monday and re-probes every exposed field, opening an issue on failure. It needs
+the `OPENFDA_API_KEY` repository secret. Run it by hand from the Actions tab
+after changing any descriptor's field list.
+
 ## Key Files
 
 - **`vite.config.ts`**: Vite build configuration; externalizes the SDK for StdioServerTransport compatibility, and injects `__APP_VERSION__` from `package.json` at build time so the version reported in `serverInfo` cannot drift from the published version
-- **`tests/`**: Vitest test suite (454 tests across 40 files: ApiHandler, catalog-conformance, catalog-coverage, catalog-shape, core/budget, core/codes, core/descriptor, core/envelope, core/escape, core/executor, core/http, core/project, core/query, core/registry, core/strategy, datasets/drug-drugsfda, datasets/drug-enforcement, datasets/drug-event, datasets/drug-label, datasets/drug-ndc, datasets/drug-orangebook, datasets/drug-shortages, datasets/faers, docs-currency, drift-guard, env, faers-codes, format, label-fields, ndc, ndc-formats, no-raw-query, no-url-in-output, OpenFDABuilder, redact, registration, schema-budget, ToolManager, ToolManager.keyguard, version)
+- **`tests/`**: Vitest test suite (460 tests across 42 files: ApiHandler, bundle-size, catalog-conformance, catalog-coverage, catalog-shape, core/budget, core/codes, core/descriptor, core/envelope, core/escape, core/executor, core/http, core/project, core/query, core/registry, core/resources, core/strategy, datasets/drug-drugsfda, datasets/drug-enforcement, datasets/drug-event, datasets/drug-label, datasets/drug-ndc, datasets/drug-orangebook, datasets/drug-shortages, datasets/faers, docs-currency, drift-guard, env, faers-codes, format, label-fields, ndc, ndc-formats, no-raw-query, no-url-in-output, OpenFDABuilder, redact, registration, schema-budget, ToolManager, ToolManager.keyguard, version)
 - **`docs/superpowers/notes/2026-09-20-field-selection.md`**: The authoritative record of which fields each `drug-*` descriptor exposes in its `field` enum, and why — including every field that was seeded but deliberately dropped. No code reads this file; it is the rationale behind `src/datasets/drug/*.ts`.
 - **`scripts/capture-fixtures.mjs`**: Manual, live-API script that captures trimmed label fixtures into `tests/fixtures/` (not run in CI)
 - **`scripts/smoke-local.mjs`** (`npm run smoke`): Manual end-to-end check that drives the built `dist/index.js` over stdio as a real MCP client would, asserting the behaviours the 1.1.0 through 2.0.0 fixes introduced. Hits the live API, so it is deliberately NOT part of `npm test`; run it after `npm run build:cli` and before publishing. `npm run smoke -- --no-key` exercises the missing-key path instead.
@@ -40,7 +45,10 @@ For single test file: `npx vitest run tests/ApiHandler.test.ts`
 ## Architecture
 
 ### Entry Point: `src/index.ts`
-The MCP server is initialized with `McpServer` from `@modelcontextprotocol/sdk`, then calls `registerDataset(toolManager, DRUG_ENDPOINTS)` (`src/core/registry.ts`). No tool handler is written by hand: `registerDataset` builds each tool's Zod schema, description and handler purely from a descriptor.
+The MCP server is initialized with `McpServer` from `@modelcontextprotocol/sdk`, then calls `registerDataset(toolManager, DRUG_ENDPOINTS)` (`src/core/registry.ts`). No tool handler is written by hand: `registerDataset` builds each tool's Zod schema, description and handler purely from a descriptor. Immediately after, `registerCatalogResources(server, DRUG_ENDPOINTS, ...)` (`src/core/resources.ts`) publishes each endpoint's full FDA field catalog as an MCP resource at `openfda://<dataset>/<endpoint>/fields` — the `capabilities.resources: {}` declared since 1.0, finally used.
+
+### Field Catalog Resources: the long tail, on demand
+A tool's `field` enum is curated to ~10–20 entries because every tool's schema loads into an agent's context on connect, called or not; the several-hundred-field long tail FDA actually publishes (207 for `drug-label`, down to 31 for `drug-orangebook`) would blow that budget if exposed as enum values. `src/core/resources.ts`'s `registerCatalogResources()` instead publishes it as a resource per endpoint — read only on demand, at zero standing context cost. `src/datasets/drug/catalogs.ts`'s `DRUG_CATALOGS` builds the served payload by merging each `src/catalog/drug-<endpoint>.json` (the published field list) with `src/catalog/drug-<endpoint>.coverage.json` (measured `coverage_pct` per field, `null` for any path coverage doesn't cover), so a model choosing a field from the long tail can tell a real-but-empty field from one worth searching. Because the catalogs are imported (not read from disk at runtime), they are bundled into `dist/index.js`; `tests/bundle-size.test.ts` guards that bundle against unbounded growth.
 
 ### The Descriptor Contract: the extension point
 `src/core/descriptor.ts` defines `EndpointDescriptor` — the one interface a new tool must satisfy: `dataset`/`endpoint`/`toolName`, `fields` (the `field` enum; each entry names a `SearchStrategy`), `projections` (the `detail` enum; each entry names the fields it guarantees to return), optional `extraFilters`, `sortFields`, `countFields`, `codeMaps`, `limits`, and `catalog` (the path to the committed FDA field-reference JSON that `tests/catalog-conformance.test.ts` checks it against). `validateDescriptor()` runs at registration time and fails startup loudly on a malformed descriptor (a duplicate field or projection name, a strategy that declares no paths, a schema key colliding with a built-in parameter such as `field`/`value`/`detail`, `limits.default` exceeding `limits.max`, etc.) — a broken descriptor can never reach a live tool.
@@ -73,6 +81,8 @@ Every file under `src/core/` operates only on generic shapes (`EndpointDescripto
 - **`src/core/shape/envelope.ts`**: `buildEnvelope()` — the one response envelope every endpoint returns.
 - **`src/core/shape/budget.ts`**: `fitToBudget()` / `MAX_RESPONSE_CHARS` (60,000) — caps a response, dropping trailing rows rather than truncating JSON mid-string.
 - **`src/core/codes.ts`**: `decodeTerm()` — decodes a coded aggregation term via a descriptor's `codeMaps`.
+- **`src/core/resources.ts`**: `registerCatalogResources()` — publishes one MCP resource per endpoint (`openfda://<dataset>/<endpoint>/fields`), serving the full field catalog described above.
+- **`src/datasets/drug/catalogs.ts`**: `DRUG_CATALOGS` — the drug group's catalog payloads, each a `src/catalog/drug-<endpoint>.json` merged with its `.coverage.json`.
 - **`src/datasets/drug/index.ts`**: `DRUG_ENDPOINTS` — the drug API group's descriptor array; consumed by `src/index.ts` and by `tests/docs-currency.test.ts`.
 - **`src/datasets/drug/label.ts`, `event.ts`, `drugsfda.ts`, `ndc.ts`, `enforcement.ts`, `orangebook.ts`, `shortages.ts`**: One `EndpointDescriptor` each — `drug-label`, `drug-event`, `drug-drugsfda`, `drug-ndc`, `drug-enforcement`, `drug-orangebook`, `drug-shortages`.
 - **`src/datasets/drug/faers.ts`**: FAERS code maps (`SERIOUSNESS`, `PATIENT_SEX`, `REACTION_OUTCOMES`) and `describeOutcome()`, consumed by the `drug-event` descriptor's `summary` projection.
