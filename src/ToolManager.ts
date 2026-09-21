@@ -11,6 +11,13 @@ type ToolDefinition = {
   name: string;
   description: string;
   inputSchema: z.ZodObject<any>;
+  /**
+   * Keys the tool's projections guarantee. Every real tool — the hand-written
+   * ones and the ones `registerDataset` builds from a descriptor — carries
+   * this, so it is part of the contract rather than an untyped passenger
+   * property. `registerTool` itself never reads it; the drift guard does.
+   */
+  returnsFields?: readonly string[];
   handler: (input: z.infer<any>) => Promise<{
     content: {
       type: string;
