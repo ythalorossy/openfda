@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { z } from 'zod';
 import { buildDescription, buildInputSchema, toToolDefinition } from '../../src/core/registry';
 import type { EndpointDescriptor } from '../../src/core/descriptor';
 
@@ -93,5 +94,30 @@ describe('toToolDefinition', () => {
 
   it('refuses to build a tool from an invalid descriptor', () => {
     expect(() => toToolDefinition({ ...descriptor, projections: [] })).toThrow(/projection/);
+  });
+});
+
+describe('extraFilters vs. built-in parameter names', () => {
+  it.each(['limit', 'sort'] as const)(
+    'refuses to build the schema when extraFilters.schema collides with the built-in "%s"',
+    (name) => {
+      const withCollision: EndpointDescriptor = {
+        ...descriptor,
+        extraFilters: { schema: { [name]: z.string().optional() }, toClauses: () => [] },
+      };
+      expect(() => buildInputSchema(withCollision)).toThrow(/collides/);
+      expect(() => toToolDefinition(withCollision)).toThrow(/collides/);
+    }
+  );
+
+  it('still builds a clean schema, and reaches it, for a legitimately-named extra filter', () => {
+    const withSeriousness: EndpointDescriptor = {
+      ...descriptor,
+      extraFilters: { schema: { seriousness: z.string().optional() }, toClauses: () => [] },
+    };
+    const schema = buildInputSchema(withSeriousness);
+    expect('seriousness' in schema.shape).toBe(true);
+    expect(schema.parse({ value: 'Advil', seriousness: 'serious' }).seriousness).toBe('serious');
+    expect(() => toToolDefinition(withSeriousness)).not.toThrow();
   });
 });

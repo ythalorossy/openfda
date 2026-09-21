@@ -38,6 +38,24 @@ export interface ExtraFilters {
   toClauses: (input: Record<string, unknown>) => Clause[];
 }
 
+/**
+ * The tool-input keys `registry.ts` sets itself: `field`, `value`, `limit`,
+ * `skip`, `detail` unconditionally, `sort`/`count` when the descriptor
+ * declares any. Defined here, not in `registry.ts`, because `registry.ts`
+ * already imports this module — the reverse import would cycle. Both
+ * `validateDescriptor` and `registry.ts` read this one list, so a future
+ * built-in parameter only needs adding here to be reserved everywhere.
+ */
+export const RESERVED_PARAM_NAMES = [
+  'field',
+  'value',
+  'limit',
+  'skip',
+  'detail',
+  'sort',
+  'count',
+] as const;
+
 export interface EndpointDescriptor {
   dataset: string;
   endpoint: string;
@@ -108,6 +126,15 @@ export function validateDescriptor(descriptor: EndpointDescriptor): string[] {
   for (const path of Object.keys(descriptor.codeMaps)) {
     if (!countable.has(stripExact(path))) {
       at(`codeMaps has "${path}" but it is not in countFields`);
+    }
+  }
+
+  const reserved: readonly string[] = RESERVED_PARAM_NAMES;
+  for (const key of Object.keys(descriptor.extraFilters?.schema ?? {})) {
+    if (reserved.includes(key)) {
+      at(
+        `extraFilters.schema declares "${key}", which collides with the built-in parameter of the same name`
+      );
     }
   }
 

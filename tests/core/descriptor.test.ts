@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { z } from 'zod';
 import { validateDescriptor, type EndpointDescriptor } from '../../src/core/descriptor';
 
 const base = (): EndpointDescriptor => ({
@@ -93,5 +94,32 @@ describe('validateDescriptor', () => {
     const d = { ...base(), [key]: '   ' };
     const prefix = key === 'toolName' ? '   ' : 'drug-label';
     expect(validateDescriptor(d)).toContain(`${prefix}: ${expected}`);
+  });
+
+  it.each(['limit', 'sort'] as const)(
+    'rejects an extraFilters.schema key that collides with the built-in "%s" parameter',
+    (name) => {
+      const d = {
+        ...base(),
+        extraFilters: {
+          schema: { [name]: z.string().optional() },
+          toClauses: () => [],
+        },
+      };
+      expect(validateDescriptor(d)).toContain(
+        `drug-label: extraFilters.schema declares "${name}", which collides with the built-in parameter of the same name`
+      );
+    }
+  );
+
+  it('accepts an extraFilters.schema key that does not collide with a built-in', () => {
+    const d = {
+      ...base(),
+      extraFilters: {
+        schema: { seriousness: z.string().optional() },
+        toClauses: () => [],
+      },
+    };
+    expect(validateDescriptor(d)).toEqual([]);
   });
 });

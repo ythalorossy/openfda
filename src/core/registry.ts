@@ -4,7 +4,7 @@
  */
 import { z } from 'zod';
 import type { EndpointDescriptor } from './descriptor.js';
-import { validateDescriptor } from './descriptor.js';
+import { validateDescriptor, RESERVED_PARAM_NAMES } from './descriptor.js';
 import {
   execute,
   SKIP_MAX,
@@ -114,9 +114,19 @@ export function buildInputSchema(
       .optional()
       .describe('Aggregate by this field instead of returning records.');
   }
+  // RESERVED_PARAM_NAMES is the same list validateDescriptor rejects a
+  // collision against, imported rather than re-listed here, so an extra
+  // filter can never silently overwrite a ceiling-enforcing built-in even
+  // when buildInputSchema is called directly, ahead of validateDescriptor.
+  const reserved: readonly string[] = RESERVED_PARAM_NAMES;
   for (const [key, schema] of Object.entries(
     descriptor.extraFilters?.schema ?? {}
   )) {
+    if (reserved.includes(key)) {
+      throw new Error(
+        `${descriptor.toolName}: extraFilters.schema declares "${key}", which collides with the built-in parameter of the same name`
+      );
+    }
     shape[key] = schema;
   }
 
