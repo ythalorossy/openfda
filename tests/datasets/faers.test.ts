@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { describeOutcome, REACTION_OUTCOMES } from '../src/drug/faers';
-import { getDrugAdverseEvents } from '../src/drug/get-drug-adverse-events';
-import { stubFetch } from './helpers/stubFetch';
+import { describeOutcome, REACTION_OUTCOMES } from '../../src/datasets/drug/faers';
+import { getDrugAdverseEvents } from '../../src/drug/get-drug-adverse-events';
+import { stubFetch } from '../helpers/stubFetch';
 
 describe('describeOutcome', () => {
   it('maps every documented FAERS outcome code', () => {

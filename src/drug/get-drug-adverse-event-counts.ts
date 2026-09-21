@@ -6,7 +6,7 @@ import z from 'zod';
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import { buildEventSearch, EVENT_MATCHED_VIA } from './event-search.js';
-import { describeCountTerm } from './faers.js';
+import { describeCountTerm } from '../datasets/drug/faers.js';
 
 /**
  * Fields verified to aggregate against the live API. `receivedate` is

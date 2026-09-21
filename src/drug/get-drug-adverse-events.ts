@@ -5,7 +5,11 @@
 import { OpenFDABuilder } from '../OpenFDABuilder.js';
 import { makeOpenFDARequest } from '../ApiHandler.js';
 import { summarizeResults, withTotals } from '../utils/format.js';
-import { describeOutcome, SERIOUSNESS, PATIENT_SEX } from './faers.js';
+import {
+  describeOutcome,
+  SERIOUSNESS,
+  PATIENT_SEX,
+} from '../datasets/drug/faers.js';
 import { buildEventSearch, EVENT_MATCHED_VIA } from './event-search.js';
 import z from 'zod';
 
