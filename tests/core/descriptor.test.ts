@@ -58,4 +58,40 @@ describe('validateDescriptor', () => {
     const d = { ...base(), limits: { default: 50, max: 25 } };
     expect(validateDescriptor(d)).toContain('drug-label: limits.default 50 exceeds limits.max 25');
   });
+
+  it('rejects a field strategy that declares no paths', () => {
+    const d = base();
+    d.fields = [
+      { name: 'brand_name', description: 'Brand', strategy: { kind: 'anyOf', paths: [] } },
+    ];
+    d.defaultField = 'brand_name';
+    expect(validateDescriptor(d)).toContain(
+      'drug-label: field "brand_name" strategy declares no paths'
+    );
+  });
+
+  it('accepts a field strategy with multiple declared paths', () => {
+    const d = base();
+    d.fields = [
+      {
+        name: 'brand_name',
+        description: 'Brand',
+        strategy: { kind: 'anyOf', paths: ['openfda.brand_name', 'openfda.generic_name'] },
+      },
+    ];
+    d.defaultField = 'brand_name';
+    expect(validateDescriptor(d)).toEqual([]);
+  });
+
+  it.each([
+    ['dataset', 'dataset must not be empty'],
+    ['endpoint', 'endpoint must not be empty'],
+    ['toolName', 'toolName must not be empty'],
+    ['summary', 'summary must not be empty'],
+    ['catalog', 'catalog must not be empty'],
+  ] as const)('rejects a blank %s', (key, expected) => {
+    const d = { ...base(), [key]: '   ' };
+    const prefix = key === 'toolName' ? '   ' : 'drug-label';
+    expect(validateDescriptor(d)).toContain(`${prefix}: ${expected}`);
+  });
 });

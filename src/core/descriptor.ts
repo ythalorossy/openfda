@@ -3,7 +3,11 @@
  * Licensed under the MIT License
  */
 import type { z } from 'zod';
-import type { Clause, SearchStrategy } from './search/strategy.js';
+import {
+  declaredPaths,
+  type Clause,
+  type SearchStrategy,
+} from './search/strategy.js';
 
 /** One entry in a tool's `field` enum: a real path, or a virtual search. */
 export interface FieldSpec {
@@ -65,12 +69,22 @@ export function validateDescriptor(descriptor: EndpointDescriptor): string[] {
     problems.push(`${descriptor.toolName}: ${message}`);
   };
 
+  const isBlank = (value: string): boolean => value.trim().length === 0;
+  if (isBlank(descriptor.dataset)) at('dataset must not be empty');
+  if (isBlank(descriptor.endpoint)) at('endpoint must not be empty');
+  if (isBlank(descriptor.toolName)) at('toolName must not be empty');
+  if (isBlank(descriptor.summary)) at('summary must not be empty');
+  if (isBlank(descriptor.catalog)) at('catalog must not be empty');
+
   if (descriptor.fields.length === 0) at('must declare at least one field');
 
   const seenFields = new Set<string>();
   for (const field of descriptor.fields) {
     if (seenFields.has(field.name)) at(`duplicate field name "${field.name}"`);
     seenFields.add(field.name);
+    if (declaredPaths(field.strategy).length === 0) {
+      at(`field "${field.name}" strategy declares no paths`);
+    }
   }
 
   if (descriptor.defaultField && !seenFields.has(descriptor.defaultField)) {
