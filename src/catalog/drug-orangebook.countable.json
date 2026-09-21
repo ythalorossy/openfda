@@ -1,0 +1,14 @@
+{
+  "endpoint": "orangebook",
+  "probed_at": "2026-09-21T23:12:13.008Z",
+  "countable": {
+    "products.application_type": true,
+    "products.application_type.exact": false,
+    "products.dosage_form": false,
+    "products.dosage_form.exact": true,
+    "products.route": false,
+    "products.route.exact": true,
+    "products.therapeutic_equivalence_codes": true,
+    "products.therapeutic_equivalence_codes.exact": false
+  }
+}

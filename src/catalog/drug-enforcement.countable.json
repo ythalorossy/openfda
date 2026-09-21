@@ -1,0 +1,16 @@
+{
+  "endpoint": "enforcement",
+  "probed_at": "2026-09-21T23:12:09.526Z",
+  "countable": {
+    "classification": false,
+    "classification.exact": true,
+    "recalling_firm": false,
+    "recalling_firm.exact": true,
+    "state": false,
+    "state.exact": true,
+    "status": false,
+    "status.exact": true,
+    "voluntary_mandated": false,
+    "voluntary_mandated.exact": true
+  }
+}

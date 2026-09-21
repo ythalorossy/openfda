@@ -1,0 +1,16 @@
+{
+  "endpoint": "ndc",
+  "probed_at": "2026-09-21T23:12:05.132Z",
+  "countable": {
+    "dosage_form": false,
+    "dosage_form.exact": true,
+    "marketing_category": true,
+    "marketing_category.exact": false,
+    "openfda.manufacturer_name": false,
+    "openfda.manufacturer_name.exact": true,
+    "product_type": false,
+    "product_type.exact": true,
+    "route": false,
+    "route.exact": true
+  }
+}

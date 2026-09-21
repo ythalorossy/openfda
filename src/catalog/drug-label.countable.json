@@ -1,0 +1,12 @@
+{
+  "endpoint": "label",
+  "probed_at": "2026-09-21T23:11:24.850Z",
+  "countable": {
+    "openfda.manufacturer_name": false,
+    "openfda.manufacturer_name.exact": true,
+    "openfda.product_type": false,
+    "openfda.product_type.exact": true,
+    "openfda.route": false,
+    "openfda.route.exact": true
+  }
+}
