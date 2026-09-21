@@ -73,6 +73,35 @@ function notFoundText(
 }
 
 /**
+ * A rejected argument is not a caller mistake here: `input.count` was already
+ * checked against `descriptor.countFields`, so reaching this means the
+ * descriptor is stale relative to openFDA's index mapping. The suffix flip is
+ * the fix in every case observed so far (2.0.0 shipped 14 of them), so it is
+ * offered as a suggestion rather than presented as a fact.
+ */
+function badArgumentText(
+  descriptor: EndpointDescriptor,
+  input: ExecuteInput,
+  detail: string
+): string {
+  if (input.count === undefined) {
+    return (
+      `openFDA rejected this ${descriptor.toolName} request as malformed: ${detail}\n\n` +
+      'This indicates a defect in the tool, not a problem with your input.'
+    );
+  }
+  const flipped = input.count.endsWith('.exact')
+    ? input.count.slice(0, -'.exact'.length)
+    : `${input.count}.exact`;
+  return (
+    `Cannot aggregate ${descriptor.toolName} by "${input.count}": ${detail}\n\n` +
+    `"${input.count}" is declared countable by this tool, so openFDA's index no longer ` +
+    `matches the committed measurement. "${flipped}" is the usual working form. ` +
+    'To fix the tool, run npm run fields:countable and correct the descriptor.'
+  );
+}
+
+/**
  * The one request pipeline. Every endpoint tool is this function plus a
  * descriptor, which is why escaping, parenthesisation, the skip ceiling, the
  * response budget and the four error outcomes cannot vary between tools.
@@ -172,6 +201,11 @@ export async function execute(
       sort: input.sort,
       count: input.count,
     });
+    // A rejected argument fails identically on every tier, so walking the
+    // rest only multiplies latency and then reports the wrong outcome.
+    if (outcome.kind === 'bad_request') {
+      return fail(badArgumentText(descriptor, input, outcome.detail));
+    }
     // A miss on one tier is expected, not fatal: keep walking.
     if (outcome.kind === 'miss') continue;
     if (outcome.kind === 'error') {

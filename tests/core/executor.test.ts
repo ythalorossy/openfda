@@ -216,6 +216,51 @@ describe('execute: search behaviour', () => {
     expect(textOf(result)).toContain('descriptor');
     expect(stub.calls).toHaveLength(0);
   });
+
+  it('reports a rejected argument as a bad request, not an upstream outage', async () => {
+    const details =
+      '[illegal_argument_exception] Text fields are not optimised for operations that ' +
+      'require per-document field data like aggregations and sorting. Please use a ' +
+      'keyword field instead.';
+    const stub = stubFetchResponses([
+      { status: 500, body: { error: { code: 'SERVER_ERROR', message: 'Check your request and try again', details } } },
+    ]);
+    restore = stub.restore;
+    const result = await execute(descriptor(), { value: 'Advil', count: 'openfda.route' });
+
+    expect(result.isError).toBe(true);
+    const text = result.content[0]!.text;
+    // The actionable upstream sentence must reach the caller.
+    expect(text).toContain('keyword field');
+    // And it must not read as an outage.
+    expect(text).not.toContain('experiencing issues');
+  }, 20000);
+
+  it('does not walk the remaining tiers after a bad request', async () => {
+    // A bad argument fails identically on every tier, so walking them only
+    // multiplies latency and then reports the wrong outcome. drug_name is
+    // tiered over two paths; exactly one request must be made.
+    const stub = stubFetchResponses([
+      { status: 404, body: { error: { code: 'NOT_FOUND', message: 'Nothing to count' } } },
+    ]);
+    restore = stub.restore;
+    const result = await execute(descriptor(), { value: 'Advil', count: 'serious' });
+
+    expect(stub.calls.length).toBe(1);
+    expect(result.isError).toBe(true);
+    expect(result.content[0]!.text).not.toContain('No drug-label records found');
+  });
+
+  it('suggests the suffix flip and names the stale descriptor when a count is rejected', async () => {
+    const stub = stubFetchResponses([
+      { status: 404, body: { error: { code: 'NOT_FOUND', message: 'Nothing to count' } } },
+    ]);
+    restore = stub.restore;
+    const result = await execute(descriptor(), { value: 'Advil', count: 'openfda.route' });
+    const text = result.content[0]!.text;
+    expect(text).toContain('openfda.route.exact');
+    expect(text).toContain('fields:countable');
+  });
 });
 
 describe('execute: response shaping', () => {
