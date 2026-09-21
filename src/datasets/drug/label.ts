@@ -62,23 +62,25 @@ export const drugLabel: EndpointDescriptor = {
   endpoint: 'label',
   toolName: 'drug-label',
   summary:
-    'Search FDA structured product labels (SPL) — prescribing and OTC drug information. ' +
-    'openfda.* fields cover roughly a third of labels; route here is the SPL route of ' +
-    'administration, a different vocabulary from drug-drugsfda products[].route (the same ' +
-    'insulin can be SUBCUTANEOUS here and INJECTION there) — do not join on route across tools.',
+    'Search FDA structured product labels (SPL) — prescribing and OTC drug info. route here is ' +
+    "the SPL route vocabulary, different from drug-drugsfda's products[].route (e.g. " +
+    'SUBCUTANEOUS vs INJECTION) — do not join across tools on route.',
+  // Descriptions here are deliberately short: this is usage guidance for a
+  // model choosing a field (rendered once, in the `field` parameter's own
+  // .describe() — see registry.ts), not the selection rationale. That
+  // rationale lives in docs/superpowers/notes/2026-09-20-field-selection.md
+  // and, from Task 25, in the field-catalog resource, which costs nothing
+  // until read. A short phrase survives here only when it disambiguates
+  // something a model would otherwise get wrong (e.g. route's vocabulary).
   fields: [
     {
       name: 'drug_name',
-      description:
-        'brand, generic or substance name, tried in that order, falling back to ' +
-        'spl_product_data_elements — reaches labels with no structured openfda block',
+      description: 'brand, generic, or substance name',
       strategy: { kind: 'tiered', paths: NAME_TIERS },
     },
     {
       name: 'ndc',
-      description:
-        'product or package NDC — joins to drug-ndc and drug-shortages; a package NDC also ' +
-        'matches its product. Dashed 4-4, 5-3, 5-4, or undashed 9 or 11 digits',
+      description: 'product or package NDC',
       strategy: {
         kind: 'clauses',
         paths: ['openfda.product_ndc', 'openfda.package_ndc'],
@@ -87,87 +89,69 @@ export const drugLabel: EndpointDescriptor = {
     },
     {
       name: 'spl_product_data_elements',
-      description:
-        'free-text product elements (99.89% coverage) — the last-resort tier of the name resolver ' +
-        'and the one search that reaches essentially the whole corpus',
+      description: 'free-text SPL product elements',
       strategy: { kind: 'exact', path: 'spl_product_data_elements' },
     },
     {
       name: 'effective_time',
-      description:
-        'the SPL version date (100% coverage) — the only way to ask "labels revised since …"',
+      description: 'SPL version/revision date',
       strategy: { kind: 'exact', path: 'effective_time' },
     },
     {
       name: 'id',
-      description:
-        'primary key of one specific label version (100% coverage) — lets an agent re-fetch the ' +
-        'exact record it was handed',
+      description: "this label version's ID",
       strategy: { kind: 'exact', path: 'id' },
     },
     {
       name: 'set_id',
-      description:
-        'the SPL identifier stable across label revisions (100% coverage) — the join key from ' +
-        'drug-ndc (openfda.spl_set_id) into this endpoint',
+      description: 'stable SPL id across revisions',
       strategy: { kind: 'exact', path: 'set_id' },
     },
     {
       name: 'brand_name',
-      description:
-        'the proprietary name, and the first tier of the name resolver; precise when present',
+      description: 'proprietary (brand) name',
       strategy: { kind: 'exact', path: 'openfda.brand_name' },
     },
     {
       name: 'generic_name',
-      description:
-        'the non-proprietary product name; second tier of the resolver',
+      description: 'non-proprietary name',
       strategy: { kind: 'exact', path: 'openfda.generic_name' },
     },
     {
       name: 'substance_name',
-      description:
-        'the active moiety, listed per ingredient, so a combination product is findable by any ' +
-        'one of its substances; third tier of the resolver',
+      description: 'active ingredient name',
       strategy: { kind: 'exact', path: 'openfda.substance_name' },
     },
     {
       name: 'manufacturer_name',
-      description:
-        'the labeler; the only company-name search this endpoint has',
+      description: 'labeler/manufacturer name',
       strategy: { kind: 'exact', path: 'openfda.manufacturer_name' },
     },
     {
       name: 'route',
-      description:
-        'route of administration (ORAL, TOPICAL, …); a small controlled vocabulary that usefully ' +
-        'narrows a name search',
+      // Worth the characters: this is the SPL route vocabulary, which
+      // differs from drug-drugsfda's products[].route (see summary).
+      description: 'SPL route of administration',
       strategy: { kind: 'exact', path: 'openfda.route' },
     },
     {
       name: 'product_type',
-      description:
-        'OTC vs prescription; a two-value split that halves the corpus and is a common qualifier',
+      description: 'OTC vs prescription drug',
       strategy: { kind: 'exact', path: 'openfda.product_type' },
     },
     {
       name: 'application_number',
-      description:
-        'NDA/ANDA/BLA number; the join key from drug-drugsfda and drug-orangebook back to the label',
+      description: 'NDA/ANDA/BLA number',
       strategy: { kind: 'exact', path: 'openfda.application_number' },
     },
     {
       name: 'unii',
-      description:
-        "FDA's unique ingredient identifier — unambiguous substance search where a name is " +
-        'ambiguous or spelled inconsistently',
+      description: 'FDA ingredient ID (UNII)',
       strategy: { kind: 'exact', path: 'openfda.unii' },
     },
     {
       name: 'rxcui',
-      description:
-        'RxNorm concept id; the identifier a clinical system will already be holding, so it makes ' +
-        "this tool reachable from outside FDA's own naming",
+      description: 'RxNorm concept id',
       strategy: { kind: 'exact', path: 'openfda.rxcui' },
     },
   ],
@@ -176,7 +160,7 @@ export const drugLabel: EndpointDescriptor = {
     {
       name: 'summary',
       description:
-        'Identity fields plus the safety narrative; every field present, empty when absent.',
+        'Identity plus safety narrative; every field present, empty if absent.',
       returnsFields: [
         'substance_name',
         'brand_name',
@@ -233,8 +217,7 @@ export const drugLabel: EndpointDescriptor = {
     },
     {
       name: 'full',
-      description:
-        'The raw upstream label under `record`, for fields the projections omit.',
+      description: 'Raw upstream label under `record`.',
       returnsFields: ['record'],
       project: (record: any) => ({ record }),
     },

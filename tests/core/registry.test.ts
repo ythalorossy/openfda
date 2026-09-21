@@ -48,10 +48,16 @@ describe('buildDescription', () => {
     }
   });
 
-  it('lists the searchable fields and the detail values', () => {
+  it('lists the detail values, but not the searchable fields (those live on the field parameter)', () => {
     const description = buildDescription(descriptor);
-    expect(description).toContain('drug_name');
     expect(description).toContain('summary');
+    // Field names and descriptions are paid for once, on the `field`
+    // parameter's own .describe() (see buildInputSchema below) — repeating
+    // them in the always-loaded tool description doubles the cost for
+    // nothing. This is the fix for the schema-budget regression the first
+    // real descriptor (drug-label) found: enumerating every field here on
+    // top of the field parameter blew the per-tool budget.
+    expect(description).not.toContain('drug_name');
   });
 });
 
@@ -67,6 +73,15 @@ describe('buildInputSchema', () => {
 
   it('rejects a field outside the enum', () => {
     expect(() => schema.parse({ value: 'Advil', field: 'nope' })).toThrow();
+  });
+
+  it('names every field, with its own description, once — on the field parameter itself', () => {
+    // `.describe()` sits on the outermost wrapper (ZodDefault around
+    // ZodOptional around ZodEnum); `.description` reads it back regardless
+    // of the wrapping.
+    const fieldDescribe = schema.shape.field.description ?? '';
+    expect(fieldDescribe).toContain('drug_name');
+    expect(fieldDescribe).toContain('Brand, generic or substance name, tried in that order.');
   });
 
   it('enforces the endpoint limit ceiling', () => {

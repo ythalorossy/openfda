@@ -30,13 +30,18 @@ const asEnum = (values: readonly string[]): [string, ...string[]] =>
  *
  * It must NAME every field each projection guarantees: a capability a model
  * cannot see in the schema does not exist as far as the model is concerned,
- * and the drift guard asserts exactly this.
+ * and the drift guard asserts exactly this. That guarantee is about
+ * *returned* fields (via each projection's `Returns: ...` clause below).
+ *
+ * Searchable fields are a separate guarantee, named once in the `field`
+ * parameter's own `.describe()` (see `buildInputSchema`) — NOT repeated
+ * here. Enumerating every field's name-plus-description a second time in
+ * this always-loaded tool description is what blew the per-tool schema
+ * budget on the first real descriptor: the field list is exactly the part
+ * of the schema an agent reads to pick a field, and it already lives on the
+ * `field` parameter, so paying for it twice bought nothing.
  */
 export function buildDescription(descriptor: EndpointDescriptor): string {
-  const fields = descriptor.fields
-    .map((field) => `${field.name} (${field.description})`)
-    .join('; ');
-
   const details = descriptor.projections
     .map(
       (projection) =>
@@ -55,8 +60,8 @@ export function buildDescription(descriptor: EndpointDescriptor): string {
       : '';
 
   return (
-    `${descriptor.summary} Search one field at a time: field + value. ` +
-    `Searchable fields: ${fields}. ` +
+    `${descriptor.summary} Search one field at a time: field + value; see the field ` +
+    `parameter for the searchable fields. ` +
     `Always returns ${ENVELOPE_FIELDS.join(', ')}, where matched_via is the real path that matched ` +
     `and total is the upstream match count, not the number returned. ` +
     `detail selects the record shape: ${details}` +
@@ -73,12 +78,19 @@ export function buildInputSchema(
     (projection) => projection.name
   );
 
+  // The one place field names AND their descriptions are spelled out: this
+  // parameter is what an agent reads to choose a field, so it is the only
+  // place that cost belongs. buildDescription deliberately does not repeat it.
+  const fieldList = descriptor.fields
+    .map((field) => `${field.name} (${field.description})`)
+    .join('; ');
+
   const shape: z.ZodRawShape = {
     field: z
       .enum(asEnum(fieldNames))
       .optional()
       .default(descriptor.defaultField ?? fieldNames[0]!)
-      .describe(`Field to search. One of: ${fieldNames.join(', ')}`),
+      .describe(`Field to search: ${fieldList}`),
     value: z.string().min(1).describe('Value to search for.'),
     limit: z
       .number()
