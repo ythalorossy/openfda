@@ -102,4 +102,54 @@ describe('makeOpenFDARequest', () => {
     expect(error).not.toBeNull();
     expect(abortSpy).toHaveBeenCalled();
   });
+
+  it('does not retry a 500 that is really a rejected argument', async () => {
+    // openFDA answers an un-aggregatable count with HTTP 500 carrying
+    // illegal_argument_exception. It is deterministic, so the three retries
+    // the generic 5xx rule triggers cost four requests and ~7s of backoff
+    // to arrive at the same rejection.
+    const body = JSON.stringify({
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Check your request and try again',
+        details:
+          '[illegal_argument_exception] Text fields are not optimised for ' +
+          'operations that require per-document field data like aggregations ' +
+          'and sorting. Please use a keyword field instead.',
+      },
+    });
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+      text: async () => body,
+    });
+
+    const started = Date.now();
+    const { data, error } = await makeOpenFDARequest('http://test.com');
+
+    expect(data).toBeNull();
+    expect(
+      mockFetch,
+      'a deterministic bad argument must not be retried'
+    ).toHaveBeenCalledTimes(1);
+    expect(Date.now() - started, 'no backoff should have been slept').toBeLessThan(500);
+    // The upstream detail must survive categorisation: fetchPage reads
+    // error.details to build its bad_request outcome.
+    expect(String(error?.details)).toContain('illegal_argument_exception');
+  });
+
+  it('still retries a generic 500 that carries no argument complaint', async () => {
+    // The guard above must not turn every 5xx into a single-shot request:
+    // a real transient outage is exactly what the retry exists for.
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+      text: async () => JSON.stringify({ error: { code: 'SERVER_ERROR' } }),
+    });
+
+    await makeOpenFDARequest('http://test.com', { maxRetries: 1, retryDelay: 1 });
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
 });
