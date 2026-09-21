@@ -169,7 +169,11 @@ const run = async () => {
     { tool: 'drug-drugsfda', args: { field: 'sponsor_name', value: 'Pfizer' } },
     // Default field (products.brand_name, 98.79% populated) — the exact
     // path this fix wave repointed away from the sparse openfda.brand_name.
-    { tool: 'drug-drugsfda', args: { value: 'Lipitor' } },
+    // Advil (18 records), not Lipitor (1 record): a single-record match
+    // would flip two of the five checks to FAIL outright (no JSON payload
+    // at all on a zero-hit response) if that one record is ever delisted
+    // or corrected upstream.
+    { tool: 'drug-drugsfda', args: { value: 'Advil' } },
     // drug-ndc: 1,484 NDC Directory listings for Ibuprofen.
     { tool: 'drug-ndc', args: { value: 'Ibuprofen' } },
     // drug-enforcement: 68 recall/enforcement reports for Ibuprofen.
