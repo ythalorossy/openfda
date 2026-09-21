@@ -17,6 +17,8 @@ import {
   getDrugsfda,
   getDrugAdverseEventCounts,
 } from './drug/index.js';
+import { registerDataset } from './core/registry.js';
+import { DRUG_ENDPOINTS } from './datasets/drug/index.js';
 
 // Replaced at build time by vite (see vite.config.ts) with the version from
 // package.json. The fallback only applies when running unbundled, e.g. vitest.
@@ -49,6 +51,8 @@ toolManager.registerTool(getDrugByNdc);
 toolManager.registerTool(getDrugByProductNdc);
 toolManager.registerTool(getDrugsfda);
 toolManager.registerTool(getDrugAdverseEventCounts);
+
+registerDataset(toolManager, DRUG_ENDPOINTS);
 
 async function main() {
   warnIfKeyless();
