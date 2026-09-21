@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 import { buildDescription, buildInputSchema, toToolDefinition } from '../../src/core/registry';
-import type { EndpointDescriptor } from '../../src/core/descriptor';
+import { RESERVED_PARAM_NAMES, type EndpointDescriptor } from '../../src/core/descriptor';
 
 const descriptor: EndpointDescriptor = {
   dataset: 'drug',
@@ -119,5 +119,19 @@ describe('extraFilters vs. built-in parameter names', () => {
     expect('seriousness' in schema.shape).toBe(true);
     expect(schema.parse({ value: 'Advil', seriousness: 'serious' }).seriousness).toBe('serious');
     expect(() => toToolDefinition(withSeriousness)).not.toThrow();
+  });
+
+  // buildInputSchema's own collision check derives from Object.keys(shape),
+  // not from RESERVED_PARAM_NAMES — see the comment in registry.ts. That
+  // means this constant (which validateDescriptor DOES check against,
+  // since it cannot build a shape without cycling into registry.ts) can
+  // drift away from what buildInputSchema actually sets. This test is the
+  // thing that turns that drift into a loud failure: `descriptor` above
+  // already declares both sortFields and countFields, so every conditional
+  // built-in key is present, and the built shape must match the constant
+  // exactly — no extras, no omissions.
+  it('pins RESERVED_PARAM_NAMES to the built-in keys buildInputSchema actually sets', () => {
+    const shape = buildInputSchema(descriptor).shape;
+    expect(new Set(Object.keys(shape))).toEqual(new Set(RESERVED_PARAM_NAMES));
   });
 });

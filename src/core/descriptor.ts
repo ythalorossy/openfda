@@ -39,12 +39,22 @@ export interface ExtraFilters {
 }
 
 /**
- * The tool-input keys `registry.ts` sets itself: `field`, `value`, `limit`,
- * `skip`, `detail` unconditionally, `sort`/`count` when the descriptor
- * declares any. Defined here, not in `registry.ts`, because `registry.ts`
- * already imports this module — the reverse import would cycle. Both
- * `validateDescriptor` and `registry.ts` read this one list, so a future
- * built-in parameter only needs adding here to be reserved everywhere.
+ * Mirrors the built-in tool-input keys `buildInputSchema` (in `registry.ts`)
+ * sets itself: `field`, `value`, `limit`, `skip`, `detail` unconditionally,
+ * `sort`/`count` when the descriptor declares any. Defined here, not in
+ * `registry.ts`, because `registry.ts` already imports this module — the
+ * reverse import would cycle, so `validateDescriptor` cannot build a shape
+ * and check against it directly; it needs this static list instead.
+ *
+ * `registry.ts` does NOT read this constant for its own collision check.
+ * `buildInputSchema` derives that check from `Object.keys(shape)` — the
+ * built-ins it just set — so a new built-in added there is reserved
+ * automatically, with no second list to remember. That means this constant
+ * and `buildInputSchema` CAN drift apart if a built-in is added to one and
+ * not the other. `tests/core/registry.test.ts` pins them together: it
+ * builds a schema from a descriptor declaring both `sort` and `count` and
+ * asserts `Object.keys(shape)` equals this constant exactly, turning a
+ * silent drift into a loud test failure.
  */
 export const RESERVED_PARAM_NAMES = [
   'field',

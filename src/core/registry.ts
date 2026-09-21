@@ -4,7 +4,7 @@
  */
 import { z } from 'zod';
 import type { EndpointDescriptor } from './descriptor.js';
-import { validateDescriptor, RESERVED_PARAM_NAMES } from './descriptor.js';
+import { validateDescriptor } from './descriptor.js';
 import {
   execute,
   SKIP_MAX,
@@ -114,15 +114,20 @@ export function buildInputSchema(
       .optional()
       .describe('Aggregate by this field instead of returning records.');
   }
-  // RESERVED_PARAM_NAMES is the same list validateDescriptor rejects a
-  // collision against, imported rather than re-listed here, so an extra
-  // filter can never silently overwrite a ceiling-enforcing built-in even
-  // when buildInputSchema is called directly, ahead of validateDescriptor.
-  const reserved: readonly string[] = RESERVED_PARAM_NAMES;
+  // The keys already on `shape` at this point ARE the built-ins this
+  // function sets (field/value/limit/skip/detail, plus sort/count when
+  // declared) — checking against `Object.keys(shape)` rather than a second,
+  // hand-maintained list makes drift structurally impossible here: a new
+  // built-in added above is reserved the instant it lands, with nothing
+  // else to remember. (`descriptor.ts`'s `RESERVED_PARAM_NAMES` is a
+  // separate static mirror `validateDescriptor` uses, since it cannot build
+  // a shape without importing this module and cycling; a pinning test keeps
+  // the two in agreement — see `tests/core/registry.test.ts`.)
+  const builtIn = new Set(Object.keys(shape));
   for (const [key, schema] of Object.entries(
     descriptor.extraFilters?.schema ?? {}
   )) {
-    if (reserved.includes(key)) {
+    if (builtIn.has(key)) {
       throw new Error(
         `${descriptor.toolName}: extraFilters.schema declares "${key}", which collides with the built-in parameter of the same name`
       );
