@@ -3,7 +3,13 @@
  * Licensed under the MIT License
  */
 
-/** One `path:"value"` term. `value` is RAW here; only the assembler escapes. */
+/**
+ * One `path:"value"` term. `value` is RAW here; only the assembler escapes.
+ * `path` must originate from a descriptor's closed set of real field paths,
+ * never from caller input — the assembler interpolates it raw and only
+ * shape-checks it as a last line of defence, so this is the assumption that
+ * check exists to catch a violation of, not a substitute for upholding it.
+ */
 export interface Clause {
   path: string;
   value: string;

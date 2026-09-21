@@ -56,4 +56,30 @@ describe('buildQuery', () => {
       ])
     ).toBe('(a:"x\\" OR b:\\"y") AND f:"q\\""');
   });
+
+  it('rejects a clause path that is not a plain dotted identifier', () => {
+    // path is interpolated raw, unlike value, so it is checked against a
+    // closed shape here rather than trusted from every call site. This path
+    // carries a colon, a space and a quote all at once — exactly the shape
+    // that would splice a second clause into the query.
+    expect(() =>
+      buildQuery({ clauses: [{ path: 'a:"x" OR b', value: 'Advil' }], op: 'OR', matched_via: 'x' })
+    ).toThrow(/a:"x" OR b/);
+  });
+
+  it('accepts a legitimate .exact path, so the path guard rejects nothing real', () => {
+    expect(
+      buildQuery({
+        clauses: [{ path: 'openfda.brand_name.exact', value: 'Advil' }],
+        op: 'OR',
+        matched_via: 'x',
+      })
+    ).toBe('openfda.brand_name.exact:"Advil"');
+  });
+
+  it('refuses an empty clause group instead of silently building an unfiltered query', () => {
+    expect(() => buildQuery({ clauses: [], op: 'OR', matched_via: 'union()' })).toThrow(
+      /empty/i
+    );
+  });
 });
