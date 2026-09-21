@@ -36,13 +36,13 @@ describe('OpenFDABuilder', () => {
   it('should throw an error if context is not set', () => {
     expect(() => {
       new OpenFDABuilder().dataset('drug').search('test').limit(1).build();
-    }).toThrow('Missing required parameters: context or search');
+    }).toThrow('Missing required parameters: dataset, endpoint or search');
   });
 
   it('should throw an error if search is not set', () => {
     expect(() => {
       new OpenFDABuilder().dataset('drug').context('label').limit(1).build();
-    }).toThrow('Missing required parameters: context or search');
+    }).toThrow('Missing required parameters: dataset, endpoint or search');
   });
 
   it('should handle a limit of 0', () => {
@@ -155,5 +155,34 @@ describe('OpenFDABuilder', () => {
       .build();
     expect(url).toContain('+OR+');
     expect(url).not.toContain('%2BOR%2B');
+  });
+});
+
+describe('dataset and endpoint are open, not a fixed union', () => {
+  it('builds a URL for an endpoint the drug tools never used', () => {
+    const url = new OpenFDABuilder()
+      .dataset('drug')
+      .endpoint('enforcement')
+      .search('classification:"Class I"')
+      .limit(3)
+      .build();
+    expect(url).toContain('https://api.fda.gov/drug/enforcement.json?');
+    expect(url).toContain('search=classification%3A%22Class+I%22');
+    expect(url).toContain('limit=3');
+  });
+
+  it('builds a URL for a future dataset without a code change', () => {
+    const url = new OpenFDABuilder()
+      .dataset('food')
+      .endpoint('enforcement')
+      .search('state:"CA"')
+      .build();
+    expect(url).toContain('https://api.fda.gov/food/enforcement.json?');
+  });
+
+  it('keeps context() working as an alias while the 1.x tools still exist', () => {
+    const viaContext = new OpenFDABuilder().dataset('drug').context('label').search('a:"b"').build();
+    const viaEndpoint = new OpenFDABuilder().dataset('drug').endpoint('label').search('a:"b"').build();
+    expect(viaContext).toBe(viaEndpoint);
   });
 });
