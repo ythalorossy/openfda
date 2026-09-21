@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mapSafetyFields, mapLabelFields } from '../src/drug/label-fields';
+import { mapSafetyFields, mapLabelFields } from '../src/datasets/drug/label-fields';
 import jantoven from './fixtures/label-jantoven.json';
 import lipitor from './fixtures/label-lipitor.json';
 import zoloft from './fixtures/label-zoloft.json';

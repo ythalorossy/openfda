@@ -3,7 +3,7 @@
  * Licensed under the MIT License
  */
 import z from 'zod';
-import { mapSafetyFields } from './label-fields.js';
+import { mapSafetyFields } from '../datasets/drug/label-fields.js';
 import {
   resolveLabel,
   notFoundMessage,

@@ -31,31 +31,45 @@ describe('every descriptor path exists in FDA\'s published catalog', () => {
     }
   }
 
-  it('is actually checking something once descriptors exist', () => {
-    // Self-deleting by construction: this passes only while DRUG_ENDPOINTS is
-    // still empty. The moment the first real descriptor lands, this fails —
-    // forcing whoever added it to replace this assertion with one that
-    // verifies the per-path checks above are genuinely running (e.g. that a
-    // fabricated path would be caught), rather than leaving behind a check
-    // that is trivially true for any array forever.
+  it('is actually checking something, not vacuously passing over an empty list', () => {
+    // Replaces the Phase-1 tripwire that asserted DRUG_ENDPOINTS.length === 0
+    // (task 15 — drug-label — is the descriptor that trips it). The
+    // replacement proves the per-path loop above ran against real data,
+    // rather than merely existing without generating any assertions.
     expect(
       DRUG_ENDPOINTS.length,
-      'DRUG_ENDPOINTS is no longer empty — replace this assertion with one that verifies the ' +
-        'per-path checks above are actually exercised against a real descriptor, not just that ' +
-        'the array exists.'
-    ).toBe(0);
+      'DRUG_ENDPOINTS is empty; the per-path checks above have nothing to run against.'
+    ).toBeGreaterThan(0);
+
+    const descriptor = DRUG_ENDPOINTS[0]!;
+    const catalog = JSON.parse(readFileSync(descriptor.catalog, 'utf8'));
+    const known = new Set<string>(catalog.fields.map((f: { path: string }) => f.path));
+
+    const referenced = [
+      ...descriptor.fields.flatMap((field) => declaredPaths(field.strategy)),
+      ...descriptor.sortFields.map((s) => s.split(':')[0]!),
+      ...descriptor.countFields,
+      ...Object.keys(descriptor.codeMaps),
+    ].map(stripExact);
+
+    // The `it` loop above only emits assertions when there is something to
+    // check — confirm this descriptor actually fed it real paths.
+    expect(referenced.length).toBeGreaterThan(0);
+    for (const path of referenced) {
+      expect(known.has(path), `${path} should be a real, checked path`).toBe(true);
+    }
+
+    // Prove the guard is not trivially true: a fabricated path (the exact
+    // shape of the 1.1.0 fabricated-field bug this guard exists to catch)
+    // is genuinely absent from FDA's own published catalog, so a descriptor
+    // that referenced it would fail the per-path checks above instead of
+    // sailing through.
+    const fabricated = 'openfda.definitely_not_a_real_field';
+    expect(known.has(fabricated)).toBe(false);
   });
 });
 
 describe('every descriptor is structurally valid', () => {
-  // vitest errors on a describe with zero test cases ("No test found in
-  // suite"), which an empty DRUG_ENDPOINTS would otherwise produce — this
-  // keeps the vacuous-pass property the brief calls for actually true.
-  if (DRUG_ENDPOINTS.length === 0) {
-    it('is empty for now (Phase 1) — nothing to validate yet', () => {
-      expect(DRUG_ENDPOINTS).toEqual([]);
-    });
-  }
   for (const descriptor of DRUG_ENDPOINTS) {
     it(`${descriptor.toolName} passes validateDescriptor`, () => {
       expect(validateDescriptor(descriptor)).toEqual([]);
@@ -69,13 +83,6 @@ describe('clause builders stay inside their declared paths', () => {
       .filter((field) => field.strategy.kind === 'clauses')
       .map((field) => ({ descriptor, field }))
   );
-  // Same emptiness guard as above: no descriptor has shipped a `clauses`
-  // strategy yet, so this describe would otherwise register zero tests.
-  if (clauseFields.length === 0) {
-    it('has no clause-based fields yet', () => {
-      expect(clauseFields).toEqual([]);
-    });
-  }
   for (const { descriptor, field } of clauseFields) {
     it(`${descriptor.toolName}.${field.name} emits only declared paths`, () => {
       const declared = new Set(field.strategy.kind === 'clauses' ? field.strategy.paths : []);
