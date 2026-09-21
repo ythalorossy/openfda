@@ -33,7 +33,8 @@
     "smoke": "node scripts/smoke-local.mjs",
     "probe:faers-codes": "node scripts/probe-faers-codes.mjs",
     "fields:sync": "node scripts/fields-sync.mjs",
-    "fields:coverage": "node scripts/fields-coverage.mjs"
+    "fields:coverage": "node scripts/fields-coverage.mjs",
+    "probe:fields": "tsx scripts/probe-fields.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

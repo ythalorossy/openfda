@@ -67,6 +67,20 @@ adding a row here, not rewriting the pattern.
   `limit` default 5, max 100. Seven search paths openFDA publishes on this
   endpoint are deliberately not exposed here — see
   [Migrating from 1.x](#migrating-from-1x) below.
+- **`drug-ndc`** — Search the NDC Directory: every drug product currently
+  listed with the FDA (packaging, labeler, marketing category and
+  application number). This is the **product registry**, distinct from
+  `drug-label`'s `ndc` field, which searches *labelling text* by NDC — see
+  the migration table below for the 1.x NDC lookup this tool is not a
+  replacement for. `field`: `product_ndc`,
+  `packaging.package_ndc`, `generic_name`, `brand_name`,
+  `active_ingredients.name`, `openfda.manufacturer_name`,
+  `marketing_category`, `application_number`, `dosage_form`, `route`,
+  `product_type`, `pharm_class`, `marketing_start_date`, `openfda.unii`,
+  `openfda.rxcui`, `openfda.spl_set_id`. `detail`: `summary` (default;
+  identity, packaging and marketing status), `full` (raw upstream record).
+  `count`: `dosage_form`, `route`, `product_type`, `marketing_category`,
+  `openfda.manufacturer_name.exact`. `limit` default 5, max 50.
 
 Every tool reports `matched_via` (which field path actually matched) and a
 `total` that is the upstream match count, not the number of records
@@ -118,7 +132,8 @@ many.
               "autoApprove": [
                   "drug-label",
                   "drug-event",
-                  "drug-drugsfda"
+                  "drug-drugsfda",
+                  "drug-ndc"
               ]
           }
       }
@@ -168,14 +183,24 @@ Pin `1.3.0` if you are not ready to migrate.
 | `get-drug-by-product-ndc` | `drug-label` `{ field: "product_ndc", value }` |
 | `get-drug-adverse-events` | `drug-event` `{ field: "drug_name", value }` |
 | `get-drug-adverse-event-counts` | `drug-event` `{ value, count: "patient.reaction.reactionmeddrapt.exact" }` |
-| `get-drugsfda` | `drug-drugsfda` `{ field: "<section>.<field>", value }` |
+| `get-drugsfda` | `drug-drugsfda` `{ field: "application_number", value }` or `{ field: "products.brand_name", value }` |
+
+**`drug-drugsfda` field names carry no section prefix.** 1.x grouped fields
+under a `section` parameter (`application`, `products`, `submissions`,
+`openfda`), so the table row above is illustrative, not literal: real field
+names are flat where 1.x had a section for the top-level `application`
+fields — `application_number` and `sponsor_name` carry no prefix — while
+`products.*`, `submissions.*` and `openfda.*` keep theirs. A caller who
+copies `application.sponsor_name` from 1.x muscle memory gets an
+unknown-field error; the correct value is `sponsor_name`.
 
 **`get-drug-by-ndc` did not search `/drug/ndc.json`.** It searched *labels*
 by `openfda.product_ndc`, so it maps to `drug-label` (`{ field: "ndc" }`),
-**not** to the new `drug-ndc` tool arriving in a later release. `drug-ndc`
-exposes the actual NDC Directory — new capability this server never reached
-before — and returns different data than the label-based lookup 1.x
-actually performed.
+**not** to `drug-ndc`. `drug-ndc` searches the actual NDC Directory — new
+capability this server did not previously expose — and returns different
+data than the label-based lookup 1.x actually performed: use `drug-ndc` for
+packaging, labeler and marketing-category questions, and `drug-label` for
+label text keyed off an NDC.
 
 **`get-drug-by-product-ndc` returned a pre-filtered `available_packages`**
 — the label's package NDCs filtered down to the product you searched.
