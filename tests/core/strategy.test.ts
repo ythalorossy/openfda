@@ -83,6 +83,22 @@ describe('planClauseSets', () => {
     };
     expect(planClauseSets(strategy, 'nonsense')).toEqual({ ok: false, message: 'not a valid NDC' });
   });
+
+  it('turns a builder-produced ClauseSet with zero clauses into a StrategyError', () => {
+    // This is a syntactically valid ClauseSet, not a StrategyError, so
+    // nothing upstream of planClauseSets would otherwise catch it before
+    // buildQuery throws on an empty clause group deep inside the executor's
+    // tier loop.
+    const strategy: SearchStrategy = {
+      kind: 'clauses',
+      paths: ['openfda.product_ndc'],
+      build: () => ({ clauses: [], op: 'OR', matched_via: 'openfda.product_ndc' }),
+    };
+    const result = planClauseSets(strategy, 'whatever');
+    expect(Array.isArray(result)).toBe(false);
+    expect((result as StrategyError).ok).toBe(false);
+    expect((result as StrategyError).message).toContain('no clauses');
+  });
 });
 
 describe('declaredPaths', () => {

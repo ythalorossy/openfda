@@ -90,7 +90,19 @@ export function planClauseSets(
       }));
     case 'clauses': {
       const built = strategy.build(value);
-      return 'ok' in built ? built : [built];
+      if ('ok' in built) return built;
+      // A syntactically valid ClauseSet with no clauses is not a
+      // StrategyError, so it would otherwise sail past this check and only
+      // throw later, inside buildQuery, mid-loop in the executor. Catching
+      // it here turns it into outcome 2 (an input error, before any
+      // request) instead of a network-loop crash.
+      if (built.clauses.length === 0) {
+        return {
+          ok: false,
+          message: `clause builder for "${strategy.paths.join(', ')}" produced no clauses`,
+        };
+      }
+      return [built];
     }
   }
 }

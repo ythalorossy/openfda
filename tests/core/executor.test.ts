@@ -32,6 +32,28 @@ const descriptor = (): EndpointDescriptor => ({
         raw === 'ok' ? { ok: true, value: '12345-1234' } : { ok: false, message: 'not a valid NDC' },
       strategy: { kind: 'exact', path: 'openfda.product_ndc' },
     },
+    {
+      name: 'empty_clauses',
+      description: 'A clauses builder that forgets to emit any clause.',
+      strategy: {
+        kind: 'clauses',
+        paths: ['openfda.product_ndc'],
+        build: () => ({ clauses: [], op: 'OR', matched_via: 'openfda.product_ndc' }),
+      },
+    },
+    {
+      name: 'unsafe_path',
+      description: 'A clauses builder that emits a path buildQuery must reject.',
+      strategy: {
+        kind: 'clauses',
+        paths: ['openfda.product_ndc'],
+        build: (value) => ({
+          clauses: [{ path: 'not a safe path!', value }],
+          op: 'OR',
+          matched_via: 'openfda.product_ndc',
+        }),
+      },
+    },
   ],
   defaultField: 'drug_name',
   projections: [
@@ -105,6 +127,18 @@ describe('execute: input validation happens before any request', () => {
     expect(result.isError).toBe(true);
     expect(stub.calls).toHaveLength(0);
   });
+
+  it('rejects a clauses builder that produces no clauses, before any request', async () => {
+    // planClauseSets must catch this itself: a syntactically valid but
+    // empty ClauseSet is not a StrategyError, so nothing upstream of it
+    // would otherwise notice before buildQuery throws mid-loop.
+    const stub = stubFetchResponses([{ body: {} }]);
+    restore = stub.restore;
+    const result = await execute(descriptor(), { field: 'empty_clauses', value: 'x' });
+    expect(result.isError).toBe(true);
+    expect(textOf(result)).toContain('no clauses');
+    expect(stub.calls).toHaveLength(0);
+  });
 });
 
 describe('execute: search behaviour', () => {
@@ -168,6 +202,19 @@ describe('execute: search behaviour', () => {
     // does not turn `+` back into a space (see adverse-events-query.test.ts).
     const url = decodeURIComponent(stub.calls[0]!.replace(/\+/g, ' '));
     expect(url).toContain('(openfda.brand_name:"Advil") AND serious:"1"');
+  });
+
+  it('catches buildQuery throwing on an unsafe path and reports it as a descriptor defect, not a crash', async () => {
+    // A clauses builder decides its clause's path at runtime, so it can
+    // emit one buildQuery's SAFE_PATH guard rejects even though the
+    // ClauseSet it returns is non-empty and so passes planClauseSets. The
+    // executor must not let that throw escape as an unhandled rejection.
+    const stub = stubFetchResponses([{ body: {} }]);
+    restore = stub.restore;
+    const result = await execute(descriptor(), { field: 'unsafe_path', value: 'x' });
+    expect(result.isError).toBe(true);
+    expect(textOf(result)).toContain('descriptor');
+    expect(stub.calls).toHaveLength(0);
   });
 });
 

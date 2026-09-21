@@ -146,10 +146,27 @@ export async function execute(
 
   for (const set of planned) {
     attempted.push(set.matched_via);
+
+    // A `clauses` strategy's build() is arbitrary, descriptor-author code:
+    // it can emit a path buildQuery's SAFE_PATH guard rejects, or (in a
+    // shape planClauseSets can't see in advance) an unsafe clause. That is
+    // a broken descriptor, not a bad user value, and letting it escape as
+    // an unhandled rejection would surface as "the tool crashed" instead of
+    // a clean, actionable error.
+    let search: string;
+    try {
+      search = buildQuery(set, filters);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      return fail(
+        `Internal error building the query for ${descriptor.toolName} — this indicates a defect in the tool's descriptor, not a problem with your input. Details: ${message}`
+      );
+    }
+
     const outcome = await fetchPage<UpstreamPage>({
       dataset: descriptor.dataset,
       endpoint: descriptor.endpoint,
-      search: buildQuery(set, filters),
+      search,
       limit,
       skip: input.skip,
       sort: input.sort,
