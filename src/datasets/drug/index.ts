@@ -5,10 +5,15 @@
 import type { EndpointDescriptor } from '../../core/descriptor.js';
 import { drugLabel } from './label.js';
 import { drugEvent } from './event.js';
+import { drugDrugsfda } from './drugsfda.js';
 
 /**
  * The drug API group. Every entry is checked by tests/catalog-conformance
  * against FDA's own published field list, so a field name that FDA does not
  * publish cannot reach a tool schema.
  */
-export const DRUG_ENDPOINTS: EndpointDescriptor[] = [drugLabel, drugEvent];
+export const DRUG_ENDPOINTS: EndpointDescriptor[] = [
+  drugLabel,
+  drugEvent,
+  drugDrugsfda,
+];
