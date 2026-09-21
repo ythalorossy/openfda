@@ -21,14 +21,15 @@ const orNull = (value: unknown): unknown =>
  * `update_date` were added.
  */
 const PATHS: Array<[name: string, description: string]> = [
-  ['generic_name', 'drug name as the shortage record states it'],
+  ['generic_name', 'drug name as recorded in shortage'],
   ['company_name', 'firm reporting the shortage'],
   ['openfda.manufacturer_name', 'normalised labeler name; sparse ~90%'],
   ['openfda.brand_name', 'proprietary name; sparse ~90%'],
   ['openfda.substance_name', 'active moiety; sparse ~89%'],
   ['package_ndc', 'package NDC of the affected presentation'],
   ['openfda.product_ndc', 'product NDC; sparse ~90%'],
-  ['status', 'Currently in Shortage, Resolved, Discontinued'],
+  ['presentation', 'specific affected package or strength'],
+  ['status', 'Shortage / Resolved / Discontinued'],
   ['therapeutic_category', 'clinical category, e.g. Anti-Infective'],
   ['dosage_form', 'e.g. ORAL SUSPENSION, INJECTION'],
   ['update_type', 'kind of change this record represents'],
@@ -50,6 +51,7 @@ function summarise(record: any): Record<string, unknown> {
     dosage_form: orNull(record?.dosage_form),
     therapeutic_category: asArray(record?.therapeutic_category),
     package_ndc: orNull(record?.package_ndc),
+    presentation: orNull(record?.presentation),
     update_type: orNull(record?.update_type),
     initial_posting_date: orNull(record?.initial_posting_date),
     update_date: orNull(record?.update_date),
@@ -87,6 +89,7 @@ export const drugShortages: EndpointDescriptor = {
         'dosage_form',
         'therapeutic_category',
         'package_ndc',
+        'presentation',
         'update_type',
         'initial_posting_date',
         'update_date',

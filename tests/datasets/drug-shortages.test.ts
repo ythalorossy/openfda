@@ -62,6 +62,19 @@ describe('drug-shortages descriptor', () => {
     expect(record.discontinued_date).toBeNull();
   });
 
+  it('emits presentation in summary and normalises empty string to null', async () => {
+    const stub = stubFetchResponses([page]);
+    restore = stub.restore;
+    const record = jsonOf(await execute(drugShortages, { value: 'AMOXICILLIN' })).results[0];
+    expect(record.presentation).toBe('250mg/5mL, 100mL bottle');
+    const emptyPresentation = { ...page, body: { meta: { results: { total: 1 } }, results: [{ ...SHORTAGE, presentation: '' }] } };
+    restore();
+    const stubEmpty = stubFetchResponses([emptyPresentation]);
+    restore = stubEmpty.restore;
+    const emptyRecord = jsonOf(await execute(drugShortages, { value: 'AMOXICILLIN' })).results[0];
+    expect(emptyRecord.presentation).toBeNull();
+  });
+
   it('uses a different generic_name path from drug-label, because the datasets differ', () => {
     const shortagesPath = drugShortages.fields.find((f) => f.name === 'generic_name')!.strategy;
     const labelPath = drugLabel.fields.find((f) => f.name === 'generic_name')!.strategy;
