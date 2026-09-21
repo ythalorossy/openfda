@@ -1,0 +1,252 @@
+{
+  "endpoint": "drugsfda",
+  "measured_at": "2026-09-21T00:09:53.525Z",
+  "total_records": 29335,
+  "fields": [
+    {
+      "path": "application_number",
+      "docs": 29335,
+      "coverage_pct": 100
+    },
+    {
+      "path": "openfda",
+      "docs": 12413,
+      "coverage_pct": 42.31
+    },
+    {
+      "path": "openfda.application_number",
+      "docs": 12413,
+      "coverage_pct": 42.31
+    },
+    {
+      "path": "openfda.brand_name",
+      "docs": 12413,
+      "coverage_pct": 42.31
+    },
+    {
+      "path": "openfda.generic_name",
+      "docs": 12413,
+      "coverage_pct": 42.31
+    },
+    {
+      "path": "openfda.manufacturer_name",
+      "docs": 12413,
+      "coverage_pct": 42.31
+    },
+    {
+      "path": "openfda.nui",
+      "docs": 5472,
+      "coverage_pct": 18.65
+    },
+    {
+      "path": "openfda.package_ndc",
+      "docs": 12413,
+      "coverage_pct": 42.31
+    },
+    {
+      "path": "openfda.pharm_class_cs",
+      "docs": 2222,
+      "coverage_pct": 7.57
+    },
+    {
+      "path": "openfda.pharm_class_epc",
+      "docs": 5213,
+      "coverage_pct": 17.77
+    },
+    {
+      "path": "openfda.pharm_class_moa",
+      "docs": 3114,
+      "coverage_pct": 10.62
+    },
+    {
+      "path": "openfda.pharm_class_pe",
+      "docs": 1268,
+      "coverage_pct": 4.32
+    },
+    {
+      "path": "openfda.product_ndc",
+      "docs": 12413,
+      "coverage_pct": 42.31
+    },
+    {
+      "path": "openfda.route",
+      "docs": 12112,
+      "coverage_pct": 41.29
+    },
+    {
+      "path": "openfda.rxcui",
+      "docs": 12115,
+      "coverage_pct": 41.3
+    },
+    {
+      "path": "openfda.spl_id",
+      "docs": 12413,
+      "coverage_pct": 42.31
+    },
+    {
+      "path": "openfda.spl_set_id",
+      "docs": 12413,
+      "coverage_pct": 42.31
+    },
+    {
+      "path": "openfda.substance_name",
+      "docs": 12061,
+      "coverage_pct": 41.11
+    },
+    {
+      "path": "openfda.unii",
+      "docs": 12069,
+      "coverage_pct": 41.14
+    },
+    {
+      "path": "products",
+      "docs": 28981,
+      "coverage_pct": 98.79
+    },
+    {
+      "path": "products.active_ingredients",
+      "docs": 28980,
+      "coverage_pct": 98.79
+    },
+    {
+      "path": "products.active_ingredients.name",
+      "docs": 28980,
+      "coverage_pct": 98.79
+    },
+    {
+      "path": "products.active_ingredients.strength",
+      "docs": 28972,
+      "coverage_pct": 98.76
+    },
+    {
+      "path": "products.brand_name",
+      "docs": 28981,
+      "coverage_pct": 98.79
+    },
+    {
+      "path": "products.dosage_form",
+      "docs": 28981,
+      "coverage_pct": 98.79
+    },
+    {
+      "path": "products.marketing_status",
+      "docs": 28981,
+      "coverage_pct": 98.79
+    },
+    {
+      "path": "products.product_number",
+      "docs": 28981,
+      "coverage_pct": 98.79
+    },
+    {
+      "path": "products.reference_drug",
+      "docs": 28981,
+      "coverage_pct": 98.79
+    },
+    {
+      "path": "products.reference_standard",
+      "docs": 28221,
+      "coverage_pct": 96.2
+    },
+    {
+      "path": "products.route",
+      "docs": 28826,
+      "coverage_pct": 98.26
+    },
+    {
+      "path": "products.te_code",
+      "docs": 13487,
+      "coverage_pct": 45.98
+    },
+    {
+      "path": "sponsor_name",
+      "docs": 29335,
+      "coverage_pct": 100
+    },
+    {
+      "path": "submissions",
+      "docs": 26627,
+      "coverage_pct": 90.77
+    },
+    {
+      "path": "submissions.application_docs",
+      "docs": 9971,
+      "coverage_pct": 33.99
+    },
+    {
+      "path": "submissions.application_docs.date",
+      "docs": 9971,
+      "coverage_pct": 33.99
+    },
+    {
+      "path": "submissions.application_docs.id",
+      "docs": 9971,
+      "coverage_pct": 33.99
+    },
+    {
+      "path": "submissions.application_docs.title",
+      "docs": 352,
+      "coverage_pct": 1.2
+    },
+    {
+      "path": "submissions.application_docs.type",
+      "docs": 9971,
+      "coverage_pct": 33.99
+    },
+    {
+      "path": "submissions.application_docs.url",
+      "docs": 9971,
+      "coverage_pct": 33.99
+    },
+    {
+      "path": "submissions.review_priority",
+      "docs": 19946,
+      "coverage_pct": 67.99
+    },
+    {
+      "path": "submissions.submission_class_code",
+      "docs": 24427,
+      "coverage_pct": 83.27
+    },
+    {
+      "path": "submissions.submission_class_code_description",
+      "docs": 19226,
+      "coverage_pct": 65.54
+    },
+    {
+      "path": "submissions.submission_number",
+      "docs": 26627,
+      "coverage_pct": 90.77
+    },
+    {
+      "path": "submissions.submission_property_type",
+      "docs": 865,
+      "coverage_pct": 2.95
+    },
+    {
+      "path": "submissions.submission_property_type.code",
+      "docs": 865,
+      "coverage_pct": 2.95
+    },
+    {
+      "path": "submissions.submission_public_notes",
+      "docs": 250,
+      "coverage_pct": 0.85
+    },
+    {
+      "path": "submissions.submission_status",
+      "docs": 26626,
+      "coverage_pct": 90.77
+    },
+    {
+      "path": "submissions.submission_status_date",
+      "docs": 26627,
+      "coverage_pct": 90.77
+    },
+    {
+      "path": "submissions.submission_type",
+      "docs": 26627,
+      "coverage_pct": 90.77
+    }
+  ]
+}

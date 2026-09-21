@@ -4,7 +4,7 @@ import {
   PATIENT_SEX,
   CODED_COUNT_FIELDS,
   describeCountTerm,
-} from '../src/drug/faers';
+} from '../src/datasets/drug/faers';
 
 describe('FAERS code maps', () => {
   it('matches the documented seriousness values', () => {

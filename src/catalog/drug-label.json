@@ -1,0 +1,1042 @@
+{
+  "endpoint": "label",
+  "source_url": "https://open.fda.gov/fields/druglabel.yaml",
+  "fetched_at": "2026-09-20T23:46:59.414Z",
+  "fields": [
+    {
+      "path": "abuse",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "abuse_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "accessories",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "accessories_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "active_ingredient",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "active_ingredient_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "adverse_reactions",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "adverse_reactions_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "alarms",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "alarms_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "animal_pharmacology_and_or_toxicology",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "animal_pharmacology_and_or_toxicology_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "ask_doctor",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "ask_doctor_or_pharmacist",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "ask_doctor_or_pharmacist_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "ask_doctor_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "assembly_or_installation_instructions",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "assembly_or_installation_instructions_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "boxed_warning",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "boxed_warning_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "calibration_instructions",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "calibration_instructions_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "carcinogenesis_and_mutagenesis_and_impairment_of_fertility",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "carcinogenesis_and_mutagenesis_and_impairment_of_fertility_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "cleaning",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "cleaning_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "clinical_pharmacology",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "clinical_pharmacology_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "clinical_studies",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "clinical_studies_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "compatible_accessories",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "compatible_accessories_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "components",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "components_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "contraindications",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "contraindications_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "controlled_substance",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "controlled_substance_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "dependence",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "dependence_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "description",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "description_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "diagram_of_device",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "diagram_of_device_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "disposal_and_waste_handling",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "disposal_and_waste_handling_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "do_not_use",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "do_not_use_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "dosage_and_administration",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "dosage_and_administration_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "dosage_forms_and_strengths",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "dosage_forms_and_strengths_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "drug_abuse_and_dependence",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "drug_abuse_and_dependence_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "drug_and_or_laboratory_test_interactions",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "drug_and_or_laboratory_test_interactions_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "drug_interactions",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "drug_interactions_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "effective_time",
+      "type": "string",
+      "description": "Date reference to the particular version of the labeling document."
+    },
+    {
+      "path": "environmental_warning",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "environmental_warning_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "food_safety_warning",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "food_safety_warning_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "general_precautions",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "general_precautions_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "geriatric_use",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "geriatric_use_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "guaranteed_analysis_of_feed",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "guaranteed_analysis_of_feed_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "health_care_provider_letter",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "health_care_provider_letter_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "health_claim",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "health_claim_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "how_supplied",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "how_supplied_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "id",
+      "type": "string",
+      "description": "The document ID, A globally unique identifier (GUID) for the particular revision of a labeling document."
+    },
+    {
+      "path": "inactive_ingredient",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "inactive_ingredient_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "indications_and_usage",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "indications_and_usage_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "information_for_owners_or_caregivers",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "information_for_owners_or_caregivers_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "information_for_patients",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "information_for_patients_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "instructions_for_use",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "instructions_for_use_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "intended_use_of_the_device",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "intended_use_of_the_device_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "keep_out_of_reach_of_children",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "keep_out_of_reach_of_children_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "labor_and_delivery",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "labor_and_delivery_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "laboratory_tests",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "laboratory_tests_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "mechanism_of_action",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "mechanism_of_action_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "meta",
+      "type": "object",
+      "description": "This section contains a disclaimer and license information. The field `last_updated` indicates when the data files were exported."
+    },
+    {
+      "path": "meta.disclaimer",
+      "type": "string",
+      "description": "Important details notes about openFDA data and limitations of the dataset."
+    },
+    {
+      "path": "meta.last_updated",
+      "type": "string",
+      "description": "The last date when this openFDA endpoint was updated. Note that this does not correspond to the most recent record for the endpoint or dataset. Rather, it is the last time the openFDA API was itself updated."
+    },
+    {
+      "path": "meta.license",
+      "type": "string",
+      "description": "Link to a web page with license terms that govern data within openFDA."
+    },
+    {
+      "path": "meta.results",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "meta.results.limit",
+      "type": "number",
+      "description": "Number of records in this return, defined by the `limit` [query parameter](/api/). If there is no `limit` parameter, the API returns one result."
+    },
+    {
+      "path": "meta.results.skip",
+      "type": "number",
+      "description": "Offset (page) of results, defined by the `skip` [query parameter](/api/)."
+    },
+    {
+      "path": "meta.results.total",
+      "type": "number",
+      "description": "Total number of records matching the search criteria."
+    },
+    {
+      "path": "meta.type",
+      "type": "unknown",
+      "description": ""
+    },
+    {
+      "path": "microbiology",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "microbiology_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "nonclinical_toxicology",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "nonclinical_toxicology_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "nonteratogenic_effects",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "nonteratogenic_effects_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "nursing_mothers",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "nursing_mothers_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "openfda.application_number",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.brand_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.generic_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.is_original_packager",
+      "type": "string",
+      "description": "Whether or not the drug has been repackaged for distribution."
+    },
+    {
+      "path": "openfda.manufacturer_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.nui",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.original_packager_product_ndc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.package_ndc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_cs",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_epc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_moa",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_pe",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.product_ndc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.product_type",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.route",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.rxcui",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.spl_id",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.spl_set_id",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.substance_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.unii",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.upc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "other_safety_information",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "other_safety_information_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "overdosage",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "overdosage_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "package_label_principal_display_panel",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "package_label_principal_display_panel_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient_medication_information",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "patient_medication_information_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "pediatric_use",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "pediatric_use_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "pharmacodynamics",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "pharmacodynamics_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "pharmacogenomics",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "pharmacogenomics_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "pharmacokinetics",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "pharmacokinetics_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "precautions",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "precautions_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "pregnancy",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "pregnancy_or_breast_feeding",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "pregnancy_or_breast_feeding_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "pregnancy_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "purpose",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "purpose_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "questions",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "questions_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "recent_major_changes",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "recent_major_changes_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "references",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "references_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "residue_warning",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "residue_warning_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "risks",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "risks_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "route",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "route_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "safe_handling_warning",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "safe_handling_warning_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "set_id",
+      "type": "string",
+      "description": "The Set ID, A globally unique identifier (GUID) for the labeling, stable across all versions or revisions."
+    },
+    {
+      "path": "spl_indexing_data_elements",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "spl_indexing_data_elements_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "spl_medguide",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "spl_medguide_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "spl_patient_package_insert",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "spl_patient_package_insert_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "spl_product_data_elements",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "spl_product_data_elements_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "spl_unclassified_section",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "spl_unclassified_section_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "statement_of_identity",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "statement_of_identity_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "stop_use",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "stop_use_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "storage_and_handling",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "storage_and_handling_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "summary_of_safety_and_effectiveness",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "summary_of_safety_and_effectiveness_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "teratogenic_effects",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "teratogenic_effects_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "troubleshooting",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "troubleshooting_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "use_in_specific_populations",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "use_in_specific_populations_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "user_safety_warnings",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "user_safety_warnings_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "version",
+      "type": "string",
+      "description": "A sequentially increasing number identifying the particular version of a document, starting with `1`."
+    },
+    {
+      "path": "warnings",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "warnings_and_cautions",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "warnings_and_cautions_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "warnings_table",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "when_using",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "when_using_table",
+      "type": "array",
+      "description": ""
+    }
+  ]
+}

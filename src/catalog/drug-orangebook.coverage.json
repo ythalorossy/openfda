@@ -1,0 +1,162 @@
+{
+  "endpoint": "orangebook",
+  "measured_at": "2026-09-21T00:10:08.864Z",
+  "total_records": 48761,
+  "fields": [
+    {
+      "path": "approval_date",
+      "docs": 42888,
+      "coverage_pct": 87.96
+    },
+    {
+      "path": "approved_prior_to_1982",
+      "docs": 5873,
+      "coverage_pct": 12.04
+    },
+    {
+      "path": "exclusivity",
+      "docs": 1217,
+      "coverage_pct": 2.5
+    },
+    {
+      "path": "exclusivity.exclusivity_code",
+      "docs": 1217,
+      "coverage_pct": 2.5
+    },
+    {
+      "path": "exclusivity.exclusivity_code_definition",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "exclusivity.exclusivity_expiration_date",
+      "docs": 1217,
+      "coverage_pct": 2.5
+    },
+    {
+      "path": "patents",
+      "docs": 2661,
+      "coverage_pct": 5.46
+    },
+    {
+      "path": "patents.drug_product_flag",
+      "docs": 2357,
+      "coverage_pct": 4.83
+    },
+    {
+      "path": "patents.drug_substance_flag",
+      "docs": 1237,
+      "coverage_pct": 2.54
+    },
+    {
+      "path": "patents.expiration_date",
+      "docs": 2661,
+      "coverage_pct": 5.46
+    },
+    {
+      "path": "patents.patent_delist_flag",
+      "docs": 36,
+      "coverage_pct": 0.07
+    },
+    {
+      "path": "patents.patent_number",
+      "docs": 2661,
+      "coverage_pct": 5.46
+    },
+    {
+      "path": "patents.patent_submission_date",
+      "docs": 2541,
+      "coverage_pct": 5.21
+    },
+    {
+      "path": "patents.patent_use_code",
+      "docs": 2117,
+      "coverage_pct": 4.34
+    },
+    {
+      "path": "patents.patent_use_code_definition",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "product_number",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products.active_ingredients",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products.active_ingredients.name",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products.active_ingredients.strength",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products.application_full_name",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products.application_name",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products.application_number",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products.application_type",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products.brand_name",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products.dosage_form",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products.product_type",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "products.reference_listed_drug",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products.reference_standard",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products.route",
+      "docs": 48761,
+      "coverage_pct": 100
+    },
+    {
+      "path": "products.therapeutic_equivalence_codes",
+      "docs": 21931,
+      "coverage_pct": 44.98
+    }
+  ]
+}

@@ -1,0 +1,287 @@
+{
+  "endpoint": "enforcement",
+  "measured_at": "2026-09-21T00:09:31.532Z",
+  "total_records": 17965,
+  "fields": [
+    {
+      "path": "address_1",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "address_2",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "center_classification_date",
+      "docs": 17964,
+      "coverage_pct": 99.99
+    },
+    {
+      "path": "city",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "classification",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "code_info",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "country",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "distribution_pattern",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "event_id",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "initial_firm_notification",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "meta",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.disclaimer",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.last_updated",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.license",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.results",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.results.limit",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.results.skip",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.results.total",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.type",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "more_code_info",
+      "docs": 8356,
+      "coverage_pct": 46.51
+    },
+    {
+      "path": "openfda",
+      "docs": 3279,
+      "coverage_pct": 18.25
+    },
+    {
+      "path": "openfda.application_number",
+      "docs": 3216,
+      "coverage_pct": 17.9
+    },
+    {
+      "path": "openfda.brand_name",
+      "docs": 3279,
+      "coverage_pct": 18.25
+    },
+    {
+      "path": "openfda.generic_name",
+      "docs": 3279,
+      "coverage_pct": 18.25
+    },
+    {
+      "path": "openfda.is_original_packager",
+      "docs": 3090,
+      "coverage_pct": 17.2
+    },
+    {
+      "path": "openfda.manufacturer_name",
+      "docs": 3279,
+      "coverage_pct": 18.25
+    },
+    {
+      "path": "openfda.nui",
+      "docs": 1155,
+      "coverage_pct": 6.43
+    },
+    {
+      "path": "openfda.original_packager_product_ndc",
+      "docs": 191,
+      "coverage_pct": 1.06
+    },
+    {
+      "path": "openfda.package_ndc",
+      "docs": 3279,
+      "coverage_pct": 18.25
+    },
+    {
+      "path": "openfda.pharm_class_cs",
+      "docs": 555,
+      "coverage_pct": 3.09
+    },
+    {
+      "path": "openfda.pharm_class_epc",
+      "docs": 1098,
+      "coverage_pct": 6.11
+    },
+    {
+      "path": "openfda.pharm_class_moa",
+      "docs": 584,
+      "coverage_pct": 3.25
+    },
+    {
+      "path": "openfda.pharm_class_pe",
+      "docs": 375,
+      "coverage_pct": 2.09
+    },
+    {
+      "path": "openfda.product_ndc",
+      "docs": 3279,
+      "coverage_pct": 18.25
+    },
+    {
+      "path": "openfda.product_type",
+      "docs": 3279,
+      "coverage_pct": 18.25
+    },
+    {
+      "path": "openfda.route",
+      "docs": 3224,
+      "coverage_pct": 17.95
+    },
+    {
+      "path": "openfda.rxcui",
+      "docs": 3143,
+      "coverage_pct": 17.5
+    },
+    {
+      "path": "openfda.spl_id",
+      "docs": 3279,
+      "coverage_pct": 18.25
+    },
+    {
+      "path": "openfda.spl_set_id",
+      "docs": 3279,
+      "coverage_pct": 18.25
+    },
+    {
+      "path": "openfda.substance_name",
+      "docs": 3205,
+      "coverage_pct": 17.84
+    },
+    {
+      "path": "openfda.unii",
+      "docs": 3208,
+      "coverage_pct": 17.86
+    },
+    {
+      "path": "openfda.upc",
+      "docs": 1570,
+      "coverage_pct": 8.74
+    },
+    {
+      "path": "product_code",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "product_description",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "product_quantity",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "product_type",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "reason_for_recall",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "recall_initiation_date",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "recall_number",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "recalling_firm",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "report_date",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "state",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "status",
+      "docs": 17965,
+      "coverage_pct": 100
+    },
+    {
+      "path": "termination_date",
+      "docs": 14806,
+      "coverage_pct": 82.42
+    },
+    {
+      "path": "type",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "voluntary_mandated",
+      "docs": 17965,
+      "coverage_pct": 100
+    }
+  ]
+}

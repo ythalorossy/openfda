@@ -8,25 +8,146 @@ A Model Context Protocol (MCP) server for querying drug information from the Ope
 
 ## Features
 
-- Retrieve drug label information by brand name, with `limit` (default 1, max 25) and `skip` to page through the rest of the matching labels — the first match is not necessarily the most canonical one, and `substance_name` leads each record so a combination product is obvious at a glance
-- Retrieve drug information by generic (active ingredient) name
-- Get all brand versions of a generic drug
-- Get adverse event (side effect) reports for a drug (by brand or generic name), with paging via `skip` (maximum 25000) and ordering via `sort` (`receivedate:desc` / `receivedate:asc`) — without `sort`, results are a deterministic earliest-`report_id` slice, so a small sample is not representative
-- Rank adverse-event values for a drug by frequency (e.g. the most commonly reported reactions) via `get-drug-adverse-event-counts`; returns `{term, term_code, count}` — for coded fields (`serious`, `patient.patientsex`, `patient.reaction.reactionoutcome`) `term` is a decoded human-readable label and `term_code` carries the raw upstream value, while text fields pass through unchanged in both; note that openFDA omits a result total on aggregated responses, so this tool reports no total
-- Retrieve all drugs manufactured by a specific company
-- Get comprehensive drug safety information (warnings, contraindications, interactions, precautions, etc.); `generic_name` is `null`, not `"Unknown"`, when the label carries no structured generic or substance name
-- Retrieve Drugs@FDA application data for a given section and field, with a `limit` parameter and a real `Showing N of M` total; can also search by `sponsor_name`, which is stored uppercase and normalised automatically. `detail` controls the record shape and defaults to `summary` (application number, sponsor, products and a `submission_count`, with no `submissions` array); `detail: 'full'` adds the `submissions` array, capped at 10 per record, plus `submissions_truncated` when more were omitted. This default changed in 1.3.0 — code written against an earlier version that read `results[].submissions` directly must now pass `detail: 'full'`
-- Normalize and validate NDC (National Drug Code) formats
-- Helpful error messages and suggestions for failed queries
+2.0.0 registers one tool per openFDA drug endpoint, each with the same shape:
+a `field` + `value` search, `limit`/`skip` for paging, `detail` for the
+returned record shape, and (where the endpoint supports it) `sort` and
+`count` for ordering and frequency aggregation. Adding an endpoint means
+adding a row here, not rewriting the pattern.
 
-> **Route vocabularies differ across tools.** `openfda.route` (used by
-> `get-drug-by-name`, `get-drug-by-generic-name`, `get-drug-by-ndc`,
-> `get-drug-by-product-ndc` and `get-drugs-by-manufacturer` — the SPL route
-> of administration) and `products[].route` (used by `get-drugsfda` — the
-> Drugs@FDA product route) are different controlled vocabularies. The same
-> insulin glargine product is reported as `SUBCUTANEOUS` in one and
-> `INJECTION` in the other, so joining or filtering on route across tools
-> will silently miss matches.
+- **`drug-label`** — Search FDA structured product labels (SPL): prescribing
+  and OTC drug info. `field`: `drug_name` (brand/generic/substance, tiered),
+  `ndc`, `spl_product_data_elements`, `effective_time`, `id`, `set_id`,
+  `brand_name`, `generic_name`, `substance_name`, `manufacturer_name`,
+  `route`, `product_type`, `application_number`, `unii`, `rxcui`. `detail`:
+  `summary` (default; identity plus the safety narrative, every field
+  present, empty if absent), `safety` (warnings, contraindications,
+  interactions and overdosage — see the migration table below for the 1.x
+  tool this replaces), `full` (the raw upstream record). `count`:
+  `openfda.route`,
+  `openfda.product_type`, `openfda.manufacturer_name.exact`. `limit` default
+  1, max 25.
+- **`drug-event`** — Search FAERS adverse event reports (voluntarily
+  submitted side-effect reports; not evidence of causation). `field`:
+  `drug_name` (unions `patient.drug.openfda.generic_name`,
+  `patient.drug.openfda.substance_name` and `patient.drug.medicinalproduct`),
+  `brand_name`, `manufacturer_name`, `product_ndc`, `pharm_class`,
+  `drug_characterization`, `indication`, `reaction`, `reaction_outcome`,
+  `serious`, `seriousness_death`, `patient_sex`, `reporter_qualification`,
+  `country`, `received_date`, `report_id`. `detail`: `summary` (default; one
+  row per report, FAERS codes decoded, (reaction, outcome) pairs
+  deduplicated), `full`. Also takes `seriousness`
+  (`serious`/`non-serious`/`all`, default `all`). `sort`:
+  `receivedate:desc`/`receivedate:asc`; without `sort`, results are a
+  deterministic earliest-`report_id` slice. `count`:
+  `patient.reaction.reactionmeddrapt.exact`,
+  `patient.reaction.reactionoutcome`, `serious`, `patient.patientsex`,
+  `occurcountry.exact`, `patient.drug.openfda.generic_name.exact` (see the
+  migration table below for the 1.x tool this replaces). `limit` default 10,
+  max 50.
+  Note: the searchable `received_date` field maps to `receivedate`, but the
+  `summary` projection's returned `report_date` reads `receiptdate` — two
+  different, near-duplicate FAERS date fields. Filtering by one and reading
+  the other back will not, in general, show the same date.
+- **`drug-drugsfda`** — Search Drugs@FDA application data: approvals,
+  sponsors, products and submissions. `field`: `products.brand_name`
+  (default drug-name search, 98.79% populated), `application_number`,
+  `sponsor_name` (stored uppercase upstream; normalised automatically),
+  `products.active_ingredients.name`, `products.dosage_form`,
+  `products.route`, `products.marketing_status`, `products.reference_drug`,
+  `products.te_code`, `openfda.brand_name`, `openfda.generic_name`,
+  `openfda.substance_name`, `openfda.manufacturer_name`, `openfda.route`,
+  `openfda.product_ndc` (the `openfda.*` names are the openFDA-harmonised
+  spelling of the same identifiers, but populated on only ~42% of
+  applications — the precise alternative to `products.brand_name`, not the
+  default), `submissions.submission_type`, `submissions.submission_status`,
+  `submissions.submission_status_date`, `submissions.submission_class_code`,
+  `submissions.review_priority`. `detail`: `summary` (default; application
+  number, sponsor, `openfda` block and `products` — each product carries
+  `te_code`, `null` when absent — plus a `submission_count`, with no
+  `submissions` array), `full` (adds `submissions`, capped at 10 per record,
+  plus `submissions_truncated` when more were omitted). `count`:
+  `sponsor_name.exact`, `products.marketing_status`, `products.dosage_form`.
+  `limit` default 5, max 100. Seven search paths openFDA publishes on this
+  endpoint are deliberately not exposed here — see
+  [Migrating from 1.x](#migrating-from-1x) below.
+- **`drug-ndc`** — Search the NDC Directory: every drug product currently
+  listed with the FDA (packaging, labeler, marketing category and
+  application number). This is the **product registry**, distinct from
+  `drug-label`'s `ndc` field, which searches *labelling text* by NDC — see
+  the migration table below for the 1.x NDC lookup this tool is not a
+  replacement for. `field`: `product_ndc`,
+  `packaging.package_ndc`, `generic_name`, `brand_name`,
+  `active_ingredients.name`, `openfda.manufacturer_name`,
+  `marketing_category`, `application_number`, `dosage_form`, `route`,
+  `product_type`, `pharm_class`, `marketing_start_date`, `openfda.unii`,
+  `openfda.rxcui`, `openfda.spl_set_id`. `detail`: `summary` (default;
+  identity, packaging and marketing status), `full` (raw upstream record).
+  `count`: `dosage_form`, `route`, `product_type`, `marketing_category`,
+  `openfda.manufacturer_name.exact`. `limit` default 5, max 50.
+- **`drug-enforcement`** — Search FDA drug recall and enforcement reports.
+  `classification` is the hazard level (Class I: reasonable probability of
+  serious harm or death; II: temporary or reversible harm; III: unlikely
+  harm) and `status` says whether a recall is Ongoing, Completed or
+  Terminated — a recall appearing in results does not mean it is still in
+  effect. `field`: `product_description` (default drug-name search, 100%
+  populated), `recall_number`, `event_id`, `code_info`, `recalling_firm`,
+  `reason_for_recall`, `classification`, `status`, `voluntary_mandated`,
+  `state`, `country`, `recall_initiation_date`, `report_date`,
+  `termination_date`, `openfda.generic_name`, `openfda.brand_name`,
+  `openfda.product_ndc` (the last three are exact but populated on only
+  ~18% of recalls — the precise alternative to `product_description`, not
+  the default). `detail`: `summary` (default; every field above except the
+  three `openfda.*` names, which are bundled as one `openfda` object),
+  `full` (raw upstream record). `count`: `classification`, `status`,
+  `state`, `voluntary_mandated`, `recalling_firm.exact`. `sort`:
+  `report_date:desc`/`report_date:asc`/`recall_initiation_date:desc`.
+  `limit` default 5, max 50.
+- **`drug-orangebook`** — Search the Orange Book: FDA-approved drug products
+  with their therapeutic-equivalence ratings. Almost all data lives in the
+  nested `products` array, which this tool flattens into one entry per
+  product. `field`: `products.brand_name`, `products.active_ingredients.name`,
+  `products.application_number`, `products.application_type`,
+  `products.application_full_name`, `products.application_name`,
+  `products.therapeutic_equivalence_codes`, `products.reference_listed_drug`,
+  `products.reference_standard`, `products.dosage_form`, `products.route`,
+  `approval_date`. `detail`: `summary` (default; `approval_date`,
+  `product_number` and the flattened `products` array —
+  `reference_listed_drug` and `reference_standard` are booleans always
+  returned, `false` a fact rather than a missing value), `full` (raw
+  upstream record). `count`: `products.application_type`,
+  `products.dosage_form`, `products.route`,
+  `products.therapeutic_equivalence_codes`. `sort`:
+  `approval_date:desc`/`approval_date:asc`. `limit` default 5, max 50.
+- **`drug-shortages`** — Search FDA drug shortage reports. `status`
+  distinguishes a current shortage from a resolved one, so a product
+  appearing here is not necessarily short now. openFDA sends an empty
+  string, not `null`, for an absent date on this endpoint; this tool
+  normalises those to `null`. `field`: `generic_name` (default),
+  `company_name`, `openfda.manufacturer_name`, `openfda.brand_name`,
+  `openfda.substance_name`, `package_ndc`, `openfda.product_ndc`, `status`,
+  `therapeutic_category`, `dosage_form`, `update_type`,
+  `initial_posting_date`, `update_date`. `detail`: `summary` (default;
+  the `openfda.*` names are bundled as one `openfda` object), `full` (raw
+  upstream record). `count`: `status`, `dosage_form`,
+  `therapeutic_category`, `company_name.exact`. `sort`:
+  `update_date:desc`/`update_date:asc`/`initial_posting_date:desc`. `limit`
+  default 10, max 50. Smallest drug dataset (~1,600 records); a coverage
+  percentage here represents far fewer records than the same percentage
+  elsewhere.
+
+Every tool reports `matched_via` (which field path actually matched) and a
+`total` that is the upstream match count, not the number of records
+returned. A search that matches nothing returns a plain no-results message,
+not an error. Every response is capped at 60,000 characters; if a result set
+would exceed that, trailing records are dropped and the response says how
+many.
+
+> **Route vocabularies differ across tools.** `drug-label`'s `route` field
+> (`openfda.route`, the SPL route of administration) and `drug-drugsfda`'s
+> `products.route` field (the Drugs@FDA product route) are different
+> controlled vocabularies. The same insulin glargine product is reported as
+> `SUBCUTANEOUS` in one and `INJECTION` in the other, so joining or filtering
+> on route across tools will silently miss matches.
 
 1. **Set up your OpenFDA API Key**
 
@@ -62,15 +183,13 @@ A Model Context Protocol (MCP) server for querying drug information from the Ope
               },
               "timeout": 60000,
               "autoApprove": [
-                  "get-drug-by-name",
-                  "get-drug-by-generic-name",
-                  "get-drug-adverse-events",
-                  "get-drugs-by-manufacturer",
-                  "get-drug-safety-info",
-                  "get-drug-by-ndc",
-                  "get-drug-by-product-ndc",
-                  "get-drugsfda",
-                  "get-drug-adverse-event-counts"
+                  "drug-label",
+                  "drug-event",
+                  "drug-drugsfda",
+                  "drug-ndc",
+                  "drug-enforcement",
+                  "drug-orangebook",
+                  "drug-shortages"
               ]
           }
       }
@@ -103,6 +222,84 @@ npx @ythalorossy/openfda
 ## Configuration
 
 Export `OPENFDA_API_KEY` in your shell before running locally: `export OPENFDA_API_KEY=your_key`.
+
+<!-- migration-table -->
+## Migrating from 1.x
+
+2.0.0 replaces the nine `get-*` tools with one tool per openFDA drug endpoint.
+Pin `1.3.0` if you are not ready to migrate.
+
+| 1.x tool | 2.0.0 call |
+| --- | --- |
+| `get-drug-by-name` | `drug-label` `{ field: "drug_name", value }` |
+| `get-drug-by-generic-name` | `drug-label` `{ field: "generic_name", value }` |
+| `get-drugs-by-manufacturer` | `drug-label` `{ field: "manufacturer_name", value }` |
+| `get-drug-safety-info` | `drug-label` `{ field: "drug_name", value, detail: "safety" }` |
+| `get-drug-by-ndc` | `drug-label` `{ field: "ndc", value }` |
+| `get-drug-by-product-ndc` | `drug-label` `{ field: "ndc", value }` |
+| `get-drug-adverse-events` | `drug-event` `{ field: "drug_name", value }` |
+| `get-drug-adverse-event-counts` | `drug-event` `{ value, count: "patient.reaction.reactionmeddrapt.exact" }` |
+| `get-drugsfda` | `drug-drugsfda` `{ field: "application_number", value }` or `{ field: "products.brand_name", value }` |
+
+**`drug-drugsfda` field names carry no section prefix.** 1.x grouped fields
+under a `section` parameter (`application`, `products`, `submissions`,
+`openfda`), so the table row above is illustrative, not literal: real field
+names are flat where 1.x had a section for the top-level `application`
+fields — `application_number` and `sponsor_name` carry no prefix — while
+`products.*`, `submissions.*` and `openfda.*` keep theirs. A caller who
+copies `application.sponsor_name` from 1.x muscle memory gets an
+unknown-field error; the correct value is `sponsor_name`.
+
+**`get-drug-by-ndc` did not search `/drug/ndc.json`.** It searched *labels*
+by `openfda.product_ndc`, so it maps to `drug-label` (`{ field: "ndc" }`),
+**not** to `drug-ndc`. `drug-ndc` searches the actual NDC Directory — new
+capability this server did not previously expose — and returns different
+data than the label-based lookup 1.x actually performed: use `drug-ndc` for
+packaging, labeler and marketing-category questions, and `drug-label` for
+label text keyed off an NDC.
+
+**`get-drug-by-product-ndc` returned a pre-filtered `available_packages`**
+— the label's package NDCs filtered down to the product you searched.
+`drug-label`'s `summary` detail returns `package_ndc` **unfiltered**, so on
+a label that covers several products it mixes packages from all of them.
+Nothing is lost: `summary` also returns `product_ndc[]`, so filtering by
+prefix is a one-line operation on the caller's side, and
+`active_ingredient`, `purpose` and `dosage_and_administration` are reachable
+via `detail: "full"` — but the convenience of a pre-filtered list is gone.
+
+**Seven Drugs@FDA search paths available in 1.x are deliberately not
+exposed** on `drug-drugsfda`: `openfda.application_number` (a 42%-populated
+duplicate of the 100%-populated `application_number`), `products.product_number`
+and `submissions.submission_number` (per-application ordinals that match
+tens of thousands of unrelated records corpus-wide), and all four
+`submissions.application_docs.{id,url,date,type}` (opaque per-document
+values you must already possess in order to search by them). See
+`docs/superpowers/notes/2026-09-20-field-selection.md` (`## drugsfda` →
+"Deliberately not exposed") for the full reasoning. All seven remain
+reachable through the field-catalog resource a later release publishes, so
+nothing becomes unqueryable — they are simply no longer in the `field` enum.
+
+Other behaviour changes:
+
+- **Search-value injection is fixed.** Every 1.x tool interpolated the
+  caller's search value straight into the query string. A crafted value
+  could append a clause and make the server report data for a different
+  drug than the one named in its own `matched_via` — verified live:
+  `openfda.brand_name:"Advil"` returns 39 records, `openfda.brand_name:"Tylenol"`
+  returns 111, and the injected combination of the two returns 150. 2.0.0
+  escapes every value, and query assembly is confined to one file with a
+  test enforcing it.
+- A search that matches nothing now returns a plain no-results message.
+  Previously openFDA's HTTP 404 was reported as `isError: true` with
+  "Failed to retrieve…", which was indistinguishable from an outage.
+- `'Unknown'` placeholder strings are gone. Absent values are `null` or `[]`,
+  so a placeholder can no longer be mistaken for data.
+- `get-drug-safety-info`'s scalar `drug_name` is now the array `brand_name`
+  (on `drug-label`'s `detail: "safety"`).
+- Response headers are uniform across tools; the emoji/prose headers are
+  gone.
+- Every response is capped at 60,000 characters, dropping trailing records
+  and saying how many, rather than returning an unusable wall of text.
 
 ## License
 

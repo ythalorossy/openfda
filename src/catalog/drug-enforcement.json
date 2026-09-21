@@ -1,0 +1,287 @@
+{
+  "endpoint": "enforcement",
+  "source_url": "https://open.fda.gov/fields/drugenforcement.yaml",
+  "fetched_at": "2026-09-20T23:46:59.594Z",
+  "fields": [
+    {
+      "path": "address_1",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "path": "address_2",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "path": "center_classification_date",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "path": "city",
+      "type": "string",
+      "description": "The city in which the recalling firm is located."
+    },
+    {
+      "path": "classification",
+      "type": "string",
+      "description": "Numerical designation (I, II, or III) that is assigned by FDA to a particular product recall that indicates the relative degree of health hazard."
+    },
+    {
+      "path": "code_info",
+      "type": "string",
+      "description": "A list of all lot and/or serial numbers, product numbers, packer or manufacturer numbers, sell or use by dates, etc., which appear on the product or its labeling."
+    },
+    {
+      "path": "country",
+      "type": "string",
+      "description": "The country in which the recalling firm is located."
+    },
+    {
+      "path": "distribution_pattern",
+      "type": "string",
+      "description": "General area of initial distribution such as, “Distributors in 6 states: NY, VA, TX, GA, FL and MA; the Virgin Islands; Canada and Japan”. The term “nationwide” is defined to mean the fifty states or a significant portion. Note that subsequent distribution by the consignees to other parties may not "
+    },
+    {
+      "path": "event_id",
+      "type": "string",
+      "description": "A numerical designation assigned by FDA to a specific recall event used for tracking purposes."
+    },
+    {
+      "path": "initial_firm_notification",
+      "type": "string",
+      "description": "The method(s) by which the firm initially notified the public or their consignees of a recall. A consignee is a person or firm named in a bill of lading to whom or to whose order the product has or will be delivered."
+    },
+    {
+      "path": "meta",
+      "type": "object",
+      "description": "This section contains a disclaimer and license information. The field `last_updated` indicates when the data files were exported."
+    },
+    {
+      "path": "meta.disclaimer",
+      "type": "string",
+      "description": "Important details notes about openFDA data and limitations of the dataset."
+    },
+    {
+      "path": "meta.last_updated",
+      "type": "string",
+      "description": "The last date when this openFDA endpoint was updated. Note that this does not correspond to the most recent record for the endpoint or dataset. Rather, it is the last time the openFDA API was itself updated."
+    },
+    {
+      "path": "meta.license",
+      "type": "string",
+      "description": "Link to a web page with license terms that govern data within openFDA."
+    },
+    {
+      "path": "meta.results",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "meta.results.limit",
+      "type": "number",
+      "description": "Number of records in this return, defined by the `limit` [query parameter](/api/). If there is no `limit` parameter, the API returns one result."
+    },
+    {
+      "path": "meta.results.skip",
+      "type": "number",
+      "description": "Offset (page) of results, defined by the `skip` [query parameter](/api/)."
+    },
+    {
+      "path": "meta.results.total",
+      "type": "number",
+      "description": "Total number of records matching the search criteria."
+    },
+    {
+      "path": "meta.type",
+      "type": "unknown",
+      "description": ""
+    },
+    {
+      "path": "more_code_info",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "path": "openfda",
+      "type": "object",
+      "description": ""
+    },
+    {
+      "path": "openfda.application_number",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.brand_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.generic_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.is_original_packager",
+      "type": "string",
+      "description": "Whether or not the drug has been repackaged for distribution."
+    },
+    {
+      "path": "openfda.manufacturer_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.nui",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.original_packager_product_ndc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.package_ndc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_cs",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_epc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_moa",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.pharm_class_pe",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.product_ndc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.product_type",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.route",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.rxcui",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.spl_id",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.spl_set_id",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.substance_name",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.unii",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "openfda.upc",
+      "type": "array",
+      "description": ""
+    },
+    {
+      "path": "product_code",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "path": "product_description",
+      "type": "string",
+      "description": "Brief description of the product being recalled."
+    },
+    {
+      "path": "product_quantity",
+      "type": "string",
+      "description": "The amount of defective product subject to recall."
+    },
+    {
+      "path": "product_type",
+      "type": "unknown",
+      "description": "The type of product being recalled. For drug queries, this will always be `Drugs`."
+    },
+    {
+      "path": "reason_for_recall",
+      "type": "string",
+      "description": "Information describing how the product is defective and violates the FD&C Act or related statutes."
+    },
+    {
+      "path": "recall_initiation_date",
+      "type": "string",
+      "description": "Date that the firm first began notifying the public or their consignees of the recall."
+    },
+    {
+      "path": "recall_number",
+      "type": "string",
+      "description": "A numerical designation assigned by FDA to a specific recall event used for tracking purposes."
+    },
+    {
+      "path": "recalling_firm",
+      "type": "string",
+      "description": "The firm that initiates a recall or, in the case of an FDA requested recall or FDA mandated recall, the firm that has primary responsibility for the manufacture and (or) marketing of the product to be recalled."
+    },
+    {
+      "path": "report_date",
+      "type": "string",
+      "description": "Date that the FDA issued the enforcement report for the product recall."
+    },
+    {
+      "path": "state",
+      "type": "string",
+      "description": "The U.S. state in which the recalling firm is located."
+    },
+    {
+      "path": "status",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "path": "termination_date",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "path": "type",
+      "type": "unknown",
+      "description": ""
+    },
+    {
+      "path": "voluntary_mandated",
+      "type": "string",
+      "description": "Describes who initiated the recall. Recalls are almost always voluntary, meaning initiated by a firm. A recall is deemed voluntary when the firm voluntarily removes or corrects marketed products or the FDA requests the marketed products be removed or corrected. A recall is mandated when the firm was"
+    }
+  ]
+}

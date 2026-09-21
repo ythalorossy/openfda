@@ -15,7 +15,7 @@ describe('OpenFDABuilder', () => {
   it('should build a valid URL with all parameters', () => {
     const url = new OpenFDABuilder()
       .dataset('drug')
-      .context('label')
+      .endpoint('label')
       .search('openfda.brand_name:"Advil"')
       .limit(5)
       .build();
@@ -27,28 +27,28 @@ describe('OpenFDABuilder', () => {
   it('should use a default limit of 1 if not specified', () => {
     const url = new OpenFDABuilder()
       .dataset('drug')
-      .context('label')
+      .endpoint('label')
       .search('openfda.brand_name:"Advil"')
       .build();
     expect(url).toContain('&limit=1');
   });
 
-  it('should throw an error if context is not set', () => {
+  it('should throw an error if endpoint is not set', () => {
     expect(() => {
       new OpenFDABuilder().dataset('drug').search('test').limit(1).build();
-    }).toThrow('Missing required parameters: context or search');
+    }).toThrow('Missing required parameters: dataset, endpoint or search');
   });
 
   it('should throw an error if search is not set', () => {
     expect(() => {
-      new OpenFDABuilder().dataset('drug').context('label').limit(1).build();
-    }).toThrow('Missing required parameters: context or search');
+      new OpenFDABuilder().dataset('drug').endpoint('label').limit(1).build();
+    }).toThrow('Missing required parameters: dataset, endpoint or search');
   });
 
   it('should handle a limit of 0', () => {
     const url = new OpenFDABuilder()
       .dataset('drug')
-      .context('label')
+      .endpoint('label')
       .search('some_query')
       .limit(0)
       .build();
@@ -60,7 +60,7 @@ describe('OpenFDABuilder', () => {
     process.env.OPENFDA_ALLOW_KEYLESS = '1';
     const url = new OpenFDABuilder()
       .dataset('drug')
-      .context('label')
+      .endpoint('label')
       .search('some_query')
       .limit(1)
       .build();
@@ -75,7 +75,7 @@ describe('OpenFDABuilder', () => {
     process.env.OPENFDA_ALLOW_KEYLESS = '1';
     const url = new OpenFDABuilder()
       .dataset('drug')
-      .context('label')
+      .endpoint('label')
       .search('some_query')
       .build();
     expect(url).not.toContain('undefined');
@@ -84,7 +84,7 @@ describe('OpenFDABuilder', () => {
   it('percent-encodes quotes and colons in the search query', () => {
     const url = new OpenFDABuilder()
       .dataset('drug')
-      .context('label')
+      .endpoint('label')
       .search('openfda.brand_name:"Advil"')
       .build();
     expect(url).toContain('search=openfda.brand_name%3A%22Advil%22');
@@ -93,7 +93,7 @@ describe('OpenFDABuilder', () => {
   it('encodes a drug name containing an ampersand without corrupting the query', () => {
     const url = new OpenFDABuilder()
       .dataset('drug')
-      .context('label')
+      .endpoint('label')
       .search('openfda.brand_name:"Tylenol & Codeine"')
       .build();
     expect(url).toContain('%26');
@@ -104,7 +104,7 @@ describe('OpenFDABuilder', () => {
   it('encodes a space-separated AND filter as +AND+ on the wire', () => {
     const url = new OpenFDABuilder()
       .dataset('drug')
-      .context('event')
+      .endpoint('event')
       .search('patient.drug.medicinalproduct:"x" AND serious:1')
       .build();
     expect(url).toContain('+AND+');
@@ -114,7 +114,7 @@ describe('OpenFDABuilder', () => {
   it('omits count, skip and sort when they are not set', () => {
     const url = new OpenFDABuilder()
       .dataset('drug')
-      .context('event')
+      .endpoint('event')
       .search('x')
       .build();
     expect(url).not.toContain('count=');
@@ -125,7 +125,7 @@ describe('OpenFDABuilder', () => {
   it('emits count when set', () => {
     const url = new OpenFDABuilder()
       .dataset('drug')
-      .context('event')
+      .endpoint('event')
       .search('x')
       .count('patient.reaction.reactionmeddrapt.exact')
       .build();
@@ -137,7 +137,7 @@ describe('OpenFDABuilder', () => {
   it('emits skip and sort when set', () => {
     const url = new OpenFDABuilder()
       .dataset('drug')
-      .context('event')
+      .endpoint('event')
       .search('x')
       .skip(20)
       .sort('receivedate:desc')
@@ -149,11 +149,34 @@ describe('OpenFDABuilder', () => {
   it('still encodes the search query when the new params are present', () => {
     const url = new OpenFDABuilder()
       .dataset('drug')
-      .context('event')
+      .endpoint('event')
       .search('a:"x" OR b:"y"')
       .skip(5)
       .build();
     expect(url).toContain('+OR+');
     expect(url).not.toContain('%2BOR%2B');
+  });
+});
+
+describe('dataset and endpoint are open, not a fixed union', () => {
+  it('builds a URL for an endpoint the drug tools never used', () => {
+    const url = new OpenFDABuilder()
+      .dataset('drug')
+      .endpoint('enforcement')
+      .search('classification:"Class I"')
+      .limit(3)
+      .build();
+    expect(url).toContain('https://api.fda.gov/drug/enforcement.json?');
+    expect(url).toContain('search=classification%3A%22Class+I%22');
+    expect(url).toContain('limit=3');
+  });
+
+  it('builds a URL for a future dataset without a code change', () => {
+    const url = new OpenFDABuilder()
+      .dataset('food')
+      .endpoint('enforcement')
+      .search('state:"CA"')
+      .build();
+    expect(url).toContain('https://api.fda.gov/food/enforcement.json?');
   });
 });

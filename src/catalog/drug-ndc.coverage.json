@@ -1,0 +1,202 @@
+{
+  "endpoint": "ndc",
+  "measured_at": "2026-09-21T00:09:06.449Z",
+  "total_records": 138046,
+  "fields": [
+    {
+      "path": "active_ingredients",
+      "docs": 135545,
+      "coverage_pct": 98.19
+    },
+    {
+      "path": "active_ingredients.name",
+      "docs": 135545,
+      "coverage_pct": 98.19
+    },
+    {
+      "path": "active_ingredients.strength",
+      "docs": 135545,
+      "coverage_pct": 98.19
+    },
+    {
+      "path": "application_number",
+      "docs": 99953,
+      "coverage_pct": 72.41
+    },
+    {
+      "path": "brand_name",
+      "docs": 116288,
+      "coverage_pct": 84.24
+    },
+    {
+      "path": "brand_name_base",
+      "docs": 116288,
+      "coverage_pct": 84.24
+    },
+    {
+      "path": "brand_name_suffix",
+      "docs": 8572,
+      "coverage_pct": 6.21
+    },
+    {
+      "path": "dea_schedule",
+      "docs": 6325,
+      "coverage_pct": 4.58
+    },
+    {
+      "path": "dosage_form",
+      "docs": 138046,
+      "coverage_pct": 100
+    },
+    {
+      "path": "finished",
+      "docs": 138046,
+      "coverage_pct": 100
+    },
+    {
+      "path": "generic_name",
+      "docs": 138043,
+      "coverage_pct": 100
+    },
+    {
+      "path": "listing_expiration_date",
+      "docs": 134167,
+      "coverage_pct": 97.19
+    },
+    {
+      "path": "marketing_category",
+      "docs": 138046,
+      "coverage_pct": 100
+    },
+    {
+      "path": "marketing_end_date",
+      "docs": 3868,
+      "coverage_pct": 2.8
+    },
+    {
+      "path": "marketing_start_date",
+      "docs": 138046,
+      "coverage_pct": 100
+    },
+    {
+      "path": "openfda",
+      "docs": 112153,
+      "coverage_pct": 81.24
+    },
+    {
+      "path": "openfda.is_original_packager",
+      "docs": 88066,
+      "coverage_pct": 63.79
+    },
+    {
+      "path": "openfda.manufacturer_name",
+      "docs": 112153,
+      "coverage_pct": 81.24
+    },
+    {
+      "path": "openfda.nui",
+      "docs": 34727,
+      "coverage_pct": 25.16
+    },
+    {
+      "path": "openfda.pharm_class_cs",
+      "docs": 17500,
+      "coverage_pct": 12.68
+    },
+    {
+      "path": "openfda.pharm_class_epc",
+      "docs": 32598,
+      "coverage_pct": 23.61
+    },
+    {
+      "path": "openfda.pharm_class_moa",
+      "docs": 15830,
+      "coverage_pct": 11.47
+    },
+    {
+      "path": "openfda.pharm_class_pe",
+      "docs": 14215,
+      "coverage_pct": 10.3
+    },
+    {
+      "path": "openfda.rxcui",
+      "docs": 84031,
+      "coverage_pct": 60.87
+    },
+    {
+      "path": "openfda.spl_set_id",
+      "docs": 112153,
+      "coverage_pct": 81.24
+    },
+    {
+      "path": "openfda.unii",
+      "docs": 110194,
+      "coverage_pct": 79.82
+    },
+    {
+      "path": "openfda.upc",
+      "docs": 38379,
+      "coverage_pct": 27.8
+    },
+    {
+      "path": "packaging",
+      "docs": 137659,
+      "coverage_pct": 99.72
+    },
+    {
+      "path": "packaging.description",
+      "docs": 137659,
+      "coverage_pct": 99.72
+    },
+    {
+      "path": "packaging.marketing_end_date",
+      "docs": 3544,
+      "coverage_pct": 2.57
+    },
+    {
+      "path": "packaging.marketing_start_date",
+      "docs": 115918,
+      "coverage_pct": 83.97
+    },
+    {
+      "path": "packaging.package_ndc",
+      "docs": 137659,
+      "coverage_pct": 99.72
+    },
+    {
+      "path": "packaging.sample",
+      "docs": 115918,
+      "coverage_pct": 83.97
+    },
+    {
+      "path": "pharm_class",
+      "docs": 74276,
+      "coverage_pct": 53.81
+    },
+    {
+      "path": "product_id",
+      "docs": 138046,
+      "coverage_pct": 100
+    },
+    {
+      "path": "product_ndc",
+      "docs": 138046,
+      "coverage_pct": 100
+    },
+    {
+      "path": "product_type",
+      "docs": 138046,
+      "coverage_pct": 100
+    },
+    {
+      "path": "route",
+      "docs": 114424,
+      "coverage_pct": 82.89
+    },
+    {
+      "path": "spl_id",
+      "docs": 138046,
+      "coverage_pct": 100
+    }
+  ]
+}

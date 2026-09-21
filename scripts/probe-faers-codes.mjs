@@ -5,7 +5,7 @@
 import { readFileSync } from 'node:fs';
 
 const YAML = 'https://open.fda.gov/fields/drugevent.yaml';
-const source = readFileSync('src/drug/faers.ts', 'utf8');
+const source = readFileSync('src/datasets/drug/faers.ts', 'utf8');
 
 // Pull each map's literal entries out of the TypeScript source.
 const readMap = (name) => {

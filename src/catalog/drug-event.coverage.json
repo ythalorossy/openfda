@@ -1,0 +1,502 @@
+{
+  "endpoint": "event",
+  "measured_at": "2026-09-21T00:08:49.362Z",
+  "total_records": 20692690,
+  "fields": [
+    {
+      "path": "authoritynumb",
+      "docs": 1080737,
+      "coverage_pct": 5.22
+    },
+    {
+      "path": "companynumb",
+      "docs": 19237775,
+      "coverage_pct": 92.97
+    },
+    {
+      "path": "duplicate",
+      "docs": 12079406,
+      "coverage_pct": 58.38
+    },
+    {
+      "path": "fulfillexpeditecriteria",
+      "docs": 20692689,
+      "coverage_pct": 100
+    },
+    {
+      "path": "occurcountry",
+      "docs": 16701200,
+      "coverage_pct": 80.71
+    },
+    {
+      "path": "patient",
+      "docs": 20692690,
+      "coverage_pct": 100
+    },
+    {
+      "path": "patient.drug",
+      "docs": 20692690,
+      "coverage_pct": 100
+    },
+    {
+      "path": "patient.drug.actiondrug",
+      "docs": 15879584,
+      "coverage_pct": 76.74
+    },
+    {
+      "path": "patient.drug.activesubstance",
+      "docs": 16265493,
+      "coverage_pct": 78.61
+    },
+    {
+      "path": "patient.drug.activesubstance.activesubstancename",
+      "docs": 16265493,
+      "coverage_pct": 78.61
+    },
+    {
+      "path": "patient.drug.drugadditional",
+      "docs": 9496582,
+      "coverage_pct": 45.89
+    },
+    {
+      "path": "patient.drug.drugadministrationroute",
+      "docs": 16835342,
+      "coverage_pct": 81.36
+    },
+    {
+      "path": "patient.drug.drugauthorizationnumb",
+      "docs": 18187437,
+      "coverage_pct": 87.89
+    },
+    {
+      "path": "patient.drug.drugbatchnumb",
+      "docs": 7529970,
+      "coverage_pct": 36.39
+    },
+    {
+      "path": "patient.drug.drugcharacterization",
+      "docs": 20692690,
+      "coverage_pct": 100
+    },
+    {
+      "path": "patient.drug.drugcumulativedosagenumb",
+      "docs": 566967,
+      "coverage_pct": 2.74
+    },
+    {
+      "path": "patient.drug.drugcumulativedosageunit",
+      "docs": 562130,
+      "coverage_pct": 2.72
+    },
+    {
+      "path": "patient.drug.drugdosageform",
+      "docs": 12745283,
+      "coverage_pct": 61.59
+    },
+    {
+      "path": "patient.drug.drugdosagetext",
+      "docs": 14172889,
+      "coverage_pct": 68.49
+    },
+    {
+      "path": "patient.drug.drugenddate",
+      "docs": 5659451,
+      "coverage_pct": 27.35
+    },
+    {
+      "path": "patient.drug.drugenddateformat",
+      "docs": 5659451,
+      "coverage_pct": 27.35
+    },
+    {
+      "path": "patient.drug.drugindication",
+      "docs": 18542325,
+      "coverage_pct": 89.61
+    },
+    {
+      "path": "patient.drug.drugintervaldosagedefinition",
+      "docs": 7861642,
+      "coverage_pct": 37.99
+    },
+    {
+      "path": "patient.drug.drugintervaldosageunitnumb",
+      "docs": 7861816,
+      "coverage_pct": 37.99
+    },
+    {
+      "path": "patient.drug.drugrecurreadministration",
+      "docs": 4095118,
+      "coverage_pct": 19.79
+    },
+    {
+      "path": "patient.drug.drugrecurrence",
+      "docs": 34315,
+      "coverage_pct": 0.17
+    },
+    {
+      "path": "patient.drug.drugrecurrence.drugrecuraction",
+      "docs": 34315,
+      "coverage_pct": 0.17
+    },
+    {
+      "path": "patient.drug.drugrecurrence.drugrecuractionmeddraversion",
+      "docs": 841,
+      "coverage_pct": 0
+    },
+    {
+      "path": "patient.drug.drugseparatedosagenumb",
+      "docs": 8494664,
+      "coverage_pct": 41.05
+    },
+    {
+      "path": "patient.drug.drugstartdate",
+      "docs": 11017932,
+      "coverage_pct": 53.25
+    },
+    {
+      "path": "patient.drug.drugstartdateformat",
+      "docs": 11017932,
+      "coverage_pct": 53.25
+    },
+    {
+      "path": "patient.drug.drugstructuredosagenumb",
+      "docs": 10513715,
+      "coverage_pct": 50.81
+    },
+    {
+      "path": "patient.drug.drugstructuredosageunit",
+      "docs": 10496036,
+      "coverage_pct": 50.72
+    },
+    {
+      "path": "patient.drug.drugtreatmentduration",
+      "docs": 1413194,
+      "coverage_pct": 6.83
+    },
+    {
+      "path": "patient.drug.drugtreatmentdurationunit",
+      "docs": 1395789,
+      "coverage_pct": 6.75
+    },
+    {
+      "path": "patient.drug.medicinalproduct",
+      "docs": 20692690,
+      "coverage_pct": 100
+    },
+    {
+      "path": "patient.drug.openfda",
+      "docs": 18371131,
+      "coverage_pct": 88.78
+    },
+    {
+      "path": "patient.drug.openfda.application_number",
+      "docs": 18349812,
+      "coverage_pct": 88.68
+    },
+    {
+      "path": "patient.drug.openfda.brand_name",
+      "docs": 18371131,
+      "coverage_pct": 88.78
+    },
+    {
+      "path": "patient.drug.openfda.generic_name",
+      "docs": 18371131,
+      "coverage_pct": 88.78
+    },
+    {
+      "path": "patient.drug.openfda.manufacturer_name",
+      "docs": 18371131,
+      "coverage_pct": 88.78
+    },
+    {
+      "path": "patient.drug.openfda.nui",
+      "docs": 14077301,
+      "coverage_pct": 68.03
+    },
+    {
+      "path": "patient.drug.openfda.package_ndc",
+      "docs": 18371131,
+      "coverage_pct": 88.78
+    },
+    {
+      "path": "patient.drug.openfda.pharm_class_cs",
+      "docs": 6739037,
+      "coverage_pct": 32.57
+    },
+    {
+      "path": "patient.drug.openfda.pharm_class_epc",
+      "docs": 13870338,
+      "coverage_pct": 67.03
+    },
+    {
+      "path": "patient.drug.openfda.pharm_class_moa",
+      "docs": 10772678,
+      "coverage_pct": 52.06
+    },
+    {
+      "path": "patient.drug.openfda.pharm_class_pe",
+      "docs": 3983267,
+      "coverage_pct": 19.25
+    },
+    {
+      "path": "patient.drug.openfda.product_ndc",
+      "docs": 18371131,
+      "coverage_pct": 88.78
+    },
+    {
+      "path": "patient.drug.openfda.product_type",
+      "docs": 18371131,
+      "coverage_pct": 88.78
+    },
+    {
+      "path": "patient.drug.openfda.route",
+      "docs": 17747483,
+      "coverage_pct": 85.77
+    },
+    {
+      "path": "patient.drug.openfda.rxcui",
+      "docs": 18027233,
+      "coverage_pct": 87.12
+    },
+    {
+      "path": "patient.drug.openfda.spl_id",
+      "docs": 18371131,
+      "coverage_pct": 88.78
+    },
+    {
+      "path": "patient.drug.openfda.spl_set_id",
+      "docs": 18371131,
+      "coverage_pct": 88.78
+    },
+    {
+      "path": "patient.drug.openfda.substance_name",
+      "docs": 17734962,
+      "coverage_pct": 85.71
+    },
+    {
+      "path": "patient.drug.openfda.unii",
+      "docs": 17734383,
+      "coverage_pct": 85.7
+    },
+    {
+      "path": "patient.patientagegroup",
+      "docs": 3812716,
+      "coverage_pct": 18.43
+    },
+    {
+      "path": "patient.patientdeath",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "patient.patientdeath.patientdeathdate",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "patient.patientdeath.patientdeathdateformat",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "patient.patientonsetage",
+      "docs": 11715717,
+      "coverage_pct": 56.62
+    },
+    {
+      "path": "patient.patientonsetageunit",
+      "docs": 11702855,
+      "coverage_pct": 56.56
+    },
+    {
+      "path": "patient.patientsex",
+      "docs": 18178865,
+      "coverage_pct": 87.85
+    },
+    {
+      "path": "patient.patientweight",
+      "docs": 4108892,
+      "coverage_pct": 19.86
+    },
+    {
+      "path": "patient.reaction",
+      "docs": 20692690,
+      "coverage_pct": 100
+    },
+    {
+      "path": "patient.reaction.reactionmeddrapt",
+      "docs": 20692687,
+      "coverage_pct": 100
+    },
+    {
+      "path": "patient.reaction.reactionmeddraversionpt",
+      "docs": 17683855,
+      "coverage_pct": 85.46
+    },
+    {
+      "path": "patient.reaction.reactionoutcome",
+      "docs": 16519492,
+      "coverage_pct": 79.83
+    },
+    {
+      "path": "patient.summary",
+      "docs": 7678036,
+      "coverage_pct": 37.11
+    },
+    {
+      "path": "patient.summary.narrativeincludeclinical",
+      "docs": 7678036,
+      "coverage_pct": 37.11
+    },
+    {
+      "path": "primarysource",
+      "docs": 20596915,
+      "coverage_pct": 99.54
+    },
+    {
+      "path": "primarysource.literaturereference",
+      "docs": 1030627,
+      "coverage_pct": 4.98
+    },
+    {
+      "path": "primarysource.qualification",
+      "docs": 19943055,
+      "coverage_pct": 96.38
+    },
+    {
+      "path": "primarysource.reportercountry",
+      "docs": 20318945,
+      "coverage_pct": 98.19
+    },
+    {
+      "path": "primarysourcecountry",
+      "docs": 17448841,
+      "coverage_pct": 84.32
+    },
+    {
+      "path": "receiptdate",
+      "docs": 20692690,
+      "coverage_pct": 100
+    },
+    {
+      "path": "receiptdateformat",
+      "docs": 20533815,
+      "coverage_pct": 99.23
+    },
+    {
+      "path": "receivedate",
+      "docs": 20692690,
+      "coverage_pct": 100
+    },
+    {
+      "path": "receivedateformat",
+      "docs": 20532683,
+      "coverage_pct": 99.23
+    },
+    {
+      "path": "receiver",
+      "docs": 17683862,
+      "coverage_pct": 85.46
+    },
+    {
+      "path": "receiver.receiverorganization",
+      "docs": 17683862,
+      "coverage_pct": 85.46
+    },
+    {
+      "path": "receiver.receivertype",
+      "docs": 17683862,
+      "coverage_pct": 85.46
+    },
+    {
+      "path": "reportduplicate",
+      "docs": 12476365,
+      "coverage_pct": 60.29
+    },
+    {
+      "path": "reportduplicate.duplicatenumb",
+      "docs": 12072421,
+      "coverage_pct": 58.34
+    },
+    {
+      "path": "reportduplicate.duplicatesource",
+      "docs": 12464658,
+      "coverage_pct": 60.24
+    },
+    {
+      "path": "reporttype",
+      "docs": 17499574,
+      "coverage_pct": 84.57
+    },
+    {
+      "path": "safetyreportid",
+      "docs": 20692690,
+      "coverage_pct": 100
+    },
+    {
+      "path": "safetyreportversion",
+      "docs": 17683862,
+      "coverage_pct": 85.46
+    },
+    {
+      "path": "sender",
+      "docs": 20692690,
+      "coverage_pct": 100
+    },
+    {
+      "path": "sender.senderorganization",
+      "docs": 20692689,
+      "coverage_pct": 100
+    },
+    {
+      "path": "sender.sendertype",
+      "docs": 17659131,
+      "coverage_pct": 85.34
+    },
+    {
+      "path": "serious",
+      "docs": 20682701,
+      "coverage_pct": 99.95
+    },
+    {
+      "path": "seriousnesscongenitalanomali",
+      "docs": 6526034,
+      "coverage_pct": 31.54
+    },
+    {
+      "path": "seriousnessdeath",
+      "docs": 7845568,
+      "coverage_pct": 37.91
+    },
+    {
+      "path": "seriousnessdisabling",
+      "docs": 6756180,
+      "coverage_pct": 32.65
+    },
+    {
+      "path": "seriousnesshospitalization",
+      "docs": 9676369,
+      "coverage_pct": 46.76
+    },
+    {
+      "path": "seriousnesslifethreatening",
+      "docs": 6882148,
+      "coverage_pct": 33.26
+    },
+    {
+      "path": "seriousnessother",
+      "docs": 11528763,
+      "coverage_pct": 55.71
+    },
+    {
+      "path": "transmissiondate",
+      "docs": 20692690,
+      "coverage_pct": 100
+    },
+    {
+      "path": "transmissiondateformat",
+      "docs": 20692690,
+      "coverage_pct": 100
+    }
+  ]
+}

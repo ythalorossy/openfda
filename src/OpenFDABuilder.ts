@@ -5,21 +5,21 @@
 
 import { checkApiKey } from './utils/env.js';
 
-type DatasetType = 'drug';
-
-// The ContextType type defines the valid OpenFDA API contexts that can be used with the OpenFDABuilder.
-// These correspond to different OpenFDA drug endpoints, such as:
-//   - 'ndc': National Drug Code Directory
-//   - 'label': Drug Labeling
-//   - 'event': Adverse Event Reporting
-type ContextType = 'ndc' | 'label' | 'event' | 'drugsfda';
+/**
+ * Open by design: the dataset and endpoint come from an EndpointDescriptor,
+ * which is a closed compile-time set. Keeping them as string here is what lets
+ * a new API group be added as data rather than as a union member.
+ */
+type DatasetType = string;
+type EndpointType = string;
 
 /**
  * The OpenFDABuilder class helps construct URLs for the OpenFDA API.
  *
  * Usage:
- *   - Set the dataset (such as 'drugs') using the dataset() method.
- *   - Set the context (such as 'label', 'ndc', or 'event') using the context() method.
+ *   - Set the dataset (such as 'drug' or 'food') using the dataset() method.
+ *   - Set the endpoint (such as 'label', 'ndc', 'event' or 'enforcement') using
+ *     the endpoint() method.
  *   - Set the search query using the search() method.
  *   - Optionally set the result limit using the limit() method (default is 1).
  *   - Call build() to assemble and return the final API URL.
@@ -27,7 +27,7 @@ type ContextType = 'ndc' | 'label' | 'event' | 'drugsfda';
  * Example:
  *   const url = new OpenFDABuilder()
  *     .dataset('drug')
- *     .context('label')
+ *     .endpoint('label')
  *     .search('openfda.brand_name:"Advil"')
  *     .limit(1)
  *     .build();
@@ -44,8 +44,8 @@ export class OpenFDABuilder {
     return this;
   }
 
-  context(context: ContextType): this {
-    this.params.set('context', context);
+  endpoint(endpoint: EndpointType): this {
+    this.params.set('endpoint', endpoint);
     return this;
   }
 
@@ -79,12 +79,14 @@ export class OpenFDABuilder {
 
   build(): string {
     const dataset = this.params.get('dataset');
-    const context = this.params.get('context');
+    const endpoint = this.params.get('endpoint');
     const search = this.params.get('search');
     const limit = this.params.get('limit') ?? 1;
 
-    if (!dataset || !context || !search) {
-      throw new Error('Missing required parameters: context or search');
+    if (!dataset || !endpoint || !search) {
+      throw new Error(
+        'Missing required parameters: dataset, endpoint or search'
+      );
     }
 
     const status = checkApiKey();
@@ -101,6 +103,6 @@ export class OpenFDABuilder {
       if (value !== undefined) query.set(key, String(value));
     }
 
-    return `${this.urlBase}/${dataset}/${context}.json?${query}`;
+    return `${this.urlBase}/${dataset}/${endpoint}.json?${query}`;
   }
 }

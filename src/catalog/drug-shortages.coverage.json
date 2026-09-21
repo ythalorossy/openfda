@@ -1,0 +1,212 @@
+{
+  "endpoint": "shortages",
+  "measured_at": "2026-09-21T00:10:27.478Z",
+  "total_records": 1603,
+  "fields": [
+    {
+      "path": "availability",
+      "docs": 1153,
+      "coverage_pct": 71.93
+    },
+    {
+      "path": "change_date",
+      "docs": 11,
+      "coverage_pct": 0.69
+    },
+    {
+      "path": "company_name",
+      "docs": 1603,
+      "coverage_pct": 100
+    },
+    {
+      "path": "contact_info",
+      "docs": 1603,
+      "coverage_pct": 100
+    },
+    {
+      "path": "discontinued_date",
+      "docs": 443,
+      "coverage_pct": 27.64
+    },
+    {
+      "path": "dosage_form",
+      "docs": 1584,
+      "coverage_pct": 98.81
+    },
+    {
+      "path": "generic_name",
+      "docs": 1603,
+      "coverage_pct": 100
+    },
+    {
+      "path": "initial_posting_date",
+      "docs": 1603,
+      "coverage_pct": 100
+    },
+    {
+      "path": "openfda",
+      "docs": 1436,
+      "coverage_pct": 89.58
+    },
+    {
+      "path": "openfda.brand_name",
+      "docs": 1436,
+      "coverage_pct": 89.58
+    },
+    {
+      "path": "openfda.dosage_form",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "openfda.is_original_packager",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "openfda.manufacturer_name",
+      "docs": 1436,
+      "coverage_pct": 89.58
+    },
+    {
+      "path": "openfda.nui",
+      "docs": 362,
+      "coverage_pct": 22.58
+    },
+    {
+      "path": "openfda.original_packager_product_ndc",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "openfda.package_ndc",
+      "docs": 1436,
+      "coverage_pct": 89.58
+    },
+    {
+      "path": "openfda.pharm_class_cs",
+      "docs": 165,
+      "coverage_pct": 10.29
+    },
+    {
+      "path": "openfda.pharm_class_epc",
+      "docs": 361,
+      "coverage_pct": 22.52
+    },
+    {
+      "path": "openfda.pharm_class_moa",
+      "docs": 125,
+      "coverage_pct": 7.8
+    },
+    {
+      "path": "openfda.pharm_class_pe",
+      "docs": 93,
+      "coverage_pct": 5.8
+    },
+    {
+      "path": "openfda.product_ndc",
+      "docs": 1436,
+      "coverage_pct": 89.58
+    },
+    {
+      "path": "openfda.product_type",
+      "docs": 1436,
+      "coverage_pct": 89.58
+    },
+    {
+      "path": "openfda.route",
+      "docs": 1427,
+      "coverage_pct": 89.02
+    },
+    {
+      "path": "openfda.rxcui",
+      "docs": 1399,
+      "coverage_pct": 87.27
+    },
+    {
+      "path": "openfda.spl_id",
+      "docs": 1436,
+      "coverage_pct": 89.58
+    },
+    {
+      "path": "openfda.spl_set_id",
+      "docs": 1436,
+      "coverage_pct": 89.58
+    },
+    {
+      "path": "openfda.substance_name",
+      "docs": 1426,
+      "coverage_pct": 88.96
+    },
+    {
+      "path": "openfda.unii",
+      "docs": 1429,
+      "coverage_pct": 89.15
+    },
+    {
+      "path": "openfda.upc",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "package_ndc",
+      "docs": 1603,
+      "coverage_pct": 100
+    },
+    {
+      "path": "presentation",
+      "docs": 1603,
+      "coverage_pct": 100
+    },
+    {
+      "path": "proprietary_name",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "related_info",
+      "docs": 1103,
+      "coverage_pct": 68.81
+    },
+    {
+      "path": "related_info_link",
+      "docs": 35,
+      "coverage_pct": 2.18
+    },
+    {
+      "path": "resolved_note",
+      "docs": 6,
+      "coverage_pct": 0.37
+    },
+    {
+      "path": "shortage_reason",
+      "docs": 410,
+      "coverage_pct": 25.58
+    },
+    {
+      "path": "status",
+      "docs": 1603,
+      "coverage_pct": 100
+    },
+    {
+      "path": "strength",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "therapeutic_category",
+      "docs": 1603,
+      "coverage_pct": 100
+    },
+    {
+      "path": "update_date",
+      "docs": 1603,
+      "coverage_pct": 100
+    },
+    {
+      "path": "update_type",
+      "docs": 1603,
+      "coverage_pct": 100
+    }
+  ]
+}

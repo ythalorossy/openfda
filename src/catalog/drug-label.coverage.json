@@ -1,0 +1,1042 @@
+{
+  "endpoint": "label",
+  "measured_at": "2026-09-21T00:07:29.433Z",
+  "total_records": 262883,
+  "fields": [
+    {
+      "path": "abuse",
+      "docs": 7969,
+      "coverage_pct": 3.03
+    },
+    {
+      "path": "abuse_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "accessories",
+      "docs": 24,
+      "coverage_pct": 0.01
+    },
+    {
+      "path": "accessories_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "active_ingredient",
+      "docs": 161650,
+      "coverage_pct": 61.49
+    },
+    {
+      "path": "active_ingredient_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "adverse_reactions",
+      "docs": 91871,
+      "coverage_pct": 34.95
+    },
+    {
+      "path": "adverse_reactions_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "alarms",
+      "docs": 29,
+      "coverage_pct": 0.01
+    },
+    {
+      "path": "alarms_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "animal_pharmacology_and_or_toxicology",
+      "docs": 11146,
+      "coverage_pct": 4.24
+    },
+    {
+      "path": "animal_pharmacology_and_or_toxicology_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "ask_doctor",
+      "docs": 45477,
+      "coverage_pct": 17.3
+    },
+    {
+      "path": "ask_doctor_or_pharmacist",
+      "docs": 23035,
+      "coverage_pct": 8.76
+    },
+    {
+      "path": "ask_doctor_or_pharmacist_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "ask_doctor_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "assembly_or_installation_instructions",
+      "docs": 6,
+      "coverage_pct": 0
+    },
+    {
+      "path": "assembly_or_installation_instructions_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "boxed_warning",
+      "docs": 33173,
+      "coverage_pct": 12.62
+    },
+    {
+      "path": "boxed_warning_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "calibration_instructions",
+      "docs": 2,
+      "coverage_pct": 0
+    },
+    {
+      "path": "calibration_instructions_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "carcinogenesis_and_mutagenesis_and_impairment_of_fertility",
+      "docs": 62859,
+      "coverage_pct": 23.91
+    },
+    {
+      "path": "carcinogenesis_and_mutagenesis_and_impairment_of_fertility_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "cleaning",
+      "docs": 219,
+      "coverage_pct": 0.08
+    },
+    {
+      "path": "cleaning_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "clinical_pharmacology",
+      "docs": 88457,
+      "coverage_pct": 33.65
+    },
+    {
+      "path": "clinical_pharmacology_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "clinical_studies",
+      "docs": 46838,
+      "coverage_pct": 17.82
+    },
+    {
+      "path": "clinical_studies_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "compatible_accessories",
+      "docs": 8,
+      "coverage_pct": 0
+    },
+    {
+      "path": "compatible_accessories_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "components",
+      "docs": 4597,
+      "coverage_pct": 1.75
+    },
+    {
+      "path": "components_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "contraindications",
+      "docs": 89738,
+      "coverage_pct": 34.14
+    },
+    {
+      "path": "contraindications_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "controlled_substance",
+      "docs": 8405,
+      "coverage_pct": 3.2
+    },
+    {
+      "path": "controlled_substance_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "dependence",
+      "docs": 7491,
+      "coverage_pct": 2.85
+    },
+    {
+      "path": "dependence_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "description",
+      "docs": 95277,
+      "coverage_pct": 36.24
+    },
+    {
+      "path": "description_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "diagram_of_device",
+      "docs": 3,
+      "coverage_pct": 0
+    },
+    {
+      "path": "diagram_of_device_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "disposal_and_waste_handling",
+      "docs": 114,
+      "coverage_pct": 0.04
+    },
+    {
+      "path": "disposal_and_waste_handling_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "do_not_use",
+      "docs": 75745,
+      "coverage_pct": 28.81
+    },
+    {
+      "path": "do_not_use_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "dosage_and_administration",
+      "docs": 253017,
+      "coverage_pct": 96.25
+    },
+    {
+      "path": "dosage_and_administration_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "dosage_forms_and_strengths",
+      "docs": 43641,
+      "coverage_pct": 16.6
+    },
+    {
+      "path": "dosage_forms_and_strengths_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "drug_abuse_and_dependence",
+      "docs": 19145,
+      "coverage_pct": 7.28
+    },
+    {
+      "path": "drug_abuse_and_dependence_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "drug_and_or_laboratory_test_interactions",
+      "docs": 8467,
+      "coverage_pct": 3.22
+    },
+    {
+      "path": "drug_and_or_laboratory_test_interactions_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "drug_interactions",
+      "docs": 68766,
+      "coverage_pct": 26.16
+    },
+    {
+      "path": "drug_interactions_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "effective_time",
+      "docs": 262883,
+      "coverage_pct": 100
+    },
+    {
+      "path": "environmental_warning",
+      "docs": 31,
+      "coverage_pct": 0.01
+    },
+    {
+      "path": "environmental_warning_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "food_safety_warning",
+      "docs": 3,
+      "coverage_pct": 0
+    },
+    {
+      "path": "food_safety_warning_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "general_precautions",
+      "docs": 25764,
+      "coverage_pct": 9.8
+    },
+    {
+      "path": "general_precautions_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "geriatric_use",
+      "docs": 58721,
+      "coverage_pct": 22.34
+    },
+    {
+      "path": "geriatric_use_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "guaranteed_analysis_of_feed",
+      "docs": 3,
+      "coverage_pct": 0
+    },
+    {
+      "path": "guaranteed_analysis_of_feed_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "health_care_provider_letter",
+      "docs": 141,
+      "coverage_pct": 0.05
+    },
+    {
+      "path": "health_care_provider_letter_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "health_claim",
+      "docs": 235,
+      "coverage_pct": 0.09
+    },
+    {
+      "path": "health_claim_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "how_supplied",
+      "docs": 91042,
+      "coverage_pct": 34.63
+    },
+    {
+      "path": "how_supplied_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "id",
+      "docs": 262883,
+      "coverage_pct": 100
+    },
+    {
+      "path": "inactive_ingredient",
+      "docs": 167177,
+      "coverage_pct": 63.59
+    },
+    {
+      "path": "inactive_ingredient_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "indications_and_usage",
+      "docs": 253581,
+      "coverage_pct": 96.46
+    },
+    {
+      "path": "indications_and_usage_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "information_for_owners_or_caregivers",
+      "docs": 224,
+      "coverage_pct": 0.09
+    },
+    {
+      "path": "information_for_owners_or_caregivers_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "information_for_patients",
+      "docs": 67338,
+      "coverage_pct": 25.62
+    },
+    {
+      "path": "information_for_patients_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "instructions_for_use",
+      "docs": 6435,
+      "coverage_pct": 2.45
+    },
+    {
+      "path": "instructions_for_use_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "intended_use_of_the_device",
+      "docs": 250,
+      "coverage_pct": 0.1
+    },
+    {
+      "path": "intended_use_of_the_device_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "keep_out_of_reach_of_children",
+      "docs": 163831,
+      "coverage_pct": 62.32
+    },
+    {
+      "path": "keep_out_of_reach_of_children_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "labor_and_delivery",
+      "docs": 18107,
+      "coverage_pct": 6.89
+    },
+    {
+      "path": "labor_and_delivery_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "laboratory_tests",
+      "docs": 15617,
+      "coverage_pct": 5.94
+    },
+    {
+      "path": "laboratory_tests_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "mechanism_of_action",
+      "docs": 43585,
+      "coverage_pct": 16.58
+    },
+    {
+      "path": "mechanism_of_action_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.disclaimer",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.last_updated",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.license",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.results",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.results.limit",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.results.skip",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.results.total",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "meta.type",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "microbiology",
+      "docs": 5269,
+      "coverage_pct": 2
+    },
+    {
+      "path": "microbiology_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "nonclinical_toxicology",
+      "docs": 41849,
+      "coverage_pct": 15.92
+    },
+    {
+      "path": "nonclinical_toxicology_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "nonteratogenic_effects",
+      "docs": 5697,
+      "coverage_pct": 2.17
+    },
+    {
+      "path": "nonteratogenic_effects_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "nursing_mothers",
+      "docs": 48011,
+      "coverage_pct": 18.26
+    },
+    {
+      "path": "nursing_mothers_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "openfda",
+      "docs": 86994,
+      "coverage_pct": 33.09
+    },
+    {
+      "path": "openfda.application_number",
+      "docs": 75265,
+      "coverage_pct": 28.63
+    },
+    {
+      "path": "openfda.brand_name",
+      "docs": 86994,
+      "coverage_pct": 33.09
+    },
+    {
+      "path": "openfda.generic_name",
+      "docs": 86994,
+      "coverage_pct": 33.09
+    },
+    {
+      "path": "openfda.is_original_packager",
+      "docs": 65338,
+      "coverage_pct": 24.85
+    },
+    {
+      "path": "openfda.manufacturer_name",
+      "docs": 86994,
+      "coverage_pct": 33.09
+    },
+    {
+      "path": "openfda.nui",
+      "docs": 26452,
+      "coverage_pct": 10.06
+    },
+    {
+      "path": "openfda.original_packager_product_ndc",
+      "docs": 21656,
+      "coverage_pct": 8.24
+    },
+    {
+      "path": "openfda.package_ndc",
+      "docs": 86994,
+      "coverage_pct": 33.09
+    },
+    {
+      "path": "openfda.pharm_class_cs",
+      "docs": 14316,
+      "coverage_pct": 5.45
+    },
+    {
+      "path": "openfda.pharm_class_epc",
+      "docs": 24931,
+      "coverage_pct": 9.48
+    },
+    {
+      "path": "openfda.pharm_class_moa",
+      "docs": 11368,
+      "coverage_pct": 4.32
+    },
+    {
+      "path": "openfda.pharm_class_pe",
+      "docs": 11744,
+      "coverage_pct": 4.47
+    },
+    {
+      "path": "openfda.product_ndc",
+      "docs": 86994,
+      "coverage_pct": 33.09
+    },
+    {
+      "path": "openfda.product_type",
+      "docs": 86994,
+      "coverage_pct": 33.09
+    },
+    {
+      "path": "openfda.route",
+      "docs": 85725,
+      "coverage_pct": 32.61
+    },
+    {
+      "path": "openfda.rxcui",
+      "docs": 64660,
+      "coverage_pct": 24.6
+    },
+    {
+      "path": "openfda.spl_id",
+      "docs": 86994,
+      "coverage_pct": 33.09
+    },
+    {
+      "path": "openfda.spl_set_id",
+      "docs": 86994,
+      "coverage_pct": 33.09
+    },
+    {
+      "path": "openfda.substance_name",
+      "docs": 85371,
+      "coverage_pct": 32.47
+    },
+    {
+      "path": "openfda.unii",
+      "docs": 85363,
+      "coverage_pct": 32.47
+    },
+    {
+      "path": "openfda.upc",
+      "docs": 27739,
+      "coverage_pct": 10.55
+    },
+    {
+      "path": "other_safety_information",
+      "docs": 24546,
+      "coverage_pct": 9.34
+    },
+    {
+      "path": "other_safety_information_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "overdosage",
+      "docs": 84320,
+      "coverage_pct": 32.08
+    },
+    {
+      "path": "overdosage_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "package_label_principal_display_panel",
+      "docs": 262523,
+      "coverage_pct": 99.86
+    },
+    {
+      "path": "package_label_principal_display_panel_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "patient_medication_information",
+      "docs": 1372,
+      "coverage_pct": 0.52
+    },
+    {
+      "path": "patient_medication_information_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "pediatric_use",
+      "docs": 69143,
+      "coverage_pct": 26.3
+    },
+    {
+      "path": "pediatric_use_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "pharmacodynamics",
+      "docs": 32658,
+      "coverage_pct": 12.42
+    },
+    {
+      "path": "pharmacodynamics_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "pharmacogenomics",
+      "docs": 526,
+      "coverage_pct": 0.2
+    },
+    {
+      "path": "pharmacogenomics_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "pharmacokinetics",
+      "docs": 51120,
+      "coverage_pct": 19.45
+    },
+    {
+      "path": "pharmacokinetics_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "precautions",
+      "docs": 47170,
+      "coverage_pct": 17.94
+    },
+    {
+      "path": "precautions_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "pregnancy",
+      "docs": 69407,
+      "coverage_pct": 26.4
+    },
+    {
+      "path": "pregnancy_or_breast_feeding",
+      "docs": 41532,
+      "coverage_pct": 15.8
+    },
+    {
+      "path": "pregnancy_or_breast_feeding_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "pregnancy_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "purpose",
+      "docs": 164520,
+      "coverage_pct": 62.58
+    },
+    {
+      "path": "purpose_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "questions",
+      "docs": 76152,
+      "coverage_pct": 28.97
+    },
+    {
+      "path": "questions_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "recent_major_changes",
+      "docs": 24073,
+      "coverage_pct": 9.16
+    },
+    {
+      "path": "recent_major_changes_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "references",
+      "docs": 14581,
+      "coverage_pct": 5.55
+    },
+    {
+      "path": "references_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "residue_warning",
+      "docs": 1,
+      "coverage_pct": 0
+    },
+    {
+      "path": "residue_warning_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "risks",
+      "docs": 978,
+      "coverage_pct": 0.37
+    },
+    {
+      "path": "risks_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "route",
+      "docs": 886,
+      "coverage_pct": 0.34
+    },
+    {
+      "path": "route_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "safe_handling_warning",
+      "docs": 1021,
+      "coverage_pct": 0.39
+    },
+    {
+      "path": "safe_handling_warning_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "set_id",
+      "docs": 262883,
+      "coverage_pct": 100
+    },
+    {
+      "path": "spl_indexing_data_elements",
+      "docs": 82,
+      "coverage_pct": 0.03
+    },
+    {
+      "path": "spl_indexing_data_elements_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "spl_medguide",
+      "docs": 23084,
+      "coverage_pct": 8.78
+    },
+    {
+      "path": "spl_medguide_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "spl_patient_package_insert",
+      "docs": 12717,
+      "coverage_pct": 4.84
+    },
+    {
+      "path": "spl_patient_package_insert_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "spl_product_data_elements",
+      "docs": 262585,
+      "coverage_pct": 99.89
+    },
+    {
+      "path": "spl_product_data_elements_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "spl_unclassified_section",
+      "docs": 106963,
+      "coverage_pct": 40.69
+    },
+    {
+      "path": "spl_unclassified_section_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "statement_of_identity",
+      "docs": 257,
+      "coverage_pct": 0.1
+    },
+    {
+      "path": "statement_of_identity_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "stop_use",
+      "docs": 96785,
+      "coverage_pct": 36.82
+    },
+    {
+      "path": "stop_use_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "storage_and_handling",
+      "docs": 77769,
+      "coverage_pct": 29.58
+    },
+    {
+      "path": "storage_and_handling_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "summary_of_safety_and_effectiveness",
+      "docs": 34,
+      "coverage_pct": 0.01
+    },
+    {
+      "path": "summary_of_safety_and_effectiveness_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "teratogenic_effects",
+      "docs": 13951,
+      "coverage_pct": 5.31
+    },
+    {
+      "path": "teratogenic_effects_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "troubleshooting",
+      "docs": 30,
+      "coverage_pct": 0.01
+    },
+    {
+      "path": "troubleshooting_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "use_in_specific_populations",
+      "docs": 43489,
+      "coverage_pct": 16.54
+    },
+    {
+      "path": "use_in_specific_populations_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "user_safety_warnings",
+      "docs": 435,
+      "coverage_pct": 0.17
+    },
+    {
+      "path": "user_safety_warnings_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "version",
+      "docs": 262883,
+      "coverage_pct": 100
+    },
+    {
+      "path": "warnings",
+      "docs": 209069,
+      "coverage_pct": 79.53
+    },
+    {
+      "path": "warnings_and_cautions",
+      "docs": 47169,
+      "coverage_pct": 17.94
+    },
+    {
+      "path": "warnings_and_cautions_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "warnings_table",
+      "docs": 0,
+      "coverage_pct": 0
+    },
+    {
+      "path": "when_using",
+      "docs": 81832,
+      "coverage_pct": 31.13
+    },
+    {
+      "path": "when_using_table",
+      "docs": 0,
+      "coverage_pct": 0
+    }
+  ]
+}
