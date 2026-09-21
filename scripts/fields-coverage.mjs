@@ -12,6 +12,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 const ENDPOINTS = ['label', 'event', 'ndc', 'enforcement', 'drugsfda', 'orangebook', 'shortages'];
 const API_KEY = process.env.OPENFDA_API_KEY;
 const PAUSE_MS = 260; // stay under 240 req/min with a key
+const RETRY_DELAY_MS = 1000;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -27,18 +28,37 @@ async function total(endpoint, search) {
   return body?.meta?.results?.total ?? 0;
 }
 
+// A failed count is never recorded as 0 — that would be indistinguishable
+// from a field openFDA genuinely never populates, and a falsely-zeroed field
+// would be silently dropped when a later task selects fields from this data,
+// with no downstream check able to notice. One retry absorbs a single
+// transient blip (429/500/timeout); a second failure aborts the whole run
+// loudly rather than writing a coverage file that looks like real data.
+async function totalWithRetry(endpoint, search, path) {
+  try {
+    return await total(endpoint, search);
+  } catch (firstError) {
+    console.error(`  ${path}: ${firstError.message} — retrying once`);
+    await sleep(RETRY_DELAY_MS);
+    try {
+      return await total(endpoint, search);
+    } catch (secondError) {
+      console.error(
+        `drug-${endpoint}: aborting — ${path} failed twice (${secondError.message}). ` +
+          `No coverage file written for drug-${endpoint}.`
+      );
+      process.exit(1);
+    }
+  }
+}
+
 for (const endpoint of ENDPOINTS) {
   const catalog = JSON.parse(readFileSync(`src/catalog/drug-${endpoint}.json`, 'utf8'));
   const totalRecords = await total(endpoint, '');
   const fields = [];
   for (const field of catalog.fields) {
     await sleep(PAUSE_MS);
-    let docs = 0;
-    try {
-      docs = await total(endpoint, `_exists_:${field.path}`);
-    } catch (error) {
-      console.error(`  ${field.path}: ${error.message}`);
-    }
+    const docs = await totalWithRetry(endpoint, `_exists_:${field.path}`, field.path);
     fields.push({
       path: field.path,
       docs,

@@ -3,6 +3,23 @@ import { readFileSync, existsSync } from 'node:fs';
 
 const ENDPOINTS = ['label', 'event', 'ndc', 'enforcement', 'drugsfda', 'orangebook', 'shortages'];
 
+// A path that is genuinely present on nearly every record for its endpoint,
+// per the committed coverage data (each measured at 100% as of this writing).
+// Used as a floor to catch a run where a swallowed request failure silently
+// zeroed out every field — shape-only checks can't tell that apart from real
+// zero coverage, but this field can't legitimately fall anywhere near zero.
+// The floor is set well below 100% so ordinary upstream drift doesn't trip it.
+const KNOWN_POPULATED: Record<string, string> = {
+  label: 'id',
+  event: 'receivedate',
+  ndc: 'product_ndc',
+  enforcement: 'classification',
+  drugsfda: 'application_number',
+  orangebook: 'product_number',
+  shortages: 'generic_name',
+};
+const KNOWN_POPULATED_FLOOR_PCT = 90;
+
 describe('field coverage data', () => {
   for (const endpoint of ENDPOINTS) {
     const file = `src/catalog/drug-${endpoint}.coverage.json`;
@@ -27,6 +44,20 @@ describe('field coverage data', () => {
       const catalog = JSON.parse(readFileSync(`src/catalog/drug-${endpoint}.json`, 'utf8'));
       const known = new Set(catalog.fields.map((f: { path: string }) => f.path));
       for (const field of coverage.fields) expect(known.has(field.path)).toBe(true);
+    });
+
+    it(`${endpoint}: coverage values are not all zero`, () => {
+      const data = JSON.parse(readFileSync(file, 'utf8'));
+      const fields: Array<{ path: string; docs: number; coverage_pct: number }> = data.fields;
+      // Catches a run where every request silently failed and got recorded
+      // as a 0-coverage field — shape checks alone can't distinguish that
+      // from real (rare but legitimate) zero coverage on individual fields.
+      expect(fields.some((f) => f.docs > 0)).toBe(true);
+
+      const knownPath = KNOWN_POPULATED[endpoint];
+      const known = fields.find((f) => f.path === knownPath);
+      expect(known, `${knownPath} missing from ${file}`).toBeDefined();
+      expect(known!.coverage_pct).toBeGreaterThanOrEqual(KNOWN_POPULATED_FLOOR_PCT);
     });
   }
 });
