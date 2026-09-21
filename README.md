@@ -99,6 +99,22 @@ adding a row here, not rewriting the pattern.
   `state`, `voluntary_mandated`, `recalling_firm.exact`. `sort`:
   `report_date:desc`/`report_date:asc`/`recall_initiation_date:desc`.
   `limit` default 5, max 50.
+- **`drug-orangebook`** — Search the Orange Book: FDA-approved drug products
+  with their therapeutic-equivalence ratings. Almost all data lives in the
+  nested `products` array, which this tool flattens into one entry per
+  product. `field`: `products.brand_name`, `products.active_ingredients.name`,
+  `products.application_number`, `products.application_type`,
+  `products.application_full_name`, `products.application_name`,
+  `products.therapeutic_equivalence_codes`, `products.reference_listed_drug`,
+  `products.reference_standard`, `products.dosage_form`, `products.route`,
+  `approval_date`. `detail`: `summary` (default; `approval_date`,
+  `product_number` and the flattened `products` array —
+  `reference_listed_drug` and `reference_standard` are booleans always
+  returned, `false` a fact rather than a missing value), `full` (raw
+  upstream record). `count`: `products.application_type`,
+  `products.dosage_form`, `products.route`,
+  `products.therapeutic_equivalence_codes`. `sort`:
+  `approval_date:desc`/`approval_date:asc`. `limit` default 5, max 50.
 
 Every tool reports `matched_via` (which field path actually matched) and a
 `total` that is the upstream match count, not the number of records
@@ -152,7 +168,8 @@ many.
                   "drug-event",
                   "drug-drugsfda",
                   "drug-ndc",
-                  "drug-enforcement"
+                  "drug-enforcement",
+                  "drug-orangebook"
               ]
           }
       }
