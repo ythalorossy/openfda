@@ -29,7 +29,7 @@ const PATHS: Array<[name: string, description: string]> = [
   ['package_ndc', 'package NDC of the affected presentation'],
   ['openfda.product_ndc', 'product NDC; sparse ~90%'],
   ['presentation', 'specific affected package or strength'],
-  ['status', 'Shortage / Resolved / Discontinued'],
+  ['status', 'Current, To Be Discontinued or Resolved'],
   ['therapeutic_category', 'clinical category, e.g. Anti-Infective'],
   ['dosage_form', 'e.g. ORAL SUSPENSION, INJECTION'],
   ['update_type', 'kind of change this record represents'],
