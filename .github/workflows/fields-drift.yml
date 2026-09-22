@@ -64,6 +64,28 @@ jobs:
           OPENFDA_API_KEY: ${{ secrets.OPENFDA_API_KEY }}
         run: npm run probe:fields
 
+      - name: Declared count fields are still aggregatable
+        env:
+          OPENFDA_API_KEY: ${{ secrets.OPENFDA_API_KEY }}
+        run: npm run fields:countable
+
+      - name: Countability has not drifted
+        run: |
+          for f in src/catalog/*.countable.json; do
+            node -e '
+              const { execSync } = require("child_process");
+              const file = process.argv[1];
+              const now = JSON.parse(require("fs").readFileSync(file, "utf8")).countable;
+              const before = JSON.parse(execSync(`git show HEAD:${file}`).toString()).countable;
+              const changed = Object.keys({ ...now, ...before })
+                .filter((k) => now[k] !== before[k]);
+              if (changed.length) {
+                console.log(`${file}: countability changed for ${changed.join(", ")}`);
+                process.exit(3);
+              }
+            ' "$f"
+          done
+
       - name: Open an issue on drift
         if: failure() || steps.diff.outputs.changed == '1'
         uses: actions/github-script@v7
@@ -82,10 +104,12 @@ jobs:
                 '- FDA changed or removed a field this server exposes, so a `field` value now matches nothing.',
                 '- A field is still published but no longer populated, which looks identical to absent data.',
                 '- openFDA was simply unavailable. Re-run the job before investigating.',
+                '- openFDA remapped a field\'s index, so a declared count field is no longer aggregatable.',
                 '',
                 `Run: ${run}`,
                 '',
                 'To fix: `npm run fields:sync`, then `npm run probe:fields`, then remove or replace any',
                 'failing path in `src/datasets/drug/*.ts` and note it in the field-selection note.',
+                'Also run `npm run fields:countable` and correct any count field it reports as broken.',
               ].join('\n'),
             });

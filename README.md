@@ -119,9 +119,12 @@ adding a row here, not rewriting the pattern.
   `products.dosage_form.exact`, `products.route.exact`,
   `products.therapeutic_equivalence_codes`. `sort`:
   `approval_date:desc`/`approval_date:asc`. `limit` default 5, max 50.
-- **`drug-shortages`** — Search FDA drug shortage reports. `status`
-  distinguishes a current shortage from a resolved one, so a product
-  appearing here is not necessarily short now. openFDA sends an empty
+- **`drug-shortages`** — Search FDA drug shortage reports. `status` is one of
+  three values, live-verified 2026-09-21: `Current` (1153 records),
+  `To Be Discontinued` (443), or `Resolved` (7) — a product appearing here is
+  not necessarily short now, and `To Be Discontinued` is neither "current"
+  nor "resolved" but the larger of the two non-`Current` states. openFDA
+  sends an empty
   string, not `null`, for an absent date on this endpoint; this tool
   normalises those to `null`. `field`: `generic_name` (default),
   `company_name`, `openfda.manufacturer_name`, `openfda.brand_name`,
@@ -136,12 +139,27 @@ adding a row here, not rewriting the pattern.
   percentage here represents far fewer records than the same percentage
   elsewhere.
 
-Every tool reports `matched_via` (which field path actually matched) and a
-`total` that is the upstream match count, not the number of records
-returned. A search that matches nothing returns a plain no-results message,
-not an error. Every response is capped at 60,000 characters; if a result set
-would exceed that, trailing records are dropped and the response says how
-many.
+Every tool's response envelope carries `matched_via` (which field path
+actually matched), `total` (the upstream match count, not the number of
+records returned), `limit`, `dropped_for_budget` (how many rows were dropped
+to stay within the 60,000-character response budget — `0` when none were,
+never omitted) and `next_skip` (the offset to resume paging from; `null`
+when the result set is exhausted or the next offset would exceed
+`SKIP_MAX`). **Page by `next_skip`, not `skip + limit`** — the budget can
+drop trailing rows, so `skip + limit` silently steps over exactly the rows
+that were dropped. A search that matches nothing returns a plain no-results
+message, not an error.
+
+`limit` means two different things depending on whether `count` is set: for
+a record search it caps rows returned, capped at that tool's `max` below;
+for an aggregation it caps buckets, defaulting to 100 (openFDA's own bucket
+ceiling) when omitted. This is an asymmetry on every tool except
+`drug-drugsfda` (whose record max is already 100): omitting `limit` under
+`count` can return up to 100 buckets, but an explicit `limit` is still
+rejected above the tool's record max — so a caller can *receive* more
+buckets than it can *explicitly request*. Record maxes: `drug-label` 25,
+`drug-event` 50, `drug-drugsfda` 100, `drug-ndc` 50, `drug-enforcement` 50,
+`drug-orangebook` 50, `drug-shortages` 50.
 
 > **Route vocabularies differ across tools.** `drug-label`'s `route` field
 > (`openfda.route`, the SPL route of administration) and `drug-drugsfda`'s
