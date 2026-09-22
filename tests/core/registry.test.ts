@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 import { buildDescription, buildInputSchema, toToolDefinition } from '../../src/core/registry';
 import { RESERVED_PARAM_NAMES, type EndpointDescriptor } from '../../src/core/descriptor';
+import { COUNT_BUCKET_DEFAULT } from '../../src/core/executor';
 
 const descriptor: EndpointDescriptor = {
   dataset: 'drug',
@@ -77,7 +78,7 @@ describe('buildInputSchema', () => {
     // .describe() and applied in execute() instead.
     const parsed = schema.parse({ value: 'Advil' });
     expect(parsed.limit).toBeUndefined();
-    expect(schema.shape.limit.description).toContain('100');
+    expect(schema.shape.limit.description).toContain(String(COUNT_BUCKET_DEFAULT));
   });
 
   it('rejects a field outside the enum', () => {
@@ -95,6 +96,16 @@ describe('buildInputSchema', () => {
 
   it('enforces the endpoint limit ceiling', () => {
     expect(() => schema.parse({ value: 'Advil', limit: 26 })).toThrow();
+  });
+
+  it('known, accepted asymmetry: an explicit limit under count is still rejected above the record ceiling, even though the unset bucket default (100) exceeds it', () => {
+    // Documented in docs/superpowers/specs/2026-09-21-2.0.1-count-and-paging-design.md
+    // ("Known asymmetry, documented not fixed"): lifting this cap only under
+    // count would need a second always-loaded schema parameter, rejected
+    // against the schema-budget ceiling. This pins the current, intentional
+    // behaviour so a future change to it is a deliberate decision, not a
+    // silent drift.
+    expect(() => schema.parse({ value: 'Advil', count: 'openfda.route', limit: 50 })).toThrow();
   });
 
   it('enforces openFDA skip ceiling', () => {

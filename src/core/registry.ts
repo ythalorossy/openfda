@@ -74,7 +74,8 @@ export function buildDescription(descriptor: EndpointDescriptor): string {
     `Always returns ${ENVELOPE_FIELDS.join(', ')}; total is the upstream match count, not the number returned. ` +
     `detail selects the record shape: ${details}` +
     `${counting}${sorting} ` +
-    `Limit max ${descriptor.limits.max} (default ${descriptor.limits.default}); skip max ${SKIP_MAX}.`
+    `Limit max ${descriptor.limits.max} (default ${descriptor.limits.default}); ` +
+    `with count set, ${COUNT_BUCKET_DEFAULT} buckets unless limit is given; skip max ${SKIP_MAX}.`
   );
 }
 
