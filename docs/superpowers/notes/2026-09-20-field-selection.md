@@ -363,7 +363,7 @@ describe one drug at different pack sizes.
 | `openfda.substance_name` | 88.96 | the active moiety; the structured substance search, standing in for the seeded `openfda.generic_name` (see below) |
 | `package_ndc` | 100 | the package NDC of the affected presentation; the precise "is this exact pack short?" lookup |
 | `openfda.product_ndc` | 89.58 | the product-level NDC, which matches a drug across all its pack sizes where `package_ndc` matches only one; also the join into `drug-ndc` and `drug-label` |
-| `status` | 100 | current / resolved / discontinued. The single most important field here — a resolved shortage is history, a current one is an operational problem |
+| `status` | 100 | Current, To Be Discontinued or Resolved (corrected 2.0.1). The single most important field here — a resolved shortage is history, a current one is an operational problem |
 | `therapeutic_category` | 100 | the clinical category of the drug; supports "what is short in oncology" without naming a drug |
 | `dosage_form` | 98.81 | dosage form; injectables dominate shortages, so this is a meaningful cut |
 | `update_type` | 100 | what kind of change the record represents |
