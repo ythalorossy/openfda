@@ -7,10 +7,11 @@ import type { EndpointDescriptor } from './descriptor.js';
 import { validateDescriptor } from './descriptor.js';
 import {
   execute,
-  SKIP_MAX,
+  COUNT_BUCKET_DEFAULT,
   type ExecuteInput,
   type McpResult,
 } from './executor.js';
+import { SKIP_MAX } from './paging.js';
 import type { ToolManager } from '../ToolManager.js';
 
 /** Keys every endpoint's record response carries. */
@@ -19,6 +20,8 @@ export const ENVELOPE_FIELDS = [
   'total',
   'returned',
   'limit',
+  'dropped_for_budget',
+  'next_skip',
   'results',
 ] as const;
 
@@ -68,12 +71,22 @@ export function buildDescription(descriptor: EndpointDescriptor): string {
       ? ` Order with sort (${descriptor.sortFields.join(', ')}); default order is a deterministic slice.`
       : '';
 
+  // Gated the same way `counting` above is: a descriptor with no
+  // countFields gets no `count` parameter at all (see buildInputSchema), so
+  // this tool has no bucket mode for the always-loaded description to
+  // describe.
+  const countLimit =
+    descriptor.countFields.length > 0
+      ? `with count set, ${COUNT_BUCKET_DEFAULT} buckets unless limit is given; `
+      : '';
+
   return (
     `${descriptor.summary} Search one field at a time: field + value. ` +
     `Always returns ${ENVELOPE_FIELDS.join(', ')}; total is the upstream match count, not the number returned. ` +
     `detail selects the record shape: ${details}` +
     `${counting}${sorting} ` +
-    `Limit max ${descriptor.limits.max} (default ${descriptor.limits.default}); skip max ${SKIP_MAX}.`
+    `Limit max ${descriptor.limits.max} (default ${descriptor.limits.default}); ` +
+    `${countLimit}skip max ${SKIP_MAX}.`
   );
 }
 
@@ -99,14 +112,27 @@ export function buildInputSchema(
       .default(descriptor.defaultField ?? fieldNames[0]!)
       .describe(`Field: ${fieldList}`),
     value: z.string().min(1).describe('Search value.'),
+    // No .default(): `execute` must be able to tell an explicit limit from
+    // an absent one, because `count` needs its own ceiling. openFDA counts
+    // buckets with the same `limit` parameter it pages records with, and the
+    // two want different defaults — drug-label's record default of 1 turned
+    // every aggregation into a single bucket.
     limit: z
       .number()
       .int()
       .min(1)
       .max(descriptor.limits.max)
       .optional()
-      .default(descriptor.limits.default)
-      .describe('Max records to return.'),
+      // Gated exactly as `counting` and `countLimit` in buildDescription
+      // are, and for the same reason: a descriptor with no countFields gets
+      // no `count` parameter below, so advertising a bucket mode on its
+      // `limit` describes a mode this tool does not have.
+      .describe(
+        `Max records to return (default ${descriptor.limits.default})` +
+          (descriptor.countFields.length > 0
+            ? `; with count set, caps buckets instead (default ${COUNT_BUCKET_DEFAULT}).`
+            : '.')
+      ),
     skip: z
       .number()
       .int()

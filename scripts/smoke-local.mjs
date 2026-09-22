@@ -208,6 +208,97 @@ const run = async () => {
     ]);
   }
 
+  // The live proof of the count fix. At 2.0.0, 14 of the 30 declared count
+  // fields passed schema validation and failed at the API, and no offline
+  // test could see it — a green unit suite over stubs is exactly what let
+  // them ship. This drives every declared count field of every tool over
+  // stdio against the live API.
+  {
+    const COUNT_FIELDS = [
+      ['drug-label', 'Advil', ['openfda.route.exact', 'openfda.product_type.exact', 'openfda.manufacturer_name.exact']],
+      ['drug-event', 'IBUPROFEN', ['patient.reaction.reactionmeddrapt.exact', 'patient.reaction.reactionoutcome', 'serious', 'patient.patientsex', 'occurcountry.exact', 'patient.drug.openfda.generic_name.exact']],
+      ['drug-drugsfda', 'Advil', ['sponsor_name', 'products.marketing_status', 'products.dosage_form.exact']],
+      ['drug-ndc', 'ibuprofen', ['dosage_form.exact', 'route.exact', 'product_type.exact', 'marketing_category', 'openfda.manufacturer_name.exact']],
+      ['drug-enforcement', 'valsartan', ['classification.exact', 'status.exact', 'state.exact', 'voluntary_mandated.exact', 'recalling_firm.exact']],
+      ['drug-orangebook', 'ibuprofen', ['products.application_type', 'products.dosage_form.exact', 'products.route.exact', 'products.therapeutic_equivalence_codes']],
+      ['drug-shortages', 'Dextrose', ['status', 'dosage_form.exact', 'therapeutic_category', 'company_name.exact']],
+    ];
+    for (const [tool, value, fields] of COUNT_FIELDS) {
+      for (const count of fields) {
+        const { text, isError } = await call(tool, { value, count });
+        const payload = parsePayload(text);
+        show(`${tool} count=${count} -> aggregates`, text, [
+          ['is not an error', !isError],
+          ['does not read as an outage', !/experiencing issues/.test(text)],
+          ['does not read as a rejected argument', !/Cannot aggregate/.test(text)],
+          ['reports what it counted by', payload !== undefined && payload.counted_by === count],
+          ['reports the bucket ceiling', payload !== undefined && typeof payload.limit === 'number'],
+        ]);
+      }
+    }
+  }
+
+  // Defect 3: limit is the RECORD ceiling, and openFDA reuses the same
+  // parameter for buckets. drug-label's record default of 1 returned a
+  // single bucket under a "Top 1 values" header; the reported Advil case is
+  // six manufacturers summing to 39.
+  {
+    const { text, isError } = await call('drug-label', {
+      value: 'Advil',
+      count: 'openfda.manufacturer_name.exact',
+    });
+    const payload = parsePayload(text);
+    show('drug-label count with no limit -> more than one bucket', text, [
+      ['is not an error', !isError],
+      ['returns more than one bucket', payload !== undefined && payload.results.length > 1],
+      ['does not claim "Top 1 values"', !/Top 1 values/.test(text)],
+      ['bucket ceiling defaulted to 100', payload !== undefined && payload.limit === 100],
+    ]);
+  }
+
+  // Defect 1: skip += limit steps over rows the response budget dropped.
+  // drug-enforcement at limit 50 is the case that actually drops rows, so
+  // it is the one that proves next_skip is both present and not equal to
+  // skip + limit.
+  {
+    const { text, isError } = await call('drug-enforcement', {
+      value: 'valsartan',
+      limit: 50,
+    });
+    const payload = parsePayload(text);
+    show('drug-enforcement paging -> next_skip is sound', text, [
+      ['is not an error', !isError],
+      ['carries next_skip', payload !== undefined && 'next_skip' in payload],
+      ['carries dropped_for_budget', payload !== undefined && 'dropped_for_budget' in payload],
+      [
+        'next_skip equals returned, not limit',
+        payload !== undefined &&
+          (payload.next_skip === null || payload.next_skip === payload.returned),
+      ],
+      [
+        'drop count agrees with returned',
+        payload !== undefined &&
+          payload.returned + payload.dropped_for_budget <= 50,
+      ],
+    ]);
+  }
+
+  // Defect 6: the field description advertised Shortage / Resolved /
+  // Discontinued. A model filtering on those found nothing and could not
+  // tell that from a product genuinely not being short.
+  {
+    const { text, isError } = await call('drug-shortages', {
+      field: 'status',
+      value: 'Current',
+    });
+    const payload = parsePayload(text);
+    show('drug-shortages status=Current -> real records', text, [
+      ['is not an error', !isError],
+      ['found records', payload !== undefined && payload.returned > 0],
+      ['did not read as no-results', !/No drug-shortages records found/i.test(text)],
+    ]);
+  }
+
   console.log(`\nDone. ${failures} check(s) failed.\n`);
   child.kill();
   process.exit(failures > 0 ? 1 : 0);

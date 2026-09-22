@@ -131,9 +131,9 @@ export const drugNdc: EndpointDescriptor = {
   ],
   sortFields: [],
   countFields: [
-    'dosage_form',
-    'route',
-    'product_type',
+    'dosage_form.exact',
+    'route.exact',
+    'product_type.exact',
     'marketing_category',
     'openfda.manufacturer_name.exact',
   ],

@@ -82,4 +82,53 @@ describe('fetchPage', () => {
     expect(stub.calls[0]).toContain('sort=receivedate%3Adesc');
     expect(stub.calls[0]).toContain('count=patient.reaction.reactionmeddrapt.exact');
   });
+
+  it('classifies an illegal_argument_exception 500 as a bad request, not an outage', async () => {
+    // openFDA's verbatim answer to `count=<text-mapped field>`, verified
+    // live 2026-09-21. Reported as an outage, it sends a caller to look at
+    // openFDA's status page for a defect in their own argument.
+    const details =
+      '[illegal_argument_exception] Text fields are not optimised for operations that ' +
+      'require per-document field data like aggregations and sorting, so these operations ' +
+      'are disabled by default. Please use a keyword field instead.';
+    const stub = stubFetchResponses([
+      {
+        status: 500,
+        body: { error: { code: 'SERVER_ERROR', message: 'Check your request and try again', details } },
+      },
+    ]);
+    restore = stub.restore;
+    const outcome = await fetchPage(request);
+    expect(outcome.kind).toBe('bad_request');
+    if (outcome.kind === 'bad_request') {
+      expect(outcome.detail).toContain('keyword field');
+    }
+  }, 20000);
+
+  it('classifies a 404 "Nothing to count" as a bad request, not a miss', async () => {
+    // The second way openFDA rejects an aggregation path. isNoMatches sees
+    // NOT_FOUND and calls it a miss, so this presented as "no records
+    // found" for a drug that has records — a phantom empty dataset.
+    const stub = stubFetchResponses([
+      { status: 404, body: { error: { code: 'NOT_FOUND', message: 'Nothing to count' } } },
+    ]);
+    restore = stub.restore;
+    const outcome = await fetchPage({ ...request, count: 'sponsor_name.exact' });
+    expect(outcome.kind).toBe('bad_request');
+    if (outcome.kind === 'bad_request') {
+      expect(outcome.detail).toContain('Nothing to count');
+    }
+  });
+
+  it('keeps a zero-match 404 a MISS even when counting', async () => {
+    // The negative case that makes the discriminator safe: openFDA says
+    // "No matches found!" for an empty result set whether or not count is
+    // set. Misreading this as a bad request would turn every legitimately
+    // empty aggregation into an error.
+    const stub = stubFetchResponses([
+      { status: 404, body: { error: { code: 'NOT_FOUND', message: 'No matches found!' } } },
+    ]);
+    restore = stub.restore;
+    expect((await fetchPage({ ...request, count: 'openfda.route.exact' })).kind).toBe('miss');
+  });
 });

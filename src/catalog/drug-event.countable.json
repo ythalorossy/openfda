@@ -1,0 +1,18 @@
+{
+  "endpoint": "event",
+  "probed_at": "2026-09-21T23:11:57.200Z",
+  "countable": {
+    "occurcountry": false,
+    "occurcountry.exact": true,
+    "patient.drug.openfda.generic_name": false,
+    "patient.drug.openfda.generic_name.exact": true,
+    "patient.patientsex": true,
+    "patient.patientsex.exact": false,
+    "patient.reaction.reactionmeddrapt": false,
+    "patient.reaction.reactionmeddrapt.exact": true,
+    "patient.reaction.reactionoutcome": true,
+    "patient.reaction.reactionoutcome.exact": false,
+    "serious": true,
+    "serious.exact": false
+  }
+}

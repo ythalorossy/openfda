@@ -30,4 +30,23 @@ describe('fitToBudget', () => {
     expect(MAX_RESPONSE_CHARS).toBeLessThan(71393);
     expect(MAX_RESPONSE_CHARS).toBeGreaterThan(10000);
   });
+
+  it('hands the render function a drop count that matches what it reports', () => {
+    // dropped_for_budget is computed per candidate slice inside render,
+    // because fitToBudget only knows the final drop count after it has
+    // finished shrinking. Computing it afterwards would mean every
+    // intermediate render measured a payload the caller never receives.
+    const rows = [{ t: 'x'.repeat(40) }, { t: 'y'.repeat(40) }, { t: 'z'.repeat(40) }];
+    const seen: number[] = [];
+    const result = fitToBudget(
+      rows,
+      (kept) => {
+        seen.push(rows.length - kept.length);
+        return JSON.stringify(kept);
+      },
+      60
+    );
+    expect(result.dropped).toBe(rows.length - result.kept);
+    expect(seen.at(-1)).toBe(result.dropped);
+  });
 });

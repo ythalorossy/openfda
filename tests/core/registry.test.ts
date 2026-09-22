@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 import { buildDescription, buildInputSchema, toToolDefinition } from '../../src/core/registry';
 import { RESERVED_PARAM_NAMES, type EndpointDescriptor } from '../../src/core/descriptor';
+import { COUNT_BUCKET_DEFAULT } from '../../src/core/executor';
 
 const descriptor: EndpointDescriptor = {
   dataset: 'drug',
@@ -43,7 +44,15 @@ describe('buildDescription', () => {
 
   it('names the envelope keys it always returns', () => {
     const description = buildDescription(descriptor);
-    for (const key of ['matched_via', 'total', 'returned', 'limit', 'results']) {
+    for (const key of [
+      'matched_via',
+      'total',
+      'returned',
+      'limit',
+      'dropped_for_budget',
+      'next_skip',
+      'results',
+    ]) {
       expect(description).toContain(key);
     }
   });
@@ -59,6 +68,20 @@ describe('buildDescription', () => {
     // top of the field parameter blew the per-tool budget.
     expect(description).not.toContain('drug_name');
   });
+
+  it('omits the count-mode bucket clause for a descriptor with no countFields', () => {
+    // The bucket-default clause must be gated the same way `counting` (the
+    // "Set count to rank by frequency..." sentence) and the `count`
+    // parameter itself are: a descriptor with no countFields has no count
+    // mode at all, so advertising a bucket default for it would tell the
+    // same false story Finding 2 fixed, just inverted.
+    const description = buildDescription({ ...descriptor, countFields: [] });
+    expect(description).not.toContain('buckets');
+    expect(description).not.toContain('with count set');
+    // The limit and skip text must still be present, unconditionally.
+    expect(description).toContain(`Limit max ${descriptor.limits.max}`);
+    expect(description).toContain('skip max');
+  });
 });
 
 describe('buildInputSchema', () => {
@@ -68,7 +91,16 @@ describe('buildInputSchema', () => {
     const parsed = schema.parse({ value: 'Advil' });
     expect(parsed.field).toBe('drug_name');
     expect(parsed.detail).toBe('summary');
-    expect(parsed.limit).toBe(1);
+  });
+
+  it('leaves limit absent so the executor can tell records from buckets', () => {
+    // A Zod .default() here made input.limit always populated, so `count`
+    // could not be given its own ceiling: drug-label's record default of 1
+    // became a one-bucket aggregation. The default is documented in
+    // .describe() and applied in execute() instead.
+    const parsed = schema.parse({ value: 'Advil' });
+    expect(parsed.limit).toBeUndefined();
+    expect(schema.shape.limit.description).toContain(String(COUNT_BUCKET_DEFAULT));
   });
 
   it('rejects a field outside the enum', () => {
@@ -88,6 +120,18 @@ describe('buildInputSchema', () => {
     expect(() => schema.parse({ value: 'Advil', limit: 26 })).toThrow();
   });
 
+  it('known, accepted asymmetry: an explicit limit under count is still rejected above the record ceiling, even though the unset bucket default (100) exceeds it', () => {
+    // Documented in docs/superpowers/specs/2026-09-21-2.0.1-count-and-paging-design.md
+    // ("Known asymmetry, documented not fixed", plus its 2026-09-21
+    // addendum): the asymmetry is parked because the default path is already
+    // the good one — NOT because the alternative was priced and refused.
+    // Enforcing the record cap as a cross-field check in execute() would
+    // need no second schema parameter and cost no always-loaded budget. This
+    // pins the current, intentional behaviour so a future change to it is a
+    // deliberate decision, not a silent drift.
+    expect(() => schema.parse({ value: 'Advil', count: 'openfda.route', limit: 50 })).toThrow();
+  });
+
   it('enforces openFDA skip ceiling', () => {
     expect(() => schema.parse({ value: 'Advil', skip: 25001 })).toThrow();
   });
@@ -96,6 +140,19 @@ describe('buildInputSchema', () => {
     const bare = buildInputSchema({ ...descriptor, sortFields: [], countFields: [] });
     expect('sort' in bare.shape).toBe(false);
     expect('count' in bare.shape).toBe(false);
+  });
+
+  it("omits the bucket mode from limit's own description when there are no countFields", () => {
+    // buildDescription's bucket clause was gated on countFields but this
+    // one was not, so a tool with no `count` parameter still advertised a
+    // count mode on the parameter a caller actually reads — the same false
+    // story, one parameter further down.
+    const bare = buildInputSchema({ ...descriptor, countFields: [] });
+    const described = bare.shape.limit!.description ?? '';
+    expect(described).toContain(`default ${descriptor.limits.default}`);
+    expect(described).not.toContain('buckets');
+    expect(described).not.toContain('count');
+    expect(described).not.toContain(String(COUNT_BUCKET_DEFAULT));
   });
 });
 

@@ -1,0 +1,14 @@
+{
+  "endpoint": "shortages",
+  "probed_at": "2026-09-21T23:12:16.701Z",
+  "countable": {
+    "company_name": false,
+    "company_name.exact": true,
+    "dosage_form": false,
+    "dosage_form.exact": true,
+    "status": true,
+    "status.exact": false,
+    "therapeutic_category": true,
+    "therapeutic_category.exact": false
+  }
+}

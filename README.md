@@ -23,8 +23,9 @@ adding a row here, not rewriting the pattern.
   present, empty if absent), `safety` (warnings, contraindications,
   interactions and overdosage — see the migration table below for the 1.x
   tool this replaces), `full` (the raw upstream record). `count`:
-  `openfda.route`,
-  `openfda.product_type`, `openfda.manufacturer_name.exact`. `limit` default
+  `openfda.route.exact`,
+  `openfda.product_type.exact`, `openfda.manufacturer_name.exact`. `sort`:
+  `effective_time:desc`/`effective_time:asc`. `limit` default
   1, max 25.
 - **`drug-event`** — Search FAERS adverse event reports (voluntarily
   submitted side-effect reports; not evidence of causation). `field`:
@@ -66,7 +67,7 @@ adding a row here, not rewriting the pattern.
   `te_code`, `null` when absent — plus a `submission_count`, with no
   `submissions` array), `full` (adds `submissions`, capped at 10 per record,
   plus `submissions_truncated` when more were omitted). `count`:
-  `sponsor_name.exact`, `products.marketing_status`, `products.dosage_form`.
+  `sponsor_name`, `products.marketing_status`, `products.dosage_form.exact`.
   `limit` default 5, max 100. Seven search paths openFDA publishes on this
   endpoint are deliberately not exposed here — see
   [Migrating from 1.x](#migrating-from-1x) below.
@@ -82,7 +83,7 @@ adding a row here, not rewriting the pattern.
   `product_type`, `pharm_class`, `marketing_start_date`, `openfda.unii`,
   `openfda.rxcui`, `openfda.spl_set_id`. `detail`: `summary` (default;
   identity, packaging and marketing status), `full` (raw upstream record).
-  `count`: `dosage_form`, `route`, `product_type`, `marketing_category`,
+  `count`: `dosage_form.exact`, `route.exact`, `product_type.exact`, `marketing_category`,
   `openfda.manufacturer_name.exact`. `limit` default 5, max 50.
 - **`drug-enforcement`** — Search FDA drug recall and enforcement reports.
   `classification` is the hazard level (Class I: reasonable probability of
@@ -98,8 +99,8 @@ adding a row here, not rewriting the pattern.
   ~18% of recalls — the precise alternative to `product_description`, not
   the default). `detail`: `summary` (default; every field above except the
   three `openfda.*` names, which are bundled as one `openfda` object),
-  `full` (raw upstream record). `count`: `classification`, `status`,
-  `state`, `voluntary_mandated`, `recalling_firm.exact`. `sort`:
+  `full` (raw upstream record). `count`: `classification.exact`, `status.exact`,
+  `state.exact`, `voluntary_mandated.exact`, `recalling_firm.exact`. `sort`:
   `report_date:desc`/`report_date:asc`/`recall_initiation_date:desc`.
   `limit` default 5, max 50.
 - **`drug-orangebook`** — Search the Orange Book: FDA-approved drug products
@@ -115,12 +116,15 @@ adding a row here, not rewriting the pattern.
   `reference_listed_drug` and `reference_standard` are booleans always
   returned, `false` a fact rather than a missing value), `full` (raw
   upstream record). `count`: `products.application_type`,
-  `products.dosage_form`, `products.route`,
+  `products.dosage_form.exact`, `products.route.exact`,
   `products.therapeutic_equivalence_codes`. `sort`:
   `approval_date:desc`/`approval_date:asc`. `limit` default 5, max 50.
-- **`drug-shortages`** — Search FDA drug shortage reports. `status`
-  distinguishes a current shortage from a resolved one, so a product
-  appearing here is not necessarily short now. openFDA sends an empty
+- **`drug-shortages`** — Search FDA drug shortage reports. `status` is one of
+  three values, live-verified 2026-09-21: `Current` (1153 records),
+  `To Be Discontinued` (443), or `Resolved` (7) — a product appearing here is
+  not necessarily short now, and `To Be Discontinued` is neither "current"
+  nor "resolved" but the larger of the two non-`Current` states. openFDA
+  sends an empty
   string, not `null`, for an absent date on this endpoint; this tool
   normalises those to `null`. `field`: `generic_name` (default),
   `company_name`, `openfda.manufacturer_name`, `openfda.brand_name`,
@@ -128,19 +132,41 @@ adding a row here, not rewriting the pattern.
   `therapeutic_category`, `dosage_form`, `update_type`,
   `initial_posting_date`, `update_date`. `detail`: `summary` (default;
   the `openfda.*` names are bundled as one `openfda` object), `full` (raw
-  upstream record). `count`: `status`, `dosage_form`,
+  upstream record). `count`: `status`, `dosage_form.exact`,
   `therapeutic_category`, `company_name.exact`. `sort`:
   `update_date:desc`/`update_date:asc`/`initial_posting_date:desc`. `limit`
   default 10, max 50. Smallest drug dataset (~1,600 records); a coverage
   percentage here represents far fewer records than the same percentage
   elsewhere.
 
-Every tool reports `matched_via` (which field path actually matched) and a
-`total` that is the upstream match count, not the number of records
-returned. A search that matches nothing returns a plain no-results message,
-not an error. Every response is capped at 60,000 characters; if a result set
-would exceed that, trailing records are dropped and the response says how
-many.
+Every tool's response envelope carries `matched_via` (which field path
+actually matched), `total` (the upstream match count, not the number of
+records in this response), `returned` (how many records it does carry),
+`limit`, `dropped_for_budget` (how many rows were dropped to stay within the
+60,000-character response budget — `0` when none were, never omitted),
+`next_skip` (the offset to resume paging from; `null` when the result set is
+exhausted or the next offset would exceed `SKIP_MAX`) and `results`.
+**Page by `next_skip`, not `skip + limit`** — the budget can drop trailing
+rows, so `skip + limit` silently steps over exactly the rows that were
+dropped. A search that matches nothing returns a plain no-results message,
+not an error.
+
+`limit` means two different things depending on whether `count` is set: for
+a record search it caps rows returned, capped at that tool's `max` below;
+for an aggregation it caps buckets, defaulting to 100 (openFDA's own bucket
+ceiling) when omitted. This is an asymmetry on every tool except
+`drug-drugsfda` (whose record max is already 100): omitting `limit` under
+`count` can return up to 100 buckets, but an explicit `limit` is still
+rejected above the tool's record max — so a caller can *receive* more
+buckets than it can *explicitly request*. Record maxes: `drug-label` 25,
+`drug-event` 50, `drug-drugsfda` 100, `drug-ndc` 50, `drug-enforcement` 50,
+`drug-orangebook` 50, `drug-shortages` 50.
+
+An aggregated response is trimmed to the same 60,000-character budget as a
+record response, and reports `dropped_for_budget` for the buckets it dropped
+— `returned` counts the buckets actually kept. It carries no `next_skip`:
+an aggregation has no result total and no skip semantics, so an offset to
+resume from would be a number with nothing behind it.
 
 > **Route vocabularies differ across tools.** `drug-label`'s `route` field
 > (`openfda.route`, the SPL route of administration) and `drug-drugsfda`'s

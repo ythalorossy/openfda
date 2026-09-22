@@ -102,8 +102,8 @@ export const drugOrangebook: EndpointDescriptor = {
   sortFields: ['approval_date:desc', 'approval_date:asc'],
   countFields: [
     'products.application_type',
-    'products.dosage_form',
-    'products.route',
+    'products.dosage_form.exact',
+    'products.route.exact',
     'products.therapeutic_equivalence_codes',
   ],
   codeMaps: {},

@@ -19,6 +19,17 @@ const DEFAULT_CONFIG: RequestConfig = {
   timeout: 30000, // 30 seconds
 };
 
+/**
+ * A 5xx that is really a rejected argument. openFDA answers an
+ * un-aggregatable `count` with HTTP 500 whose body carries
+ * `illegal_argument_exception` — deterministic, so retrying it costs four
+ * requests and ~7s of backoff to reach the same rejection. The generic
+ * "retry every 5xx" rule is right for an outage and wrong for this.
+ */
+function isRejectedArgument(status: number, body: string): boolean {
+  return status >= 500 && body.includes('illegal_argument_exception');
+}
+
 // Helper function to determine if error is retryable
 function isRetryableError(error: any): boolean {
   // Network errors, timeouts, and 5xx server errors are retryable
@@ -100,6 +111,9 @@ async function makeOpenFDARequest<T>(
         }
 
         lastError = httpError;
+
+        // Deterministic: the same argument fails the same way every time.
+        if (isRejectedArgument(response.status, errorText)) break;
 
         // Don't retry client errors (4xx) except rate limiting
         if (

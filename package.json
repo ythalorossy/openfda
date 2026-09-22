@@ -1,6 +1,6 @@
 {
   "name": "@ythalorossy/openfda",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "OpenFDA Model Context Protocol",
   "repository": {
     "type": "git",
@@ -34,6 +34,7 @@
     "probe:faers-codes": "node scripts/probe-faers-codes.mjs",
     "fields:sync": "node scripts/fields-sync.mjs",
     "fields:coverage": "node scripts/fields-coverage.mjs",
+    "fields:countable": "tsx scripts/fields-countable.ts",
     "probe:fields": "tsx scripts/probe-fields.ts"
   },
   "dependencies": {

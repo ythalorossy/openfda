@@ -94,3 +94,57 @@ describe('clause builders stay inside their declared paths', () => {
     });
   }
 });
+
+describe('every countField can actually be aggregated by openFDA', () => {
+  // Countability is a property of openFDA's index mapping, not of the
+  // published field reference: a path can be published, populated, and
+  // still rejected for aggregation. It is measured by
+  // `npm run fields:countable` and committed beside the catalog.
+  //
+  // The load-bearing property here is that a MISSING entry FAILS. A guard
+  // that passed over unprobed fields would be the same hole this exists to
+  // close: at 2.0.0 all 14 broken fields passed schema validation and
+  // failed at the API.
+  for (const descriptor of DRUG_ENDPOINTS) {
+    const path = `src/catalog/drug-${descriptor.endpoint}.countable.json`;
+    const probed = JSON.parse(readFileSync(path, 'utf8')).countable as Record<string, boolean>;
+
+    for (const field of descriptor.countFields) {
+      it(`${descriptor.toolName}: "${field}" is countable`, () => {
+        expect(
+          Object.prototype.hasOwnProperty.call(probed, field),
+          `${descriptor.toolName} declares countField "${field}", which was never probed. ` +
+            `Run npm run fields:countable — an unprobed field is not a passing field.`
+        ).toBe(true);
+
+        const alternate = field.endsWith('.exact')
+          ? field.slice(0, -'.exact'.length)
+          : `${field}.exact`;
+        const hint = probed[alternate] === true ? ` Use "${alternate}" instead.` : '';
+
+        expect(
+          probed[field],
+          `${descriptor.toolName} declares countField "${field}", but openFDA rejects ` +
+            `aggregating it (measured in ${path}).${hint}`
+        ).toBe(true);
+      });
+    }
+  }
+
+  it('is actually checking something, not vacuously passing over an empty list', () => {
+    const declared = DRUG_ENDPOINTS.flatMap((d) => d.countFields);
+    expect(declared.length, 'no countFields declared anywhere').toBeGreaterThan(0);
+
+    // Prove the guard is not trivially true: a fabricated path is absent
+    // from every probed map, so a descriptor declaring it would fail the
+    // per-field checks above rather than sail through.
+    for (const descriptor of DRUG_ENDPOINTS) {
+      const probed = JSON.parse(
+        readFileSync(`src/catalog/drug-${descriptor.endpoint}.countable.json`, 'utf8')
+      ).countable as Record<string, boolean>;
+      expect(Object.prototype.hasOwnProperty.call(probed, 'definitely_not_a_real_field')).toBe(
+        false
+      );
+    }
+  });
+});

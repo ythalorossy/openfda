@@ -1,0 +1,12 @@
+{
+  "endpoint": "drugsfda",
+  "probed_at": "2026-09-21T23:11:59.906Z",
+  "countable": {
+    "products.dosage_form": false,
+    "products.dosage_form.exact": true,
+    "products.marketing_status": true,
+    "products.marketing_status.exact": false,
+    "sponsor_name": true,
+    "sponsor_name.exact": false
+  }
+}
