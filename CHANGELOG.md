@@ -43,6 +43,29 @@
   filtering on those values found nothing and could not tell that from a
   product genuinely not being short. The documented vocabulary is now the
   one the dataset actually has: `Current`, `To Be Discontinued`, `Resolved`.
+  `drug-shortages`'s own tool description — the text a model reads before it
+  ever calls the tool — now names all three; it still presented `status` as
+  "current or resolved", so a model asking for shortages that are not
+  resolved would search `status=Current` and silently miss the 443
+  `To Be Discontinued` records (27% of the dataset).
+- **An aggregated (`count`) response was not capped at all.** The record path
+  went through the 60,000-character budget; the `count` path was
+  `JSON.stringify`d straight out, and raising the bucket ceiling to 100 on
+  every tool (above) enlarged that uncapped path 100×. 100 buckets of
+  multi-ingredient FAERS generic names breach the budget comfortably. The
+  aggregated payload now goes through the same `fitToBudget` and carries
+  `dropped_for_budget`, so a trimmed aggregation says so rather than
+  arriving silently short; `returned` counts the buckets actually kept. It
+  gains no `next_skip`: an aggregation carries no result total and has no
+  skip semantics, so an offset to resume from would be meaningless.
+- `openFDA rejected this request as malformed` with no `count` set now names
+  the `sort` value when one was sent — sorting a field openFDA's index will
+  not sort is the likeliest cause of that rejection, and the message
+  previously offered no pointer at all.
+- A tool whose descriptor declares no `countFields` no longer advertises a
+  count mode on its `limit` parameter. It gets no `count` parameter and no
+  bucket clause in its description, but `limit` still said "with count set,
+  caps buckets instead".
 
 ### Added
 
@@ -54,6 +77,13 @@
   alongside the existing field-reference and populated-field checks, and
   opens an issue if openFDA remaps a field's index out from under a
   declared count field.
+- `tests/docs-currency.test.ts` now ties the docs to the code offline: every
+  place `README.md`, `CLAUDE.md` or `AGENTS.md` enumerates the response
+  envelope must enumerate all of it in `ENVELOPE_FIELDS` order, and all
+  three — plus `drug-shortages`'s own tool description — must name every
+  `status` value the descriptor declares. Three enumerations had been left
+  behind by this release's two new envelope keys, one of them in the
+  `CLAUDE.md` paragraph loaded as project instructions.
 
 ## 2.0.0
 

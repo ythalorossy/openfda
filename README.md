@@ -141,14 +141,15 @@ adding a row here, not rewriting the pattern.
 
 Every tool's response envelope carries `matched_via` (which field path
 actually matched), `total` (the upstream match count, not the number of
-records returned), `limit`, `dropped_for_budget` (how many rows were dropped
-to stay within the 60,000-character response budget — `0` when none were,
-never omitted) and `next_skip` (the offset to resume paging from; `null`
-when the result set is exhausted or the next offset would exceed
-`SKIP_MAX`). **Page by `next_skip`, not `skip + limit`** — the budget can
-drop trailing rows, so `skip + limit` silently steps over exactly the rows
-that were dropped. A search that matches nothing returns a plain no-results
-message, not an error.
+records in this response), `returned` (how many records it does carry),
+`limit`, `dropped_for_budget` (how many rows were dropped to stay within the
+60,000-character response budget — `0` when none were, never omitted),
+`next_skip` (the offset to resume paging from; `null` when the result set is
+exhausted or the next offset would exceed `SKIP_MAX`) and `results`.
+**Page by `next_skip`, not `skip + limit`** — the budget can drop trailing
+rows, so `skip + limit` silently steps over exactly the rows that were
+dropped. A search that matches nothing returns a plain no-results message,
+not an error.
 
 `limit` means two different things depending on whether `count` is set: for
 a record search it caps rows returned, capped at that tool's `max` below;
@@ -160,6 +161,12 @@ rejected above the tool's record max — so a caller can *receive* more
 buckets than it can *explicitly request*. Record maxes: `drug-label` 25,
 `drug-event` 50, `drug-drugsfda` 100, `drug-ndc` 50, `drug-enforcement` 50,
 `drug-orangebook` 50, `drug-shortages` 50.
+
+An aggregated response is trimmed to the same 60,000-character budget as a
+record response, and reports `dropped_for_budget` for the buckets it dropped
+— `returned` counts the buckets actually kept. It carries no `next_skip`:
+an aggregation has no result total and no skip semantics, so an offset to
+resume from would be a number with nothing behind it.
 
 > **Route vocabularies differ across tools.** `drug-label`'s `route` field
 > (`openfda.route`, the SPL route of administration) and `drug-drugsfda`'s
