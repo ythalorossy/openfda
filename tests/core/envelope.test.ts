@@ -55,6 +55,14 @@ describe('buildEnvelope', () => {
     expect(envelope.next_skip).toBeNull();
   });
 
+  it('returns next_skip at the SKIP_MAX boundary itself, only nulling once it would exceed it', () => {
+    // The clamp is `next > SKIP_MAX`, not `>=`: an offset exactly at the
+    // ceiling is still one execute() would accept, so it must be handed
+    // back rather than nulled.
+    const envelope = buildEnvelope('x', [{ a: 1 }], 1_000_000, 5, SKIP_MAX - 1);
+    expect(envelope.next_skip).toBe(SKIP_MAX);
+  });
+
   it('still advances when openFDA reports no total', () => {
     // total is null on an aggregation and could be absent on a record page;
     // without it, exhaustion is unknowable, so offering the next offset is

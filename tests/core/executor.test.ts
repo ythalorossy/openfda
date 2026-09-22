@@ -389,6 +389,43 @@ describe('execute: response shaping', () => {
     expect(stub.calls[0]).toContain('limit=1');
   });
 
+  it('advances next_skip past only the rows actually returned, not the rows fetched and dropped for budget', async () => {
+    // 200 records, each padded with a 500-char brand_name, render to roughly
+    // 200 * ~520 chars (JSON quoting plus the 2-space indent) ≈ 104,000
+    // characters — comfortably over the 60,000-char MAX_RESPONSE_CHARS
+    // budget regardless of exact per-record overhead, so fitToBudget is
+    // guaranteed to drop trailing rows rather than merely might.
+    const fetchedCount = 200;
+    const records = Array.from({ length: fetchedCount }, () => ({
+      openfda: { brand_name: ['X'.repeat(500)] },
+    }));
+    const stub = stubFetchResponses([
+      { body: { meta: { results: { total: 1000 } }, results: records } },
+    ]);
+    restore = stub.restore;
+
+    const result = await execute(descriptor(), {
+      value: 'Advil',
+      detail: 'summary',
+      skip: 30,
+    });
+    const text = textOf(result);
+    const envelope = JSON.parse(text.slice(text.indexOf('{')));
+
+    // The budget must actually have bitten: fewer rows survived than were
+    // fetched, and the drop count is not silently zero.
+    expect(envelope.returned).toBeLessThan(fetchedCount);
+    expect(envelope.dropped_for_budget).toBeGreaterThan(0);
+    expect(envelope.dropped_for_budget).toBe(fetchedCount - envelope.returned);
+
+    // The bug this test exists to catch: advancing by the fetched count (or
+    // by the record `limit`) would step over exactly the rows dropped for
+    // budget. Advancing by `returned` — the rows actually handed back — is
+    // the only correct offset.
+    expect(envelope.next_skip).toBe(30 + envelope.returned);
+    expect(text).toContain(`continue from offset ${envelope.next_skip}`);
+  });
+
   it('reports the bucket ceiling, since an aggregation carries no total', async () => {
     // returned === limit is the only signal a caller has that buckets were
     // cut off: openFDA sends no meta.results.total on an aggregation.
