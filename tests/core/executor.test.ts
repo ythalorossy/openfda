@@ -360,4 +360,43 @@ describe('execute: response shaping', () => {
     expect(text).toContain('"counted_by": "serious"');
     expect(text).not.toContain('"total"');
   });
+
+  it('does not cap count buckets at the record default', async () => {
+    // descriptor()'s limits.default is 1 (drug-label's real value), which
+    // made an aggregation return a single bucket under a "Top 1 values"
+    // header. limit is the record ceiling; buckets are a different quantity.
+    const stub = stubFetchResponses([
+      { body: { results: [{ term: 'ORAL', count: 9 }, { term: 'TOPICAL', count: 4 }] } },
+    ]);
+    restore = stub.restore;
+    await execute(descriptor(), { value: 'Advil', count: 'serious' });
+    expect(stub.calls[0]).toContain('limit=100');
+  });
+
+  it('lets an explicit limit cap buckets', async () => {
+    const stub = stubFetchResponses([{ body: { results: [{ term: 'ORAL', count: 9 }] } }]);
+    restore = stub.restore;
+    await execute(descriptor(), { value: 'Advil', count: 'serious', limit: 3 });
+    expect(stub.calls[0]).toContain('limit=3');
+  });
+
+  it('still uses the record default when not counting', async () => {
+    const stub = stubFetchResponses([
+      { body: { meta: { results: { total: 5 } }, results: [{ openfda: {} }] } },
+    ]);
+    restore = stub.restore;
+    await execute(descriptor(), { value: 'Advil' });
+    expect(stub.calls[0]).toContain('limit=1');
+  });
+
+  it('reports the bucket ceiling, since an aggregation carries no total', async () => {
+    // returned === limit is the only signal a caller has that buckets were
+    // cut off: openFDA sends no meta.results.total on an aggregation.
+    const stub = stubFetchResponses([
+      { body: { results: [{ term: 1, count: 812 }, { term: 2, count: 44 }] } },
+    ]);
+    restore = stub.restore;
+    const result = await execute(descriptor(), { value: 'Advil', count: 'serious', limit: 2 });
+    expect(result.content[0]!.text).toContain('"limit": 2');
+  });
 });

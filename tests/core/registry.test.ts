@@ -68,7 +68,16 @@ describe('buildInputSchema', () => {
     const parsed = schema.parse({ value: 'Advil' });
     expect(parsed.field).toBe('drug_name');
     expect(parsed.detail).toBe('summary');
-    expect(parsed.limit).toBe(1);
+  });
+
+  it('leaves limit absent so the executor can tell records from buckets', () => {
+    // A Zod .default() here made input.limit always populated, so `count`
+    // could not be given its own ceiling: drug-label's record default of 1
+    // became a one-bucket aggregation. The default is documented in
+    // .describe() and applied in execute() instead.
+    const parsed = schema.parse({ value: 'Advil' });
+    expect(parsed.limit).toBeUndefined();
+    expect(schema.shape.limit.description).toContain('100');
   });
 
   it('rejects a field outside the enum', () => {

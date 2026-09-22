@@ -20,6 +20,16 @@ import type { OpenFDAError } from '../types.js';
 /** openFDA rejects a larger offset: "Skip value must 25000 or less." */
 export const SKIP_MAX = 25000;
 
+/**
+ * openFDA's own default bucket ceiling, verified live 2026-09-21: a
+ * search-free count with no `limit` returns at most 100 terms. Stated
+ * explicitly rather than relied on implicitly.
+ *
+ * This is a generic property of openFDA aggregation, not drug knowledge, so
+ * it belongs here and not in seven descriptors.
+ */
+export const COUNT_BUCKET_DEFAULT = 100;
+
 export interface McpResult {
   content: { type: 'text'; text: string }[];
   isError?: boolean;
@@ -184,7 +194,13 @@ export async function execute(
 
   // --- query ---------------------------------------------------------------
   const filters = descriptor.extraFilters?.toClauses(input) ?? [];
-  const limit = input.limit ?? descriptor.limits.default;
+  // `limit` is openFDA's ceiling for two different quantities. For records it
+  // is rows; for an aggregation it is buckets, which is why an absent limit
+  // must stay absent all the way to here (see buildInputSchema).
+  const limit =
+    input.count !== undefined
+      ? (input.limit ?? COUNT_BUCKET_DEFAULT)
+      : (input.limit ?? descriptor.limits.default);
 
   let hit: { set: ClauseSet; data: UpstreamPage } | null = null;
   let lastError: OpenFDAError | null = null;
@@ -253,6 +269,9 @@ export async function execute(
       matched_via: hit.set.matched_via,
       counted_by: input.count,
       returned: rows.length,
+      // An aggregation carries no total, so `returned === limit` is the only
+      // signal available that buckets were cut off.
+      limit,
       results: rows,
     };
     return succeed(

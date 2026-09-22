@@ -7,6 +7,7 @@ import type { EndpointDescriptor } from './descriptor.js';
 import { validateDescriptor } from './descriptor.js';
 import {
   execute,
+  COUNT_BUCKET_DEFAULT,
   SKIP_MAX,
   type ExecuteInput,
   type McpResult,
@@ -99,14 +100,21 @@ export function buildInputSchema(
       .default(descriptor.defaultField ?? fieldNames[0]!)
       .describe(`Field: ${fieldList}`),
     value: z.string().min(1).describe('Search value.'),
+    // No .default(): `execute` must be able to tell an explicit limit from
+    // an absent one, because `count` needs its own ceiling. openFDA counts
+    // buckets with the same `limit` parameter it pages records with, and the
+    // two want different defaults — drug-label's record default of 1 turned
+    // every aggregation into a single bucket.
     limit: z
       .number()
       .int()
       .min(1)
       .max(descriptor.limits.max)
       .optional()
-      .default(descriptor.limits.default)
-      .describe('Max records to return.'),
+      .describe(
+        `Max records to return (default ${descriptor.limits.default}); ` +
+          `with count set, caps buckets instead (default ${COUNT_BUCKET_DEFAULT}).`
+      ),
     skip: z
       .number()
       .int()
