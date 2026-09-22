@@ -69,13 +69,22 @@ export function buildDescription(descriptor: EndpointDescriptor): string {
       ? ` Order with sort (${descriptor.sortFields.join(', ')}); default order is a deterministic slice.`
       : '';
 
+  // Gated the same way `counting` above is: a descriptor with no
+  // countFields gets no `count` parameter at all (see buildInputSchema), so
+  // this tool has no bucket mode for the always-loaded description to
+  // describe.
+  const countLimit =
+    descriptor.countFields.length > 0
+      ? `with count set, ${COUNT_BUCKET_DEFAULT} buckets unless limit is given; `
+      : '';
+
   return (
     `${descriptor.summary} Search one field at a time: field + value. ` +
     `Always returns ${ENVELOPE_FIELDS.join(', ')}; total is the upstream match count, not the number returned. ` +
     `detail selects the record shape: ${details}` +
     `${counting}${sorting} ` +
     `Limit max ${descriptor.limits.max} (default ${descriptor.limits.default}); ` +
-    `with count set, ${COUNT_BUCKET_DEFAULT} buckets unless limit is given; skip max ${SKIP_MAX}.`
+    `${countLimit}skip max ${SKIP_MAX}.`
   );
 }
 

@@ -60,6 +60,20 @@ describe('buildDescription', () => {
     // top of the field parameter blew the per-tool budget.
     expect(description).not.toContain('drug_name');
   });
+
+  it('omits the count-mode bucket clause for a descriptor with no countFields', () => {
+    // The bucket-default clause must be gated the same way `counting` (the
+    // "Set count to rank by frequency..." sentence) and the `count`
+    // parameter itself are: a descriptor with no countFields has no count
+    // mode at all, so advertising a bucket default for it would tell the
+    // same false story Finding 2 fixed, just inverted.
+    const description = buildDescription({ ...descriptor, countFields: [] });
+    expect(description).not.toContain('buckets');
+    expect(description).not.toContain('with count set');
+    // The limit and skip text must still be present, unconditionally.
+    expect(description).toContain(`Limit max ${descriptor.limits.max}`);
+    expect(description).toContain('skip max');
+  });
 });
 
 describe('buildInputSchema', () => {
