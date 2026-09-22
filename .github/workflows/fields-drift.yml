@@ -36,7 +36,13 @@ jobs:
           # fetched_at changes every run, so compare only the field lists.
           changed=0
           for f in src/catalog/drug-*.json; do
-            case "$f" in *.coverage.json) continue;; esac
+            # Only the published field references have a .fields array: the
+            # coverage and countability files are different shapes, and
+            # reading one here would throw a TypeError and be reported as a
+            # phantom drift. (Harmless today only because fields:countable
+            # runs later in this job — an order this guard must not depend
+            # on.)
+            case "$f" in *.coverage.json|*.countable.json) continue;; esac
             if ! git diff --quiet -- "$f"; then
               node -e '
                 const { execSync } = require("child_process");

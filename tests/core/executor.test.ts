@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { execute } from '../../src/core/executor';
 import type { EndpointDescriptor } from '../../src/core/descriptor';
+import { MAX_RESPONSE_CHARS } from '../../src/core/shape/budget';
 import { stubFetchResponses } from '../helpers/stubFetchResponses';
 
 let restore = () => {};
@@ -424,6 +425,58 @@ describe('execute: response shaping', () => {
     // the only correct offset.
     expect(envelope.next_skip).toBe(30 + envelope.returned);
     expect(text).toContain(`continue from offset ${envelope.next_skip}`);
+  });
+
+  it('trims an aggregated response to the budget and says how many buckets it dropped', async () => {
+    // 100 buckets is what COUNT_BUCKET_DEFAULT now asks openFDA for on every
+    // tool, and an 800-character term is not a contrivance: aggregating
+    // FAERS generic names returns concatenated multi-ingredient strings that
+    // run to hundreds of characters. 100 * ~850 ≈ 85,000 characters, so the
+    // 60,000-char budget is guaranteed to bite rather than merely might.
+    const fetched = 100;
+    const buckets = Array.from({ length: fetched }, (_, index) => ({
+      term: `${'INGREDIENT '.repeat(72)}${index}`,
+      count: fetched - index,
+    }));
+    const stub = stubFetchResponses([{ body: { results: buckets } }]);
+    restore = stub.restore;
+
+    const result = await execute(descriptor(), { value: 'Advil', count: 'serious' });
+    const text = textOf(result);
+    const payload = JSON.parse(text.slice(text.indexOf('{')));
+
+    // Before 2.0.1 this payload was JSON.stringify'd with no budget at all:
+    // the record branch was capped and this one was not.
+    expect(payload.dropped_for_budget).toBeGreaterThan(0);
+    expect(payload.returned).toBe(payload.results.length);
+    expect(payload.returned).toBe(fetched - payload.dropped_for_budget);
+    expect(payload.returned).toBeLessThan(fetched);
+    // `limit` still reports the ceiling asked of openFDA, not what survived.
+    expect(payload.limit).toBe(100);
+    // An aggregation has no total and no skip semantics, so it gets no
+    // next_skip — deliberately, not by omission.
+    expect(payload.next_skip).toBeUndefined();
+    expect(text).toContain(
+      `${payload.dropped_for_budget} omitted to stay within the response budget`
+    );
+    expect(text).toContain(`Top ${payload.returned} values`);
+
+    // The payload itself is what the budget governs; the one-line prose
+    // header sits outside it, exactly as it does on the record path.
+    const json = text.slice(text.indexOf('{'));
+    expect(json.length).toBeLessThanOrEqual(MAX_RESPONSE_CHARS);
+    expect(text.length).toBeLessThanOrEqual(MAX_RESPONSE_CHARS + 200);
+  });
+
+  it('leaves dropped_for_budget at 0 on an aggregation that fits', async () => {
+    const stub = stubFetchResponses([
+      { body: { results: [{ term: 1, count: 812 }, { term: 2, count: 44 }] } },
+    ]);
+    restore = stub.restore;
+    const result = await execute(descriptor(), { value: 'Advil', count: 'serious' });
+    const text = textOf(result);
+    expect(text).toContain('"dropped_for_budget": 0');
+    expect(text).not.toContain('omitted to stay within the response budget');
   });
 
   it('reports the bucket ceiling, since an aggregation carries no total', async () => {

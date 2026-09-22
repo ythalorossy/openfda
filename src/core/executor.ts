@@ -13,7 +13,7 @@ import { fetchPage } from './http.js';
 import { applyProjection } from './shape/project.js';
 import { buildEnvelope } from './shape/envelope.js';
 import { fitToBudget } from './shape/budget.js';
-import { decodeTerm } from './codes.js';
+import { decodeTerm, type DecodedTerm } from './codes.js';
 import { summarizeResults } from '../utils/format.js';
 import { SKIP_MAX } from './paging.js';
 import type { OpenFDAError } from '../types.js';
@@ -93,8 +93,16 @@ function badArgumentText(
   detail: string
 ): string {
   if (input.count === undefined) {
+    // Without `count`, `sort` is the likeliest source of an
+    // illegal_argument_exception — openFDA raises it for a field its index
+    // will not sort — so name it. Named, not blamed: nothing here proves it
+    // was the refused parameter.
     return (
       `openFDA rejected this ${descriptor.toolName} request as malformed: ${detail}\n\n` +
+      (input.sort !== undefined
+        ? `sort "${input.sort}" was sent and is declared sortable by this tool; check it ` +
+          "against openFDA's current index first. "
+        : '') +
       'This indicates a defect in the tool, not a problem with your input.'
     );
   }
@@ -129,7 +137,8 @@ function badArgumentText(
 /**
  * The one request pipeline. Every endpoint tool is this function plus a
  * descriptor, which is why escaping, parenthesisation, the skip ceiling, the
- * response budget and the four error outcomes cannot vary between tools.
+ * response budget and the five outcomes (hit, miss, rejected argument,
+ * upstream error, input error) cannot vary between tools.
  */
 export async function execute(
   descriptor: EndpointDescriptor,
@@ -263,18 +272,45 @@ export async function execute(
       ...decodeTerm(descriptor.codeMaps, input.count as string, row.term),
       count: row.count,
     }));
-    const payload = {
-      matched_via: hit.set.matched_via,
-      counted_by: input.count,
-      returned: rows.length,
-      // An aggregation carries no total, so `returned === limit` is the only
-      // signal available that buckets were cut off.
-      limit,
-      results: rows,
-    };
+    const countedVia = hit.set.matched_via;
+    // Aggregations go through the same budget as records, for the same
+    // reason: `COUNT_BUCKET_DEFAULT` raised the ceiling to 100 buckets on
+    // every tool, and a FAERS generic-name term is routinely hundreds of
+    // characters, so 100 of them breach 60,000. `fitToBudget` re-renders with
+    // successively smaller slices and keeps the last render, so `returned`
+    // and the drop count must be computed from the slice this invocation was
+    // handed — not from `rows` — or they describe a payload that was thrown
+    // away.
+    //
+    // It gains `dropped_for_budget` and NOT `next_skip`: capping without
+    // reporting is the defect class this release exists to close, but an
+    // aggregation has no result total and no skip semantics, so an offset to
+    // resume from would be a number with no meaning behind it.
+    const renderCount = (kept: readonly (DecodedTerm & { count: number })[]) =>
+      JSON.stringify(
+        {
+          matched_via: countedVia,
+          counted_by: input.count,
+          returned: kept.length,
+          // An aggregation carries no total, so `returned === limit` is the
+          // only signal available that buckets were cut off upstream.
+          limit,
+          dropped_for_budget: rows.length - kept.length,
+          results: kept,
+        },
+        null,
+        2
+      );
+
+    const { text, kept, dropped } = fitToBudget(rows, renderCount);
+
     return succeed(
-      `Top ${rows.length} values of ${input.count} for "${value}" ` +
-        `(aggregated responses carry no result total)\n\n${JSON.stringify(payload, null, 2)}`
+      `Top ${kept} values of ${input.count} for "${value}" ` +
+        `(aggregated responses carry no result total)` +
+        (dropped > 0
+          ? ` — ${dropped} omitted to stay within the response budget`
+          : '') +
+        `\n\n${text}`
     );
   }
 

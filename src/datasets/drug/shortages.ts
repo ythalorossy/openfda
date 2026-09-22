@@ -70,8 +70,9 @@ export const drugShortages: EndpointDescriptor = {
   endpoint: 'shortages',
   toolName: 'drug-shortages',
   summary:
-    'Search FDA drug shortage reports. status distinguishes a current shortage from a resolved ' +
-    'one, so a product appearing here is not necessarily short now — always read status and ' +
+    'Search FDA drug shortage reports. status is Current, To Be Discontinued or Resolved — ' +
+    '"To Be Discontinued" is 27% of records and is neither current nor resolved — so a product ' +
+    'appearing here is not necessarily short now; always read status and ' +
     'update_date. openFDA sends an empty string, not null, for an absent date on this endpoint; ' +
     'this tool normalises those to null. Smallest drug dataset (~1,600 records), so a coverage ' +
     'percentage here represents far fewer records than the same percentage elsewhere.',

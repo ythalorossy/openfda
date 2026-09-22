@@ -122,11 +122,13 @@ describe('buildInputSchema', () => {
 
   it('known, accepted asymmetry: an explicit limit under count is still rejected above the record ceiling, even though the unset bucket default (100) exceeds it', () => {
     // Documented in docs/superpowers/specs/2026-09-21-2.0.1-count-and-paging-design.md
-    // ("Known asymmetry, documented not fixed"): lifting this cap only under
-    // count would need a second always-loaded schema parameter, rejected
-    // against the schema-budget ceiling. This pins the current, intentional
-    // behaviour so a future change to it is a deliberate decision, not a
-    // silent drift.
+    // ("Known asymmetry, documented not fixed", plus its 2026-09-21
+    // addendum): the asymmetry is parked because the default path is already
+    // the good one — NOT because the alternative was priced and refused.
+    // Enforcing the record cap as a cross-field check in execute() would
+    // need no second schema parameter and cost no always-loaded budget. This
+    // pins the current, intentional behaviour so a future change to it is a
+    // deliberate decision, not a silent drift.
     expect(() => schema.parse({ value: 'Advil', count: 'openfda.route', limit: 50 })).toThrow();
   });
 
@@ -138,6 +140,19 @@ describe('buildInputSchema', () => {
     const bare = buildInputSchema({ ...descriptor, sortFields: [], countFields: [] });
     expect('sort' in bare.shape).toBe(false);
     expect('count' in bare.shape).toBe(false);
+  });
+
+  it("omits the bucket mode from limit's own description when there are no countFields", () => {
+    // buildDescription's bucket clause was gated on countFields but this
+    // one was not, so a tool with no `count` parameter still advertised a
+    // count mode on the parameter a caller actually reads — the same false
+    // story, one parameter further down.
+    const bare = buildInputSchema({ ...descriptor, countFields: [] });
+    const described = bare.shape.limit!.description ?? '';
+    expect(described).toContain(`default ${descriptor.limits.default}`);
+    expect(described).not.toContain('buckets');
+    expect(described).not.toContain('count');
+    expect(described).not.toContain(String(COUNT_BUCKET_DEFAULT));
   });
 });
 

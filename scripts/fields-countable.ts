@@ -1,10 +1,5 @@
 #!/usr/bin/env tsx
 /*
- * Copyright (c) 2025 Ythalo Saldanha
- * Licensed under the MIT License
- */
-
-/*
  * For every countField every descriptor declares, and for its suffix
  * alternate, asks openFDA whether the path can actually be aggregated.
  * Hits the live API; NOT part of npm test.

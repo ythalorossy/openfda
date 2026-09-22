@@ -123,9 +123,15 @@ export function buildInputSchema(
       .min(1)
       .max(descriptor.limits.max)
       .optional()
+      // Gated exactly as `counting` and `countLimit` in buildDescription
+      // are, and for the same reason: a descriptor with no countFields gets
+      // no `count` parameter below, so advertising a bucket mode on its
+      // `limit` describes a mode this tool does not have.
       .describe(
-        `Max records to return (default ${descriptor.limits.default}); ` +
-          `with count set, caps buckets instead (default ${COUNT_BUCKET_DEFAULT}).`
+        `Max records to return (default ${descriptor.limits.default})` +
+          (descriptor.countFields.length > 0
+            ? `; with count set, caps buckets instead (default ${COUNT_BUCKET_DEFAULT}).`
+            : '.')
       ),
     skip: z
       .number()
