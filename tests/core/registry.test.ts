@@ -44,7 +44,15 @@ describe('buildDescription', () => {
 
   it('names the envelope keys it always returns', () => {
     const description = buildDescription(descriptor);
-    for (const key of ['matched_via', 'total', 'returned', 'limit', 'results']) {
+    for (const key of [
+      'matched_via',
+      'total',
+      'returned',
+      'limit',
+      'dropped_for_budget',
+      'next_skip',
+      'results',
+    ]) {
       expect(description).toContain(key);
     }
   });

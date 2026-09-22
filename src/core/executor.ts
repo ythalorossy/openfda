@@ -15,10 +15,8 @@ import { buildEnvelope } from './shape/envelope.js';
 import { fitToBudget } from './shape/budget.js';
 import { decodeTerm } from './codes.js';
 import { summarizeResults } from '../utils/format.js';
+import { SKIP_MAX } from './paging.js';
 import type { OpenFDAError } from '../types.js';
-
-/** openFDA rejects a larger offset: "Skip value must 25000 or less." */
-export const SKIP_MAX = 25000;
 
 /**
  * openFDA's own default bucket ceiling, verified live 2026-09-21: a
@@ -287,12 +285,21 @@ export async function execute(
 
   const render = (rows: readonly Record<string, unknown>[]): string =>
     JSON.stringify(
-      buildEnvelope(matchedVia, [...rows], total, limit, input.skip),
+      buildEnvelope(
+        matchedVia,
+        [...rows],
+        total,
+        limit,
+        input.skip,
+        projected.length - rows.length
+      ),
       null,
       2
     );
 
   const { text, kept, dropped } = fitToBudget(projected, render);
+
+  const nextSkip = JSON.parse(text).next_skip as number | null;
 
   const header =
     summarizeResults(
@@ -303,7 +310,8 @@ export async function execute(
     (input.skip !== undefined ? `, starting at offset ${input.skip}` : '') +
     (dropped > 0
       ? ` (${dropped} omitted to stay within the response budget)`
-      : '');
+      : '') +
+    (nextSkip !== null ? ` — continue from offset ${nextSkip}` : '');
 
   return succeed(`${header}\n\n${text}`);
 }

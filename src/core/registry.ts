@@ -8,10 +8,10 @@ import { validateDescriptor } from './descriptor.js';
 import {
   execute,
   COUNT_BUCKET_DEFAULT,
-  SKIP_MAX,
   type ExecuteInput,
   type McpResult,
 } from './executor.js';
+import { SKIP_MAX } from './paging.js';
 import type { ToolManager } from '../ToolManager.js';
 
 /** Keys every endpoint's record response carries. */
@@ -20,6 +20,8 @@ export const ENVELOPE_FIELDS = [
   'total',
   'returned',
   'limit',
+  'dropped_for_budget',
+  'next_skip',
   'results',
 ] as const;
 
