@@ -17,6 +17,7 @@ import { declaredPaths } from '../src/core/search/strategy.js';
 
 const API_KEY = process.env.OPENFDA_API_KEY;
 const PAUSE_MS = 260;
+const RETRY_DELAY_MS = 1000;
 const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -42,6 +43,32 @@ async function existsCount(
   return body?.meta?.results?.total ?? 0;
 }
 
+// A failed count is never recorded as 0 — that would be indistinguishable
+// from a field openFDA genuinely never populates, and a falsely-zeroed field
+// would be silently dropped when a later task selects fields from this data,
+// with no downstream check able to notice. One retry absorbs a single
+// transient blip (429/500/timeout); a second failure aborts the whole run
+// loudly rather than writing coverage that looks like real data.
+async function existsCountWithRetry(
+  dataset: string,
+  endpoint: string,
+  path: string
+): Promise<number> {
+  try {
+    return await existsCount(dataset, endpoint, path);
+  } catch (firstError) {
+    console.error(
+      `  ${path}: ${(firstError as Error).message} — retrying once`
+    );
+    await sleep(RETRY_DELAY_MS);
+    try {
+      return await existsCount(dataset, endpoint, path);
+    } catch (secondError) {
+      throw new Error(`${(secondError as Error).message}`);
+    }
+  }
+}
+
 async function main(): Promise<void> {
   let failures = 0;
   for (const descriptor of DRUG_ENDPOINTS) {
@@ -55,7 +82,7 @@ async function main(): Promise<void> {
     for (const path of paths) {
       await sleep(PAUSE_MS);
       try {
-        const docs = await existsCount(
+        const docs = await existsCountWithRetry(
           descriptor.dataset,
           descriptor.endpoint,
           path
